@@ -46,15 +46,21 @@ export default function PaymentPage() {
       ]
     };
     
-    orderService.update(order.id, updates);
-    
-    // Update associated submission to PROCESSED
-    if (order.submissionId) {
-      submissionService.updateStatus(order.submissionId, 'PROCESSED');
+    try {
+      await orderService.update(order.id, updates);
+
+      // Update associated submission to PROCESSED
+      if (order.submissionId) {
+        await submissionService.updateStatus(order.submissionId, 'PROCESSED');
+      }
+
+      setIsPaying(false);
+      setPaymentSuccess(true);
+    } catch (error) {
+      console.error('Failed to process payment:', error);
+      alert('操作失敗');
+      setIsPaying(false);
     }
-    
-    setIsPaying(false);
-    setPaymentSuccess(true);
   };
 
   if (loading) {

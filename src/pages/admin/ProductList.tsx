@@ -36,7 +36,7 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validate orderCode
     if (!editedProduct.orderCode || editedProduct.orderCode.trim() === '') {
       setOrderCodeError('訂單代碼為必填欄位');
@@ -48,7 +48,7 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
       setOrderCodeError('訂單代碼必須為 3 碼大寫英文字母');
       return;
     }
-    
+
     // Check uniqueness
     const allProducts = productService.getAll();
     const isDuplicate = allProducts.some(p => p.id !== editedProduct.id && p.orderCode === code);
@@ -56,15 +56,22 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
       setOrderCodeError('此訂單代碼已與其他產品重複');
       return;
     }
-    
+
     // Update to uppercase
     editedProduct.orderCode = code;
 
     setOrderCodeError('');
     setIsSaving(true);
-    productService.update(editedProduct.id, editedProduct);
-    onSave();
-    onClose();
+    try {
+      await productService.update(editedProduct.id, editedProduct);
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('儲存產品失敗:', error);
+      alert('操作失敗');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateProductField = (field: string, value: any) => {
@@ -566,10 +573,15 @@ export default function ProductList() {
     setLoading(false);
   };
 
-  const handleAddProduct = () => {
-    const newProduct = productService.create({ name: '新產品' });
-    loadProducts();
-    setEditingProduct(newProduct);
+  const handleAddProduct = async () => {
+    try {
+      const newProduct = await productService.create({ name: '新產品' });
+      loadProducts();
+      setEditingProduct(newProduct);
+    } catch (error) {
+      console.error('新增產品失敗:', error);
+      alert('操作失敗');
+    }
   };
 
   const existingCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[];

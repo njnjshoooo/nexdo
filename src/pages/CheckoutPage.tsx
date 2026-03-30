@@ -36,8 +36,9 @@ export default function CheckoutPage() {
 
     // 模擬訂單生成
     setTimeout(async () => {
+      try {
       const mainProductId = cartItems[0]?.pageId || 'unknown';
-      const orderId = orderService.generateOrderId(mainProductId);
+      const orderId = await orderService.generateOrderId(mainProductId);
 
       const newOrder: Order = {
         id: orderId,
@@ -61,7 +62,7 @@ export default function CheckoutPage() {
       };
 
       // 存入 localStorage
-      orderService.create(newOrder);
+      await orderService.create(newOrder);
 
       // 如果有登入，更新使用者資料
       if (user) {
@@ -86,6 +87,11 @@ export default function CheckoutPage() {
       
       // 跳轉至成功頁面
       navigate('/checkout-success', { state: { orderId: newOrder.id } });
+      } catch (error) {
+        console.error('Failed to create order:', error);
+        alert('操作失敗');
+        setLoading(false);
+      }
     }, 1500);
   };
 

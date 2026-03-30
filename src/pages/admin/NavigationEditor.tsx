@@ -169,11 +169,17 @@ export default function NavigationEditor() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    navigationService.updateSettings({ items });
-    setToast('導覽列設定已儲存');
-    setIsSaving(false);
-    setTimeout(() => setToast(null), 2000);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      await navigationService.updateSettings({ items });
+      setToast('導覽列設定已儲存');
+    } catch (error) {
+      console.error('儲存導覽列失敗:', error);
+      alert('操作失敗');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setToast(null), 2000);
+    }
   };
 
   return (

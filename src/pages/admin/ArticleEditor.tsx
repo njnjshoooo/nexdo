@@ -110,10 +110,10 @@ export default function ArticleEditor() {
     setSaveStatus('saving');
     try {
       if (isNew) {
-        const newArticle = articleService.create(data);
+        const newArticle = await articleService.create(data);
         navigate(`/admin/articles/${newArticle.slug}`, { replace: true });
       } else {
-        articleService.update(data.id, data);
+        await articleService.update(data.id, data);
         if (urlSlug !== data.slug) {
           navigate(`/admin/articles/${data.slug}`, { replace: true });
         }

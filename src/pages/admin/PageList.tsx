@@ -26,10 +26,15 @@ export default function PageList() {
     });
   }, [pages, searchTerm, filterTemplate]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('確定要刪除此頁面嗎？此動作無法復原。')) {
-      if (pageService.delete(id)) {
-        setPages(pageService.getAll());
+      try {
+        if (await pageService.delete(id)) {
+          setPages(pageService.getAll());
+        }
+      } catch (error) {
+        console.error('刪除頁面失敗:', error);
+        alert('操作失敗');
       }
     }
   };

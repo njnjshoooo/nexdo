@@ -11,10 +11,15 @@ export default function ArticleList() {
     setArticles(articleService.getAll());
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('確定要刪除此文章嗎？此動作無法復原。')) {
-      if (articleService.delete(id)) {
-        setArticles(articleService.getAll());
+      try {
+        if (await articleService.delete(id)) {
+          setArticles(articleService.getAll());
+        }
+      } catch (error) {
+        console.error('刪除文章失敗:', error);
+        alert('操作失敗');
       }
     }
   };

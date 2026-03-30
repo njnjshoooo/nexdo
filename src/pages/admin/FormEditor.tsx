@@ -43,9 +43,9 @@ export default function FormEditor() {
     setIsSaving(true);
     try {
       if (isEditing && id) {
-        formService.update(id, form as any);
+        await formService.update(id, form as any);
       } else {
-        formService.create(form as any);
+        await formService.create(form as any);
       }
       
       // Simulate delay for feedback

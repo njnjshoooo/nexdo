@@ -24,10 +24,15 @@ export default function FormList() {
     setSubmissions(all);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('確定要刪除此表單嗎？刪除後無法復原。')) {
-      formService.delete(id);
-      setForms(formService.getAll());
+      try {
+        await formService.delete(id);
+        setForms(formService.getAll());
+      } catch (error) {
+        console.error('刪除表單失敗:', error);
+        alert('操作失敗');
+      }
     }
   };
 

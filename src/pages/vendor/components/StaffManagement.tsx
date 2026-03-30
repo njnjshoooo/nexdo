@@ -18,8 +18,9 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
     loadData();
   }, [vendor.id]);
 
-  const loadData = () => {
-    setStaffList(staffService.getAll(vendor.id));
+  const loadData = async () => {
+    const staff = await staffService.getAll(vendor.id);
+    setStaffList(staff);
   };
 
   const calculateAge = (birthDate: string) => {
@@ -34,34 +35,39 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
     return age;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.phone || !formData.email || !formData.birthDate || !formData.gender) {
       alert('請填寫所有必填欄位');
       return;
     }
 
-    if (selectedStaff) {
-      staffService.update(selectedStaff.id, formData);
-    } else {
-      staffService.create({
-        vendorId: vendor.id,
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        birthDate: formData.birthDate,
-        gender: formData.gender as 'MALE' | 'FEMALE' | 'OTHER',
-        photoUrl: formData.photoUrl || '',
-        hasPoliceRecord: formData.hasPoliceRecord || false
-      });
-    }
+    try {
+      if (selectedStaff) {
+        await staffService.update(selectedStaff.id, formData);
+      } else {
+        await staffService.create({
+          vendorId: vendor.id,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          birthDate: formData.birthDate,
+          gender: formData.gender as 'MALE' | 'FEMALE' | 'OTHER',
+          photoUrl: formData.photoUrl || '',
+          hasPoliceRecord: formData.hasPoliceRecord || false
+        });
+      }
 
-    setIsEditing(false);
-    setSelectedStaff(null);
-    setFormData({});
-    loadData();
+      setIsEditing(false);
+      setSelectedStaff(null);
+      setFormData({});
+      loadData();
+    } catch (error) {
+      console.error('Failed to save staff:', error);
+      alert('操作失敗');
+    }
   };
 
-  const handleDelete = (staff: Staff) => {
+  const handleDelete = async (staff: Staff) => {
     // Check if staff has active orders
     const allOrders = orderService.getAll();
     const hasActiveOrders = allOrders.some(
@@ -74,8 +80,13 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
     }
 
     if (window.confirm(`確定要刪除服務人員 ${staff.name} 嗎？`)) {
-      staffService.delete(staff.id);
-      loadData();
+      try {
+        await staffService.delete(staff.id);
+        loadData();
+      } catch (error) {
+        console.error('Failed to delete staff:', error);
+        alert('操作失敗');
+      }
     }
   };
 

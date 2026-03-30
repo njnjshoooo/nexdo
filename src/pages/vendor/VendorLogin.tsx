@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Briefcase, Building2, User, Phone, Mail, MapPin, FileText, ArrowLeft } from 'lucide-react';
+import { vendorService } from '../../services/vendorService';
 
 export default function VendorLogin() {
   const [activeTab, setActiveTab] = useState<'join' | 'login'>('join');
@@ -24,66 +25,35 @@ export default function VendorLogin() {
     motivation: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setIsLoggingIn(true);
 
-    const defaultVendors = [
-      {
-        id: 'tidyman',
-        name: '居家整聊室',
-        taxId: '88888888',
-        type: '居家整聊',
-        contactName: '賴芝芝',
-        jobTitle: '課程顧問',
-        phone: '02-8888-8888',
-        extension: '888',
-        address: '台北市信義區松德路',
-        account: 'tidyman@tidyman.com',
-        password: '888888',
-        status: 'active',
-        certifications: [],
-        billingCycle: 'monthly',
-        createdAt: '2026-01-01T00:00:00Z',
-        updatedAt: '2026-01-01T00:00:00Z',
-      },
-      {
-        id: 'hobbystudio',
-        name: '習慣健康國際',
-        taxId: '82977822',
-        type: '樂齡健康',
-        contactName: '林阿茹',
-        jobTitle: '課程顧問',
-        phone: '02-2222-2222',
-        extension: '222',
-        address: '台北市大同區長安西路',
-        account: 'hobbystudio@hobbystudio.com',
-        password: '222222',
-        status: 'active',
-        certifications: [],
-        billingCycle: 'monthly',
-        createdAt: '2026-03-24T00:00:00Z',
-        updatedAt: '2026-03-24T00:00:00Z',
-      }
-    ];
+    try {
+      const vendor = await vendorService.login(account, password);
 
-    const storedVendors = localStorage.getItem('vendors');
-    const vendors = storedVendors ? JSON.parse(storedVendors) : defaultVendors;
-    
-    const vendor = vendors.find((v: any) => v.account === account && v.password === password);
-    
-    if (vendor) {
-      if (vendor.status !== 'active') {
-        setLoginError('您的帳號目前非合作狀態，請聯繫管理員。');
+      if (vendor) {
+        if (vendor.status !== 'active') {
+          setLoginError('您的帳號目前非合作狀態，請聯繫管理員。');
+          setIsLoggingIn(false);
+          return;
+        }
+        // Store logged in vendor info
+        localStorage.setItem('currentVendor', JSON.stringify(vendor));
+        navigate(`/vendor/${vendor.id}`);
         return;
       }
-      // Store logged in vendor info
-      localStorage.setItem('currentVendor', JSON.stringify(vendor));
-      navigate(`/vendor/${vendor.id}`);
-      return;
+
+      setLoginError('帳號或密碼錯誤');
+    } catch (err) {
+      console.error('Vendor login error:', err);
+      setLoginError('登入失敗，請稍後再試。');
+    } finally {
+      setIsLoggingIn(false);
     }
-    
-    setLoginError('帳號或密碼錯誤');
   };
 
   const handleJoinSubmit = (e: React.FormEvent) => {
@@ -323,9 +293,10 @@ export default function VendorLogin() {
 
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                disabled={isLoggingIn}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
               >
-                登入
+                {isLoggingIn ? '登入中...' : '登入'}
               </button>
             </form>
           )}

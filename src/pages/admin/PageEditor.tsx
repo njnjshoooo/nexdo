@@ -104,12 +104,12 @@ export default function PageEditor() {
     try {
       if (isNew) {
         // 💡 修正：新增頁面時呼叫 create
-        const newPage = pageService.create(data.title, data.template);
+        const newPage = await pageService.create(data.title, data.template);
         // 更新新頁面的內容
-        pageService.update(newPage.id, { ...data, id: newPage.id });
+        await pageService.update(newPage.id, { ...data, id: newPage.id });
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
       } else {
-        pageService.update(data.id, data);
+        await pageService.update(data.id, data);
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }

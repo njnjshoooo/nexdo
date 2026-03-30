@@ -56,29 +56,35 @@ export default function OrderDetail() {
     }
   }, [feedback]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!order) return;
     setSaving(true);
-    
-    // If status is changed to a paid status and paidAt is not set, set it
-    let updatedPaidAt = order.paidAt;
-    if (status !== 'UNPAID' && status !== 'CANCELLED' && !order.paidAt) {
-      updatedPaidAt = new Date().toISOString();
-    } else if (status === 'UNPAID') {
-      updatedPaidAt = undefined;
-    }
 
-    orderService.update(order.id, {
-      customerServiceNotes,
-      customerInfo,
-      paidAt: updatedPaidAt
-    });
-    
-    // Update local state to reflect changes immediately
-    setOrder(prev => prev ? { ...prev, customerServiceNotes, customerInfo, paidAt: updatedPaidAt } : null);
-    
-    setSaving(false);
-    setFeedback({ type: 'success', message: '儲存成功' });
+    try {
+      // If status is changed to a paid status and paidAt is not set, set it
+      let updatedPaidAt = order.paidAt;
+      if (status !== 'UNPAID' && status !== 'CANCELLED' && !order.paidAt) {
+        updatedPaidAt = new Date().toISOString();
+      } else if (status === 'UNPAID') {
+        updatedPaidAt = undefined;
+      }
+
+      await orderService.update(order.id, {
+        customerServiceNotes,
+        customerInfo,
+        paidAt: updatedPaidAt
+      });
+
+      // Update local state to reflect changes immediately
+      setOrder(prev => prev ? { ...prev, customerServiceNotes, customerInfo, paidAt: updatedPaidAt } : null);
+
+      setFeedback({ type: 'success', message: '儲存成功' });
+    } catch (error) {
+      console.error('儲存訂單失敗:', error);
+      setFeedback({ type: 'error', message: '操作失敗' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCustomerInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -110,77 +116,97 @@ export default function OrderDetail() {
     return statusMap[status] || status;
   };
 
-  const handleDispatch = () => {
+  const handleDispatch = async () => {
     if (!vendorId) {
       setFeedback({ type: 'error', message: '請先選擇要指派的廠商！' });
       return;
     }
-    
-    const newUpdate = {
-      status: 'PENDING' as const,
-      timestamp: new Date().toISOString(),
-      note: `管理員指派廠商: ${vendors.find(v => v.id === vendorId)?.name || vendorId}`
-    };
 
-    const updates = { 
-      vendorId,
-      status: 'PENDING' as const,
-      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-    };
+    try {
+      const newUpdate = {
+        status: 'PENDING' as const,
+        timestamp: new Date().toISOString(),
+        note: `管理員指派廠商: ${vendors.find(v => v.id === vendorId)?.name || vendorId}`
+      };
 
-    orderService.update(order!.id, updates);
-    setOrder(prev => prev ? { ...prev, ...updates } : null);
-    setStatus('PENDING');
-    setFeedback({ type: 'success', message: '任務已成功派發！' });
+      const updates = {
+        vendorId,
+        status: 'PENDING' as const,
+        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+      };
+
+      await orderService.update(order!.id, updates);
+      setOrder(prev => prev ? { ...prev, ...updates } : null);
+      setStatus('PENDING');
+      setFeedback({ type: 'success', message: '任務已成功派發！' });
+    } catch (error) {
+      console.error('派發任務失敗:', error);
+      setFeedback({ type: 'error', message: '操作失敗' });
+    }
   };
 
-  const handleApproveClosure = () => {
-    const newUpdate = {
-      status: 'PAID' as const,
-      timestamp: new Date().toISOString(),
-      note: '管理員核准結案'
-    };
-    const updates = { 
-      status: 'PAID' as const,
-      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-    };
-    orderService.update(order!.id, updates);
-    setOrder(prev => prev ? { ...prev, ...updates } : null);
-    setStatus('PAID');
-    setFeedback({ type: 'success', message: '已核准結案' });
+  const handleApproveClosure = async () => {
+    try {
+      const newUpdate = {
+        status: 'PAID' as const,
+        timestamp: new Date().toISOString(),
+        note: '管理員核准結案'
+      };
+      const updates = {
+        status: 'PAID' as const,
+        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+      };
+      await orderService.update(order!.id, updates);
+      setOrder(prev => prev ? { ...prev, ...updates } : null);
+      setStatus('PAID');
+      setFeedback({ type: 'success', message: '已核准結案' });
+    } catch (error) {
+      console.error('核准結案失敗:', error);
+      setFeedback({ type: 'error', message: '操作失敗' });
+    }
   };
 
-  const handleApproveCancel = () => {
-    const newUpdate = {
-      status: 'CANCELLED' as const,
-      timestamp: new Date().toISOString(),
-      note: '管理員核准取消'
-    };
-    const updates = { 
-      status: 'CANCELLED' as const,
-      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-    };
-    orderService.update(order!.id, updates);
-    setOrder(prev => prev ? { ...prev, ...updates } : null);
-    setStatus('CANCELLED');
-    setFeedback({ type: 'success', message: '已核准取消' });
+  const handleApproveCancel = async () => {
+    try {
+      const newUpdate = {
+        status: 'CANCELLED' as const,
+        timestamp: new Date().toISOString(),
+        note: '管理員核准取消'
+      };
+      const updates = {
+        status: 'CANCELLED' as const,
+        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+      };
+      await orderService.update(order!.id, updates);
+      setOrder(prev => prev ? { ...prev, ...updates } : null);
+      setStatus('CANCELLED');
+      setFeedback({ type: 'success', message: '已核准取消' });
+    } catch (error) {
+      console.error('核准取消失敗:', error);
+      setFeedback({ type: 'error', message: '操作失敗' });
+    }
   };
 
-  const handleRejectCancel = () => {
-    const newUpdate = {
-      status: 'ACTIVE' as const,
-      timestamp: new Date().toISOString(),
-      note: '管理員拒絕取消，恢復為已媒合'
-    };
-    const updates = { 
-      status: 'ACTIVE' as const,
-      cancelReason: undefined,
-      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-    };
-    orderService.update(order!.id, updates);
-    setOrder(prev => prev ? { ...prev, ...updates } : null);
-    setStatus('ACTIVE');
-    setFeedback({ type: 'success', message: '已拒絕取消' });
+  const handleRejectCancel = async () => {
+    try {
+      const newUpdate = {
+        status: 'ACTIVE' as const,
+        timestamp: new Date().toISOString(),
+        note: '管理員拒絕取消，恢復為已媒合'
+      };
+      const updates = {
+        status: 'ACTIVE' as const,
+        cancelReason: undefined,
+        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+      };
+      await orderService.update(order!.id, updates);
+      setOrder(prev => prev ? { ...prev, ...updates } : null);
+      setStatus('ACTIVE');
+      setFeedback({ type: 'success', message: '已拒絕取消' });
+    } catch (error) {
+      console.error('拒絕取消失敗:', error);
+      setFeedback({ type: 'error', message: '操作失敗' });
+    }
   };
 
   if (loading) {

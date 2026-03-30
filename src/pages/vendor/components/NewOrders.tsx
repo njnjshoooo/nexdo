@@ -35,16 +35,17 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
     loadData();
   }, [vendor.id]);
 
-  const loadData = () => {
+  const loadData = async () => {
     // In a real app, we'd filter by vendorId and status='PENDING'
     const allOrders = orderService.getAll();
     const newOrders = allOrders.filter(o => o.status === 'PENDING' && o.vendorId === vendor.id);
     setOrders(newOrders);
-    
-    setStaffList(staffService.getAll(vendor.id));
+
+    const staff = await staffService.getAll(vendor.id);
+    setStaffList(staff);
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (!selectedOrder || !selectedDate || !selectedTime || !selectedStaffId) {
       setFeedback({ type: 'error', message: '請填寫完整資訊' });
       return;
@@ -71,22 +72,27 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    orderService.update(selectedOrder.id, updates);
+    try {
+      await orderService.update(selectedOrder.id, updates);
 
-    // Update associated submission to ACTIVE
-    if (selectedOrder.submissionId) {
-      submissionService.updateStatus(selectedOrder.submissionId, 'ACTIVE');
+      // Update associated submission to ACTIVE
+      if (selectedOrder.submissionId) {
+        await submissionService.updateStatus(selectedOrder.submissionId, 'ACTIVE');
+      }
+
+      setSelectedOrder(null);
+      loadData();
+      setFeedback({ type: 'success', message: '已成功接案！' });
+    } catch (error) {
+      console.error('Failed to accept order:', error);
+      alert('操作失敗');
     }
-
-    setSelectedOrder(null);
-    loadData();
-    setFeedback({ type: 'success', message: '已成功接案！' });
   };
 
-  const autoSelectOptions = (order: Order) => {
+  const autoSelectOptions = async (order: Order) => {
     if (order.items.length > 0) {
       const firstItem = order.items[0];
-      
+
       // Auto select time if available
       if (firstItem.expectedTime) {
         setSelectedTime(firstItem.expectedTime);
@@ -100,14 +106,14 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
         }
       }
     }
-    
-    const staff = staffService.getAll(vendor.id);
+
+    const staff = await staffService.getAll(vendor.id);
     if (staff.length === 1) {
       setSelectedStaffId(staff[0].id);
     }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!selectedOrder || !rejectReason) {
       setFeedback({ type: 'error', message: '請填寫無法配合原因' });
       return;
@@ -119,10 +125,15 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
       // For now, we just add notes. In a real system, it might go back to admin.
     };
 
-    orderService.update(selectedOrder.id, updates);
-    setSelectedOrder(null);
-    loadData();
-    setFeedback({ type: 'success', message: '已送出無法配合原因' });
+    try {
+      await orderService.update(selectedOrder.id, updates);
+      setSelectedOrder(null);
+      loadData();
+      setFeedback({ type: 'success', message: '已送出無法配合原因' });
+    } catch (error) {
+      console.error('Failed to reject order:', error);
+      alert('操作失敗');
+    }
   };
 
   const maskPhone = (phone: string) => {

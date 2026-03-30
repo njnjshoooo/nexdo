@@ -147,7 +147,7 @@ export default function AppointmentManagement() {
       const page = allPages.find(p => p.slug === assigningSubmission.pageSlug);
       const productId = page?.content?.subItem?.linkedProductId || page?.content?.subItem?.productId;
       
-      const newOrderId = orderService.generateOrderId(productId || '');
+      const newOrderId = await orderService.generateOrderId(productId || '');
 
       const newOrder: Order = {
         id: newOrderId,
@@ -186,7 +186,7 @@ export default function AppointmentManagement() {
         ]
       };
 
-      orderService.create(newOrder);
+      await orderService.create(newOrder);
       
       alert('已成功轉為需求單並指派！');
       
@@ -211,7 +211,7 @@ export default function AppointmentManagement() {
       // 2. Find associated order and update its status to PENDING (waiting for vendor acceptance)
       const order = orderService.getBySubmissionId(submission.id);
       if (order) {
-        orderService.update(order.id, {
+        await orderService.update(order.id, {
           status: 'PENDING',
           paidAt: new Date().toISOString(),
           statusUpdates: [

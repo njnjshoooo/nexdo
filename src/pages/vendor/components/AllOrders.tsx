@@ -99,7 +99,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (!selectedOrder || !photoUrl) {
       alert('請上傳服務完成照片');
       return;
@@ -117,13 +117,18 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    orderService.update(selectedOrder.id, updates);
-    setSelectedOrder(null);
-    loadData();
-    setFeedback({ type: 'success', message: '已完成服務！' });
+    try {
+      await orderService.update(selectedOrder.id, updates);
+      setSelectedOrder(null);
+      loadData();
+      setFeedback({ type: 'success', message: '已完成服務！' });
+    } catch (error) {
+      console.error('Failed to complete order:', error);
+      alert('操作失敗');
+    }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (!selectedOrder || !cancelReason) {
       setFeedback({ type: 'error', message: '請填寫取消原因' });
       return;
@@ -141,15 +146,20 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    orderService.update(selectedOrder.id, updates);
-    setSelectedOrder(null);
-    loadData();
-    setFeedback({ type: 'success', message: '已申請取消訂單，請等待後台審核。' });
+    try {
+      await orderService.update(selectedOrder.id, updates);
+      setSelectedOrder(null);
+      loadData();
+      setFeedback({ type: 'success', message: '已申請取消訂單，請等待後台審核。' });
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      alert('操作失敗');
+    }
   };
 
-  const handleRequestClosure = () => {
+  const handleRequestClosure = async () => {
     if (!selectedOrder) return;
-    
+
     const newUpdate: OrderStatusUpdate = {
       status: 'PENDING_PAYMENT',
       timestamp: new Date().toISOString(),
@@ -161,10 +171,15 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    orderService.update(selectedOrder.id, updates);
-    setSelectedOrder(null);
-    loadData();
-    setFeedback({ type: 'success', message: '已申請結案，請等待後台審核。' });
+    try {
+      await orderService.update(selectedOrder.id, updates);
+      setSelectedOrder(null);
+      loadData();
+      setFeedback({ type: 'success', message: '已申請結案，請等待後台審核。' });
+    } catch (error) {
+      console.error('Failed to request closure:', error);
+      alert('操作失敗');
+    }
   };
 
   if (selectedOrder) {

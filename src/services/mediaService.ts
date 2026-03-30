@@ -1,4 +1,5 @@
 import localforage from 'localforage';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface MediaItem {
   id: string;
@@ -6,6 +7,7 @@ export interface MediaItem {
   name: string;
   type: string;
   createdAt: string;
+  storagePath?: string;
 }
 
 const STORAGE_KEY = 'admin_media_library';
@@ -618,6 +620,13 @@ class MediaService {
   }
 
   private async load() {
+    // If Supabase configured, load from DB + merge defaults
+    if (isSupabaseConfigured) {
+      await this.refresh();
+      return;
+    }
+
+    // Fallback: existing localforage logic
     try {
       const stored = await localforage.getItem<MediaItem[]>(STORAGE_KEY);
       if (stored) {
@@ -650,6 +659,52 @@ class MediaService {
     }
   }
 
+  /**
+   * Refresh media list from Supabase database, merging with defaults.
+   * Can be called externally to re-sync in the background.
+   */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+
+    try {
+      const { data, error } = await supabase.from('media').select('*');
+      if (error) {
+        console.error('mediaService.refresh error:', error);
+        // On error, fall back to localforage cache + defaults
+        const cached = await localforage.getItem<MediaItem[]>(STORAGE_KEY).catch(() => null);
+        this.media = cached || [...DEFAULT_MEDIA];
+        return;
+      }
+
+      const dbMedia: MediaItem[] = (data || []).map((row: Record<string, unknown>) => ({
+        id: row.id as string,
+        url: row.url as string,
+        name: row.name as string,
+        type: row.type as string,
+        createdAt: row.created_at as string,
+        storagePath: (row.storage_path as string) || undefined,
+      }));
+
+      // Merge: start with DB records, then add any defaults not already present
+      const allMedia = [...dbMedia];
+      DEFAULT_MEDIA.forEach(def => {
+        if (!allMedia.find(m => m.id === def.id || m.url === def.url)) {
+          allMedia.push(def);
+        }
+      });
+
+      this.media = allMedia;
+
+      // Update localforage cache for offline resilience
+      await localforage.setItem(STORAGE_KEY, this.media).catch(() => {});
+    } catch (e) {
+      console.error('mediaService.refresh unexpected error:', e);
+      // Fall back to localforage cache + defaults
+      const cached = await localforage.getItem<MediaItem[]>(STORAGE_KEY).catch(() => null);
+      this.media = cached || [...DEFAULT_MEDIA];
+    }
+  }
+
   private async save() {
     try {
       await localforage.setItem(STORAGE_KEY, this.media);
@@ -661,11 +716,51 @@ class MediaService {
 
   async getAll(): Promise<MediaItem[]> {
     await this.initialized;
-    return [...this.media].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return [...this.media].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }
 
   async upload(file: File): Promise<MediaItem> {
     await this.initialized;
+
+    if (isSupabaseConfigured) {
+      const path = `uploads/${Date.now()}-${file.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(path, file);
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: urlData } = supabase.storage.from('media').getPublicUrl(path);
+      const publicUrl = urlData.publicUrl;
+
+      const newItem: MediaItem = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+        url: publicUrl,
+        name: file.name,
+        type: file.type,
+        createdAt: new Date().toISOString(),
+        storagePath: path,
+      };
+
+      const { error: insertError } = await supabase.from('media').insert({
+        id: newItem.id,
+        url: newItem.url,
+        name: newItem.name,
+        type: newItem.type,
+        storage_path: newItem.storagePath,
+        created_at: newItem.createdAt,
+      });
+      if (insertError) throw new Error(insertError.message);
+
+      this.media.unshift(newItem);
+      // Update localforage cache
+      await localforage.setItem(STORAGE_KEY, this.media).catch(() => {});
+      return newItem;
+    }
+
+    // Fallback: base64 via FileReader
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -688,6 +783,17 @@ class MediaService {
 
   async delete(id: string) {
     await this.initialized;
+
+    if (isSupabaseConfigured) {
+      // Get the record to find storage_path
+      const item = this.media.find(m => m.id === id);
+      if (item?.storagePath) {
+        await supabase.storage.from('media').remove([item.storagePath]);
+      }
+      const { error } = await supabase.from('media').delete().eq('id', id);
+      if (error) throw new Error(error.message);
+    }
+
     this.media = this.media.filter(item => item.id !== id);
     await this.save();
   }

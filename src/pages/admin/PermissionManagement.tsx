@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../../types/auth';
 import { Shield, Check } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 const PERMISSIONS = [
   { id: 'member', label: '會員權限管理' },
@@ -19,14 +20,34 @@ export default function PermissionManagement() {
     loadAdmins();
   }, []);
 
-  const loadAdmins = () => {
+  const loadAdmins = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*').eq('role', 'admin');
+        if (!error && data && data.length > 0) {
+          const adminList: User[] = data.map((row: any) => ({
+            id: row.id,
+            name: row.name || '',
+            email: row.email || '',
+            role: row.role || 'admin',
+            permissions: row.permissions || [],
+            createdAt: row.created_at,
+          }));
+          setAdmins(adminList);
+          setDraftAdmins(JSON.parse(JSON.stringify(adminList)));
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load admins from Supabase:', err);
+      }
+    }
+    // Fallback to localStorage
     const stored = localStorage.getItem('users');
     let localUsers: User[] = stored ? JSON.parse(stored) : [];
-    // Include default admin (id: '1')
     const allUsers = [{ id: '1', name: 'Admin User', email: 'admin@test.com', role: 'admin', permissions: ['all'] } as User, ...localUsers];
     const adminList = allUsers.filter(u => u.role === 'admin');
     setAdmins(adminList);
-    setDraftAdmins(JSON.parse(JSON.stringify(adminList))); // Deep copy
+    setDraftAdmins(JSON.parse(JSON.stringify(adminList)));
   };
 
   const togglePermission = (userId: string, permission: string) => {
@@ -52,24 +73,34 @@ export default function PermissionManagement() {
 
   const [saving, setSaving] = useState(false);
 
-  const savePermissions = () => {
+  const savePermissions = async () => {
     setSaving(true);
-    const stored = localStorage.getItem('users');
-    let localUsers: User[] = stored ? JSON.parse(stored) : [];
-    
-    // Update local users with draft permissions (excluding id: '1')
-    const updatedUsers = localUsers.map(u => {
-      const draft = draftAdmins.find(d => d.id === u.id);
-      return draft ? { ...u, permissions: draft.permissions } : u;
-    });
-    
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    
-    setTimeout(() => {
+
+    try {
+      if (isSupabaseConfigured) {
+        for (const draft of draftAdmins) {
+          const { error } = await supabase.from('profiles')
+            .update({ permissions: draft.permissions })
+            .eq('id', draft.id);
+          if (error) throw error;
+        }
+      } else {
+        const stored = localStorage.getItem('users');
+        let localUsers: User[] = stored ? JSON.parse(stored) : [];
+        const updatedUsers = localUsers.map(u => {
+          const draft = draftAdmins.find(d => d.id === u.id);
+          return draft ? { ...u, permissions: draft.permissions } : u;
+        });
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+      }
       loadAdmins();
-      setSaving(false);
       alert('權限已儲存');
-    }, 500);
+    } catch (err) {
+      console.error('Failed to save permissions:', err);
+      alert('儲存失敗');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

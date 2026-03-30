@@ -1,6 +1,7 @@
 import { Page, TemplateType, DEFAULT_MAJOR_ITEM_TEMPLATE, DEFAULT_SUB_ITEM_TEMPLATE } from '../types/admin';
 import { v4 as uuidv4 } from 'uuid';
 import { allInitialPages } from '../data/pages/index';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 class PageService {
   private pages: Page[] = [];
@@ -11,14 +12,14 @@ class PageService {
     const storedVersion = localStorage.getItem('admin_pages_version');
     if (storedPages && storedVersion === this.VERSION) {
       this.pages = JSON.parse(storedPages);
-      
+
       // Ensure blog page exists and has correct template
       const blogIndex = this.pages.findIndex(p => p.slug === 'blog');
       if (blogIndex === -1) {
         const blogPage = allInitialPages.find(p => p.slug === 'blog');
         if (blogPage) {
           this.pages.push(blogPage);
-          this.save();
+          this.saveToCache();
         }
       } else if (this.pages[blogIndex].template !== 'BLOG') {
         // Force the blog page to be a BLOG template if it was created as something else
@@ -27,7 +28,7 @@ class PageService {
           const defaultBlog = allInitialPages.find(p => p.slug === 'blog');
           this.pages[blogIndex].content.blog = defaultBlog?.content.blog;
         }
-        this.save();
+        this.saveToCache();
       }
     } else {
       // If version mismatch or no stored pages, we should try to preserve existing pages
@@ -42,7 +43,7 @@ class PageService {
       }
 
       this.pages = [...allInitialPages];
-      
+
       // Overwrite initial pages with existing ones if they have the same ID
       existingPages.forEach(ep => {
         const index = this.pages.findIndex(ip => ip.id === ep.id);
@@ -65,35 +66,64 @@ class PageService {
         }
       });
 
-      this.save();
+      this.saveToCache();
+    }
+
+    // Background refresh from Supabase
+    if (isSupabaseConfigured) {
+      this.refresh().catch(err => console.error('PageService: background refresh failed', err));
     }
   }
 
-  private save() {
+  /** Save to localStorage cache */
+  private saveToCache() {
     localStorage.setItem('admin_pages', JSON.stringify(this.pages));
     localStorage.setItem('admin_pages_version', this.VERSION);
+  }
+
+  /** Fetch all pages from Supabase and update local cache */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+
+    const { data, error } = await supabase.from('pages').select('*');
+    if (error) {
+      console.error('PageService.refresh error:', error);
+      return;
+    }
+    if (data && data.length > 0) {
+      this.pages = data.map(row => ({
+        id: row.id,
+        slug: row.slug,
+        title: row.title,
+        template: row.template,
+        parentId: row.parent_id,
+        content: row.content || {},
+        isPublished: row.is_published,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      } as Page));
+      this.saveToCache();
+    }
   }
 
   getAll(): Page[] { return this.pages; }
 
   getById(id: string): Page | undefined {
-    // 統一使用 slug 作為唯一識別碼
     return this.getBySlug(id);
   }
 
   getBySlug(slug: string): Page | undefined {
     if (!slug || typeof slug !== 'string') return undefined;
-    // 優先匹配 id，再匹配 slug (在過渡期兩者可能不同)
-    return this.pages.find(p => 
-      p.id?.toLowerCase() === slug.toLowerCase() || 
+    return this.pages.find(p =>
+      p.id?.toLowerCase() === slug.toLowerCase() ||
       p.slug?.toLowerCase() === slug.toLowerCase()
     );
   }
 
-  create(title: string, template: TemplateType, parentId?: string): Page {
+  async create(title: string, template: TemplateType, parentId?: string): Promise<Page> {
     const slug = `page-${Date.now()}`;
     const newPage: Page = {
-      id: slug, // ID 與 Slug 一致
+      id: slug,
       slug,
       title,
       template,
@@ -103,35 +133,70 @@ class PageService {
       updatedAt: new Date().toISOString(),
       content: { ...DEFAULT_MAJOR_ITEM_TEMPLATE }
     };
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('pages').insert({
+        id: newPage.id,
+        slug: newPage.slug,
+        title: newPage.title,
+        template: newPage.template,
+        parent_id: newPage.parentId || null,
+        content: newPage.content,
+        is_published: newPage.isPublished,
+        created_at: newPage.createdAt,
+        updated_at: newPage.updatedAt,
+      });
+      if (error) throw new Error(error.message);
+    }
+
     this.pages.push(newPage);
-    this.save();
+    this.saveToCache();
     return newPage;
   }
 
-  update(id: string, data: Partial<Page>) {
+  async update(id: string, data: Partial<Page>): Promise<void> {
     const index = this.pages.findIndex(p => p.id === id || p.slug === id);
-    if (index !== -1) {
-      const currentPage = this.pages[index];
-      const updatedData = { ...data };
-      
-      // 如果更新了 slug，且原本 id 與 slug 一致，則同步更新 id
-      if (data.slug && currentPage.id === currentPage.slug) {
-        updatedData.id = data.slug;
-      }
+    if (index === -1) return;
 
-      const newPage = { ...currentPage, ...updatedData, updatedAt: new Date().toISOString() };
-      this.pages[index] = newPage;
+    const currentPage = this.pages[index];
+    const updatedData = { ...data };
 
-      this.save();
+    // If slug is updated and id matches slug, sync id too
+    if (data.slug && currentPage.id === currentPage.slug) {
+      updatedData.id = data.slug;
     }
+
+    const newPage = { ...currentPage, ...updatedData, updatedAt: new Date().toISOString() };
+
+    if (isSupabaseConfigured) {
+      const dbData: Record<string, any> = { updated_at: newPage.updatedAt };
+      if (updatedData.slug !== undefined) dbData.slug = updatedData.slug;
+      if (updatedData.id !== undefined) dbData.id = updatedData.id;
+      if (updatedData.title !== undefined) dbData.title = updatedData.title;
+      if (updatedData.template !== undefined) dbData.template = updatedData.template;
+      if (updatedData.parentId !== undefined) dbData.parent_id = updatedData.parentId;
+      if (updatedData.content !== undefined) dbData.content = updatedData.content;
+      if (updatedData.isPublished !== undefined) dbData.is_published = updatedData.isPublished;
+
+      const { error } = await supabase.from('pages').update(dbData).eq('id', currentPage.id);
+      if (error) throw new Error(error.message);
+    }
+
+    this.pages[index] = newPage;
+    this.saveToCache();
   }
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const index = this.pages.findIndex(p => p.id === id || p.slug === id);
     if (index === -1) return false;
 
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('pages').delete().eq('id', this.pages[index].id);
+      if (error) throw new Error(error.message);
+    }
+
     this.pages.splice(index, 1);
-    this.save();
+    this.saveToCache();
     return true;
   }
 }

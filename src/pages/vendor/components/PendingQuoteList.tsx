@@ -28,7 +28,7 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
     setOrders(pendingQuotes);
   };
 
-  const handleSubmitQuote = () => {
+  const handleSubmitQuote = async () => {
     if (!selectedOrder || !quoteAmount || isNaN(Number(quoteAmount))) {
       setFeedback({ type: 'error', message: '請輸入有效的預估金額' });
       return;
@@ -49,17 +49,22 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
       ]
     };
 
-    orderService.update(selectedOrder.id, updates);
-    
-    // Also update the original submission status to QUOTED
-    if (selectedOrder.submissionId) {
-      submissionService.updateStatus(selectedOrder.submissionId, 'QUOTED');
-    }
+    try {
+      await orderService.update(selectedOrder.id, updates);
 
-    setSelectedOrder(null);
-    setQuoteAmount('');
-    loadData();
-    setFeedback({ type: 'success', message: '報價已成功送出！' });
+      // Also update the original submission status to QUOTED
+      if (selectedOrder.submissionId) {
+        await submissionService.updateStatus(selectedOrder.submissionId, 'QUOTED');
+      }
+
+      setSelectedOrder(null);
+      setQuoteAmount('');
+      loadData();
+      setFeedback({ type: 'success', message: '報價已成功送出！' });
+    } catch (error) {
+      console.error('Failed to submit quote:', error);
+      alert('操作失敗');
+    }
   };
 
   const parseNotes = (notes?: string) => {

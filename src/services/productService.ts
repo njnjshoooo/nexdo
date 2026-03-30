@@ -1,5 +1,6 @@
 import { Product } from '../types/admin';
 import { initialProducts } from '../data/products';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'haolingju_products';
 
@@ -8,6 +9,11 @@ class ProductService {
 
   constructor() {
     this.loadFromStorage();
+
+    // Background refresh from Supabase
+    if (isSupabaseConfigured) {
+      this.refresh().catch(err => console.error('ProductService: background refresh failed', err));
+    }
   }
 
   private loadFromStorage() {
@@ -17,7 +23,7 @@ class ProductService {
     } else {
       this.products = [...initialProducts];
     }
-    
+
     // Migration: Add default categories and orderCodes if missing
     let changed = false;
     const categoryMap: Record<string, string> = {
@@ -107,12 +113,46 @@ class ProductService {
     });
 
     if (changed || !stored) {
-      this.saveToStorage();
+      this.saveToCache();
     }
   }
 
-  private saveToStorage() {
+  private saveToCache() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.products));
+  }
+
+  /** Fetch all products from Supabase and update local cache */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) {
+      console.error('ProductService.refresh error:', error);
+      return;
+    }
+    if (data && data.length > 0) {
+      this.products = data.map(row => ({
+        id: row.id,
+        name: row.name,
+        category: row.category,
+        description: row.description,
+        image: row.image,
+        checklist: row.checklist || [],
+        orderMode: row.order_mode,
+        orderCode: row.order_code,
+        requireDate: row.require_date,
+        requireTime: row.require_time,
+        requireNotes: row.require_notes,
+        variants: row.variants || [],
+        fixedConfig: row.fixed_config || { price: 0, unit: '次', buttonText: '立即下單' },
+        quoteConfig: row.quote_config,
+        internalFormConfig: row.internal_form_config || { priceText: '依需求報價', buttonText: '填寫表單', formId: '' },
+        externalLinkConfig: row.external_link_config || { priceText: '依需求報價', buttonText: 'LINE諮詢報價', url: '' },
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      } as Product));
+      this.saveToCache();
+    }
   }
 
   getAll(): Product[] {
@@ -123,7 +163,7 @@ class ProductService {
     return this.products.find(p => p.id === id);
   }
 
-  create(data: Partial<Product>): Product {
+  async create(data: Partial<Product>): Promise<Product> {
     const newProduct: Product = {
       id: data.id || `product-${Date.now()}`,
       name: data.name || '新產品',
@@ -138,31 +178,84 @@ class ProductService {
       updatedAt: new Date().toISOString(),
     };
 
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('products').insert({
+        id: newProduct.id,
+        name: newProduct.name,
+        category: data.category || null,
+        description: newProduct.description,
+        image: newProduct.image || null,
+        checklist: newProduct.checklist,
+        order_mode: newProduct.orderMode,
+        order_code: data.orderCode || null,
+        require_date: data.requireDate || false,
+        require_time: data.requireTime || false,
+        require_notes: data.requireNotes || false,
+        variants: data.variants || [],
+        fixed_config: newProduct.fixedConfig,
+        quote_config: data.quoteConfig || null,
+        internal_form_config: newProduct.internalFormConfig,
+        external_link_config: newProduct.externalLinkConfig,
+        created_at: newProduct.createdAt,
+        updated_at: newProduct.updatedAt,
+      });
+      if (error) throw new Error(error.message);
+    }
+
     this.products.push(newProduct);
-    this.saveToStorage();
+    this.saveToCache();
     return newProduct;
   }
 
-  update(id: string, updates: Partial<Product>): Product | undefined {
+  async update(id: string, updates: Partial<Product>): Promise<Product | undefined> {
     const index = this.products.findIndex(p => p.id === id);
     if (index === -1) return undefined;
 
-    this.products[index] = {
+    const updatedProduct = {
       ...this.products[index],
       ...updates,
       updatedAt: new Date().toISOString()
     };
 
-    this.saveToStorage();
+    if (isSupabaseConfigured) {
+      const dbData: Record<string, any> = { updated_at: updatedProduct.updatedAt };
+      if (updates.name !== undefined) dbData.name = updates.name;
+      if (updates.category !== undefined) dbData.category = updates.category;
+      if (updates.description !== undefined) dbData.description = updates.description;
+      if (updates.image !== undefined) dbData.image = updates.image;
+      if (updates.checklist !== undefined) dbData.checklist = updates.checklist;
+      if (updates.orderMode !== undefined) dbData.order_mode = updates.orderMode;
+      if (updates.orderCode !== undefined) dbData.order_code = updates.orderCode;
+      if (updates.requireDate !== undefined) dbData.require_date = updates.requireDate;
+      if (updates.requireTime !== undefined) dbData.require_time = updates.requireTime;
+      if (updates.requireNotes !== undefined) dbData.require_notes = updates.requireNotes;
+      if (updates.variants !== undefined) dbData.variants = updates.variants;
+      if (updates.fixedConfig !== undefined) dbData.fixed_config = updates.fixedConfig;
+      if (updates.quoteConfig !== undefined) dbData.quote_config = updates.quoteConfig;
+      if (updates.internalFormConfig !== undefined) dbData.internal_form_config = updates.internalFormConfig;
+      if (updates.externalLinkConfig !== undefined) dbData.external_link_config = updates.externalLinkConfig;
+
+      const { error } = await supabase.from('products').update(dbData).eq('id', id);
+      if (error) throw new Error(error.message);
+    }
+
+    this.products[index] = updatedProduct;
+    this.saveToCache();
     return this.products[index];
   }
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const initialLength = this.products.length;
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw new Error(error.message);
+    }
+
     this.products = this.products.filter(p => p.id !== id);
-    
+
     if (this.products.length !== initialLength) {
-      this.saveToStorage();
+      this.saveToCache();
       return true;
     }
     return false;

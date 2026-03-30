@@ -1,6 +1,7 @@
 import { NavigationSettings, NavItem } from '../types/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { HEADER_ITEMS } from '../data/header';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const DEFAULT_NAVIGATION: NavigationSettings = {
   items: HEADER_ITEMS
@@ -24,12 +25,35 @@ class NavigationService {
       }
     } else {
       this.settings = DEFAULT_NAVIGATION;
-      this.save();
+      this.saveToCache();
+    }
+
+    // Background refresh from Supabase
+    if (isSupabaseConfigured) {
+      this.refresh().catch(err => console.error('NavigationService: background refresh failed', err));
     }
   }
 
-  private save() {
+  private saveToCache() {
     localStorage.setItem('admin_navigation', JSON.stringify(this.settings));
+  }
+
+  /** Fetch navigation from Supabase (single row, id=1) and update local cache */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+
+    const { data, error } = await supabase.from('navigation').select('*').eq('id', 1).single();
+    if (error) {
+      // If the row doesn't exist yet, that's fine
+      if (error.code !== 'PGRST116') {
+        console.error('NavigationService.refresh error:', error);
+      }
+      return;
+    }
+    if (data && Array.isArray(data.items)) {
+      this.settings = { items: data.items };
+      this.saveToCache();
+    }
   }
 
   getSettings(): NavigationSettings {
@@ -57,9 +81,16 @@ class NavigationService {
     return { items: resolveItems(this.settings.items) };
   }
 
-  updateSettings(settings: NavigationSettings) {
+  async updateSettings(settings: NavigationSettings): Promise<void> {
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('navigation')
+        .upsert({ id: 1, items: settings.items, updated_at: new Date().toISOString() });
+      if (error) throw new Error(error.message);
+    }
+
     this.settings = settings;
-    this.save();
+    this.saveToCache();
   }
 
   syncSubItemToNavigation(slug: string, parentSlug: string, pageTitle: string, pageUrl: string) {
@@ -100,7 +131,15 @@ class NavigationService {
     };
 
     if (parentSlug) addItemToParent(this.settings.items);
-    if (hasChanges) this.save();
+    if (hasChanges) {
+      this.saveToCache();
+      // Also persist to Supabase in background
+      if (isSupabaseConfigured) {
+        this.updateSettings(this.settings).catch(err =>
+          console.error('NavigationService: failed to sync to Supabase', err)
+        );
+      }
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Trash2, Shield, User as UserIcon, AlertTriangle, X, Save } from 'lucide-react';
 import { User } from '../../types/auth';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 const defaultUsers: User[] = [
   { id: '1', name: 'Admin', email: 'admin@nexdo.com', role: 'admin', createdAt: '2026-01-01T00:00:00Z' },
@@ -19,7 +20,34 @@ export default function UserManagement() {
     loadUsers();
   }, []);
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (!error && data) {
+          const profiles: User[] = data.map((row: any) => ({
+            id: row.id,
+            name: row.name || '',
+            email: row.email || '',
+            role: row.role || 'user',
+            phone: row.phone || '',
+            title: row.title || '',
+            lineId: row.line_id || '',
+            address: row.address || '',
+            permissions: row.permissions || [],
+            emergencyContactName: row.emergency_contact_name || '',
+            emergencyContactPhone: row.emergency_contact_phone || '',
+            specialRequirements: row.special_requirements || '',
+            createdAt: row.created_at,
+          }));
+          setUsers(profiles.length > 0 ? profiles : defaultUsers);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load users from Supabase:', err);
+      }
+    }
+    // Fallback to localStorage
     const stored = localStorage.getItem('users');
     let localUsers: User[] = [];
     if (stored) {
@@ -30,14 +58,35 @@ export default function UserManagement() {
     setUsers([...defaultUsers, ...localUsers]);
   };
 
-  const handleSaveUser = (updatedUser: User) => {
-    const stored = localStorage.getItem('users');
-    let localUsers: User[] = stored ? JSON.parse(stored) : [];
-    
-    // Update in local storage
-    const updatedUsers = localUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    
+  const handleSaveUser = async (updatedUser: User) => {
+    if (isSupabaseConfigured) {
+      try {
+        const dbData: Record<string, any> = {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          phone: updatedUser.phone || null,
+          title: updatedUser.title || null,
+          line_id: updatedUser.lineId || null,
+          address: updatedUser.address || null,
+          permissions: updatedUser.permissions || [],
+          emergency_contact_name: updatedUser.emergencyContactName || null,
+          emergency_contact_phone: updatedUser.emergencyContactPhone || null,
+          special_requirements: updatedUser.specialRequirements || null,
+        };
+        const { error } = await supabase.from('profiles').update(dbData).eq('id', updatedUser.id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Failed to save user to Supabase:', err);
+        alert('儲存失敗');
+      }
+    } else {
+      const stored = localStorage.getItem('users');
+      let localUsers: User[] = stored ? JSON.parse(stored) : [];
+      const updatedUsers = localUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+    }
+
     loadUsers();
     setEditModalOpen(false);
     setUserToEdit(null);
@@ -49,18 +98,28 @@ export default function UserManagement() {
     setDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!userToDelete) return;
-    
-    const stored = localStorage.getItem('users');
-    if (stored) {
+
+    if (isSupabaseConfigured) {
       try {
-        let localUsers: User[] = JSON.parse(stored);
-        const updatedUsers = localUsers.filter(u => u.id !== userToDelete.id);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        loadUsers();
-      } catch (e) {}
+        const { error } = await supabase.from('profiles').delete().eq('id', userToDelete.id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Failed to delete user from Supabase:', err);
+        alert('刪除失敗');
+      }
+    } else {
+      const stored = localStorage.getItem('users');
+      if (stored) {
+        try {
+          let localUsers: User[] = JSON.parse(stored);
+          const updatedUsers = localUsers.filter(u => u.id !== userToDelete.id);
+          localStorage.setItem('users', JSON.stringify(updatedUsers));
+        } catch (e) {}
+      }
     }
+    loadUsers();
     setDeleteModalOpen(false);
     setUserToDelete(null);
   };
