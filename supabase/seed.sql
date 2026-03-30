@@ -330,7 +330,7 @@ INSERT INTO public.vendors (
   'tidyman@tidyman.com',
   crypt('888888', gen_salt('bf')),
   'active',
-  '[]'::jsonb,
+  '{}'::text[],
   'monthly',
   '2026-01-01T00:00:00Z',
   '2026-01-01T00:00:00Z'
@@ -348,7 +348,7 @@ INSERT INTO public.vendors (
   'hobbystudio@hobbystudio.com',
   crypt('222222', gen_salt('bf')),
   'active',
-  '[]'::jsonb,
+  '{}'::text[],
   'monthly',
   '2026-03-24T00:00:00Z',
   '2026-03-24T00:00:00Z'
