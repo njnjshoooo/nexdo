@@ -71,6 +71,7 @@ const HomePageWrapper = () => {
 import FormPage from './pages/FormPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import PaymentPage from './pages/customer/PaymentPage';
+import EasyCardPartnerPage from './pages/partner/EasyCardPartnerPage';
 
 export default function App() {
   return (
@@ -114,6 +115,9 @@ export default function App() {
       {/* 廠商專區路由 - 獨立於 MainLayout */}
       <Route path="/vendor/login" element={<VendorLogin />} />
       <Route path="/vendor/:vendorId" element={<VendorDashboard />} />
+
+      {/* 合作夥伴專屬隱藏頁面 - 獨立於 MainLayout */}
+      <Route path="/partner/easycard" element={<EasyCardPartnerPage />} />
 
       {/* 2. 前台路由 */}
       <Route element={<MainLayout />}>
