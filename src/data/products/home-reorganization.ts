@@ -10,7 +10,7 @@ export const homeReorganizationProduct: Product = {
           { text: '情感導向的物資篩選' },
           { text: '實用導向的空間配置' }
         ],
-  orderMode: 'EXTERNAL_LINK',
+  orderMode: 'INTERNAL_FORM',
   fixedConfig: {
     price: 0,
     unit: '次',
@@ -23,8 +23,11 @@ export const homeReorganizationProduct: Product = {
   },
   internalFormConfig: {
     priceText: '依需求報價',
-    buttonText: '填寫表單',
-    formId: ''
+    buttonText: '立即填寫表單',
+    formId: 'home-organize-booking-form',
+    enableDeposit: true,
+    depositRatio: 30,
+    balanceRatio: 70
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()

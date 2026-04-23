@@ -5,7 +5,8 @@ import { Page, DEFAULT_MAJOR_ITEM_TEMPLATE, DEFAULT_HOME_TEMPLATE, DEFAULT_SUB_I
 import { pageService } from '../../services/pageService';
 import { formService } from '../../services/formService';
 import { Form } from '../../types/form';
-import { Save, ArrowLeft, Check, Globe, PanelsTopLeft } from 'lucide-react';
+import { ArrowLeft, Globe, PanelsTopLeft } from 'lucide-react';
+import SaveButton from '../../components/admin/SaveButton';
 
 import HomeEditor from './editors/HomeEditor';
 import MajorItemEditor from './editors/MajorItemEditor';
@@ -104,12 +105,12 @@ export default function PageEditor() {
     try {
       if (isNew) {
         // 💡 修正：新增頁面時呼叫 create
-        const newPage = await pageService.create(data.title, data.template);
+        const newPage = pageService.create(data.title, data.template);
         // 更新新頁面的內容
-        await pageService.update(newPage.id, { ...data, id: newPage.id });
+        pageService.update(newPage.id, { ...data, id: newPage.id });
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
       } else {
-        await pageService.update(data.id, data);
+        pageService.update(data.id, data);
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }
@@ -149,24 +150,14 @@ export default function PageEditor() {
           >
             {isPublished ? '切換為草稿' : '發布頁面'}
           </button>
-          <button 
-            type="submit" 
-            disabled={saveStatus === 'saving'}
-            className={`px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all ${
-              saveStatus === 'saving' 
-                ? 'bg-green-600 text-white cursor-not-allowed' 
-                : 'bg-[#8B5E34] text-white shadow-lg shadow-brown-200/50 hover:bg-black'
-            }`}
-          >
-            {saveStatus === 'saving' ? '儲存中...' : '儲存變更'} {saveStatus === 'saved' ? <Check size={18} /> : saveStatus === 'saving' ? null : <Save size={18} />}
-          </button>
+          <SaveButton status={saveStatus} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* 左側：基本設定 (Slug 恢復) */}
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 space-y-5">
+        <div className="lg:sticky lg:top-24 space-y-6 self-start">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-stone-200 space-y-5">
             <h3 className="font-bold text-stone-900 flex items-center gap-2 border-b border-stone-50 pb-3">
               <PanelsTopLeft size={18} className="text-stone-400" /> 基本設定
             </h3>
@@ -192,7 +183,7 @@ export default function PageEditor() {
             </div>
           </div>
 
-          <div className="bg-white rounded-[2rem] shadow-sm border border-stone-200 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
             <div className="p-4 bg-stone-50 border-b border-stone-200 font-bold text-[11px] text-stone-400 uppercase tracking-widest">內容區塊導覽</div>
             <nav className="flex flex-col">
               {template === 'HOME' && (
@@ -216,11 +207,12 @@ export default function PageEditor() {
               {template === 'SUB_ITEM' && (
                 <>
                   <TabButton active={activeTab === 'sub_product'} label="產品基本資訊" onClick={() => setActiveTab('sub_product')} />
-                  <TabButton active={activeTab === 'sub_core_services'} label="核心服務" onClick={() => setActiveTab('sub_core_services')} />
+                  <TabButton active={activeTab === 'sub_intro'} label="服務介紹" onClick={() => setActiveTab('sub_intro')} />
                   <TabButton active={activeTab === 'sub_partners'} label="專業夥伴" onClick={() => setActiveTab('sub_partners')} />
                   <TabButton active={activeTab === 'sub_cases'} label="真實案例" onClick={() => setActiveTab('sub_cases')} />
+                  <TabButton active={activeTab === 'sub_core_services'} label="服務流程" onClick={() => setActiveTab('sub_core_services')} />
+                  <TabButton active={activeTab === 'sub_faqs'} label="常見問題" onClick={() => setActiveTab('sub_faqs')} />
                   <TabButton active={activeTab === 'sub_related'} label="關聯服務" onClick={() => setActiveTab('sub_related')} />
-                  <TabButton active={activeTab === 'sub_button'} label="按鈕設定" onClick={() => setActiveTab('sub_button')} />
                   <TabButton active={activeTab === 'home_form'} label="表單開關" onClick={() => setActiveTab('home_form')} />
                 </>
               )}

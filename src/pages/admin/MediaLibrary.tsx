@@ -1,19 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Upload, Trash2, Image as ImageIcon, Search, Filter, Calendar, Info } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Upload, Trash2, Image as ImageIcon, Filter, Calendar, Info } from 'lucide-react';
 import { mediaService, MediaItem } from '../../services/mediaService';
+import AdminSearchInput from '../../components/admin/search/AdminSearchInput';
+import CreateButton from '../../components/admin/CreateButton';
+import { Pagination } from '../../components/ui/Pagination';
 
 export default function MediaLibrary() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 24; // 6 columns * 4 rows
 
   useEffect(() => {
     loadMedia();
   }, []);
 
   const loadMedia = async () => {
-    setMedia(await mediaService.getAll());
+    const allMedia = await mediaService.getAll();
+    setMedia(allMedia.filter(m => m.source === 'admin' || m.id.startsWith('default-')));
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +29,7 @@ export default function MediaLibrary() {
       try {
         const files = Array.from(e.target.files);
         for (const file of files) {
-          await mediaService.upload(file);
+          await mediaService.upload(file, 'admin');
         }
         await loadMedia();
       } catch (error) {
@@ -45,6 +52,17 @@ export default function MediaLibrary() {
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredMedia.length / itemsPerPage);
+  const paginatedMedia = filteredMedia.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8 shrink-0">
@@ -54,11 +72,22 @@ export default function MediaLibrary() {
           </h1>
           <p className="text-stone-500 mt-1">管理網站所有的圖片與檔案</p>
         </div>
-        <label className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-95">
-          <Upload size={20} />
-          {uploading ? '上傳中...' : '上傳檔案'}
-          <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
-        </label>
+        <div className="flex items-center gap-3">
+          <CreateButton
+            text={uploading ? '上傳中...' : '上傳檔案'}
+            icon={Upload}
+            onClick={() => fileInputRef.current?.click()}
+          />
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            accept="image/*" 
+            multiple 
+            onChange={handleUpload} 
+            className="hidden" 
+            disabled={uploading} 
+          />
+        </div>
       </div>
 
       <div className="flex gap-6 flex-1 min-h-0">
@@ -66,25 +95,21 @@ export default function MediaLibrary() {
         <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
           {/* Toolbar */}
           <div className="p-4 border-b border-stone-100 flex items-center gap-4 bg-stone-50/50">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-              <input
-                type="text"
-                placeholder="搜尋檔案名稱..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-              />
-            </div>
+            <AdminSearchInput
+              placeholder="搜尋檔案名稱..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 max-w-md"
+            />
             <button className="p-2 text-stone-500 hover:bg-stone-100 rounded-lg transition-colors">
               <Filter size={20} />
             </button>
           </div>
 
           {/* Grid */}
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {filteredMedia.map((item) => (
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 flex-1 content-start">
+              {paginatedMedia.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setSelectedItem(item)}
@@ -117,11 +142,21 @@ export default function MediaLibrary() {
                 </div>
               ))}
             </div>
+            
+            {totalPages > 1 && (
+              <div className="mt-6 flex justify-center shrink-0">
+                <Pagination 
+                  currentPage={currentPage} 
+                  totalPages={totalPages} 
+                  onPageChange={setCurrentPage} 
+                />
+              </div>
+            )}
           </div>
         </div>
 
         {/* Sidebar Info */}
-        <div className="w-80 bg-white rounded-2xl shadow-sm border border-stone-200 p-6 overflow-y-auto hidden lg:block">
+        <div className="w-80 bg-white rounded-2xl shadow-sm border border-stone-200 p-6 overflow-y-auto hidden lg:block sticky top-8 self-start max-h-[calc(100vh-4rem)]">
           {selectedItem ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
               <h3 className="font-bold text-stone-900 flex items-center gap-2">

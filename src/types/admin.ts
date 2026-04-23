@@ -1,3 +1,5 @@
+import { OrderStatus } from '../constants/orderStatus';
+
 export type TemplateType = 'HOME' | 'MAJOR_ITEM' | 'SUB_ITEM' | 'GENERAL' | 'BLOG';
 
 export interface ImageBlock {
@@ -32,7 +34,7 @@ export interface CartItem {
 }
 
 export interface OrderStatusUpdate {
-  status: Order['status'];
+  status: OrderStatus;
   timestamp: string;
   note?: string;
   staffName?: string;
@@ -40,6 +42,22 @@ export interface OrderStatusUpdate {
   assignedDate?: string;
   assignedTime?: string;
   photoUrl?: string;
+  receiptPhotoUrl?: string;
+  paymentProofPhotoUrl?: string;
+}
+
+export type StatementStatus = 'SUBMITTED' | 'PAYOUT_PROCESSING' | 'PAID';
+
+export interface Statement {
+  id: string; // statementId: YYYYMM-Statement-vendorId
+  vendorId: string;
+  month: string; // YYYY-MM
+  totalOrders: number;
+  totalAmount: number; // Total revenue
+  payoutAmount: number; // Amount to pay to vendor
+  status: StatementStatus;
+  createdAt: string;
+  paidAt?: string;
 }
 
 export interface Order {
@@ -47,8 +65,10 @@ export interface Order {
   userId: string;
   items: CartItem[];
   totalAmount: number;
+  depositAmount?: number;
+  balanceAmount?: number;
   quotedAmount?: number;
-  status: 'UNPAID' | 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'PENDING_PAYMENT' | 'PAID' | 'CANCELLED' | 'CANCELING' | 'QUOTE_PENDING' | 'QUOTED' | 'PROCESSED';
+  status: OrderStatus;
   customerInfo: {
     name: string;
     phone: string;
@@ -61,6 +81,7 @@ export interface Order {
   };
   paymentMethod: string;
   createdAt: string;
+  updatedAt?: string;
   paidAt?: string;
   customerServiceNotes?: string;
   
@@ -73,7 +94,18 @@ export interface Order {
   vendorNotes?: string;
   cancelReason?: string;
   servicePhotoUrl?: string;
+  receiptPhotoUrl?: string;
+  paymentProofPhotoUrl?: string;
   statusUpdates?: OrderStatusUpdate[];
+  statementId?: string;
+  refundInfo?: {
+    payee: string;
+    bankCode: string;
+    bankName: string;
+    bankBranch: string;
+    accountNumber: string;
+    accountName: string;
+  };
 }
 
 export interface HeroSection {
@@ -82,6 +114,7 @@ export interface HeroSection {
   backgroundImage: string;
   mainButton: ButtonConfig;
   secondaryButton: ButtonConfig;
+  tags?: string[];
 }
 
 export interface ServiceItem {
@@ -110,9 +143,9 @@ export interface HomeHeroButton {
 export interface HomeServiceDisplay {
   pageId: string; // Selected Major Item ID
   title?: string;
-  description: string;
-  tags: string[]; // Flexible tags
-  image: string;
+  description?: string;
+  tags?: string[]; // Flexible tags
+  image?: string;
   testimonial: {
     text: string;
     author: string;
@@ -179,6 +212,7 @@ export interface Product {
   category?: string;
   description: string;
   image?: string;
+  images?: string[];
   checklist?: { text: string }[];
   orderMode: 'FIXED' | 'INTERNAL_FORM' | 'EXTERNAL_LINK';
   orderCode?: string;
@@ -190,6 +224,9 @@ export interface Product {
     price: number;
     unit: string;
     buttonText: string;
+    enableDeposit?: boolean;
+    depositRatio?: number;
+    balanceRatio?: number;
   };
   quoteConfig?: {
     priceText: string;
@@ -200,11 +237,17 @@ export interface Product {
     priceText: string;
     buttonText: string;
     formId: string;
+    enableDeposit?: boolean;
+    depositRatio?: number;
+    balanceRatio?: number;
   };
   externalLinkConfig?: {
     priceText: string;
     buttonText: string;
     url: string;
+    enableDeposit?: boolean;
+    depositRatio?: number;
+    balanceRatio?: number;
   };
   createdAt: string;
   updatedAt: string;
@@ -212,13 +255,37 @@ export interface Product {
 
 export interface SubItemContent {
   productId?: string; // New field for linked product
+  mainTitle?: string; // Adding main title
   coreServicesSectionTitle?: string;
   coreServices: CoreServiceItem[]; // Should be 4
   partners: PartnerItem[];
   cases: CaseStudy[];
+  faqs?: { id: string; question: string; answer: string; }[];
   additionalServices: string[]; // Page IDs
   button: ButtonConfig;
   linkedProductId?: string;
+  serviceIntro?: {
+    blockA: {
+      enabled: boolean;
+      title: string;
+      items: { id: string; title: string; image: string; }[];
+    };
+    blockB: {
+      enabled: boolean;
+      title: string;
+      images: string[];
+      content: string;
+      layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM';
+    };
+    blockC: {
+      enabled: boolean;
+      title: string;
+      beforeImage: string;
+      afterImage: string;
+      beforeLabel: string;
+      afterLabel: string;
+    };
+  };
 }
 
 export type GeneralBlockType = 
@@ -253,11 +320,11 @@ export interface GeneralBlock {
   };
   // Payload for different types
   hero1?: {
+    subtitle?: string;
     title: string;
     image: string;
     buttons: HomeHeroButton[];
-    testimonial?: { text: string; author: string; };
-    floatingCard?: { text: string; author: string; };
+    imageTestimonial?: { text: string; author: string; };
   };
   hero2?: {
     title: string;
@@ -268,8 +335,15 @@ export interface GeneralBlock {
   };
   mainService?: HomeServiceDisplay;
   secondaryServices?: HomeServiceDisplay[];
-  services?: HomeServiceDisplay[];
-  additionalServices?: string[]; // Page IDs
+  services?: {
+    subtitle?: string;
+    title?: string;
+    items: HomeServiceDisplay[];
+  } | HomeServiceDisplay[];
+  additionalServices?: {
+    title?: string;
+    items: string[];
+  } | string[]; // Page IDs
   consultationSteps?: {
     title: string;
     steps: ConsultationStep[];
@@ -283,9 +357,11 @@ export interface GeneralBlock {
       desc: string;
       action: string;
     }[];
+    footerLabels?: string[];
   };
   testimonials?: {
     title: string;
+    description?: string;
     items: HomeTestimonial[];
   };
   items?: HomeTestimonial[]; // For direct items in block
@@ -394,19 +470,48 @@ export const DEFAULT_MAJOR_ITEM_TEMPLATE: PageContent = {
 };
 
 export const DEFAULT_SUB_ITEM_TEMPLATE: SubItemContent = {
-  coreServicesSectionTitle: '核心服務',
+  mainTitle: '服務介紹與特色',
+  coreServicesSectionTitle: '服務流程',
   coreServices: [
-    { title: '核心服務 1', content: '服務內容...' },
-    { title: '核心服務 2', content: '服務內容...' },
-    { title: '核心服務 3', content: '服務內容...' },
-    { title: '核心服務 4', content: '服務內容...' },
+    { title: '流程 1', content: '流程內容...' },
+    { title: '流程 2', content: '流程內容...' },
+    { title: '流程 3', content: '流程內容...' },
+    { title: '流程 4', content: '流程內容...' },
   ],
   partners: [
     { title: '合作夥伴 1', description: '夥伴描述...' }
   ],
   cases: [],
+  faqs: [],
   additionalServices: [],
-  button: { text: '加入預約單', type: 'FORM', value: '', isVisible: true }
+  button: { text: '加入預約單', type: 'FORM', value: '', isVisible: true },
+  serviceIntro: {
+    blockA: {
+      enabled: false,
+      title: '服務項目',
+      items: [
+        { id: '1', title: '項目 1', image: '' },
+        { id: '2', title: '項目 2', image: '' },
+        { id: '3', title: '項目 3', image: '' },
+        { id: '4', title: '項目 4', image: '' },
+      ]
+    },
+    blockB: {
+      enabled: false,
+      title: '服務介紹',
+      images: [],
+      content: '服務內容說明...',
+      layout: 'LEFT'
+    },
+    blockC: {
+      enabled: false,
+      title: '施作前後對比',
+      beforeImage: '',
+      afterImage: '',
+      beforeLabel: 'Before',
+      afterLabel: 'After'
+    }
+  }
 };
 
 export const DEFAULT_GENERAL_TEMPLATE: GeneralPageContent = {

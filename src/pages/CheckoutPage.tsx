@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'motion/react';
@@ -6,12 +6,46 @@ import { CreditCard, Truck, User, Phone, MapPin, Mail, ArrowRight, ArrowLeft, Ch
 import { useNavigate } from 'react-router-dom';
 import { Order } from '../types/admin';
 import { orderService } from '../services/orderService';
+import { productService } from '../services/productService';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Label } from '../components/ui/Label';
+import { Button } from '../components/ui/Button';
 
 export default function CheckoutPage() {
   const { cartItems, totalPrice, clearCart } = useCart();
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const [orderItemsWithDeposit, setOrderItemsWithDeposit] = useState<any[]>([]);
+
+  useEffect(() => {
+    const calculateDeposits = async () => {
+      const items = await Promise.all(cartItems.map(async item => {
+        const product = await productService.getById(item.pageId);
+        const isDepositEnabled = product?.orderMode === 'FIXED' && product?.fixedConfig?.enableDeposit;
+        const depositRatio = isDepositEnabled ? (product.fixedConfig.depositRatio || 100) : 100;
+        
+        const itemTotal = item.price * item.quantity;
+        const depositAmount = isDepositEnabled ? Math.round(itemTotal * (depositRatio / 100)) : itemTotal;
+        const balanceAmount = itemTotal - depositAmount;
+
+        return {
+          ...item,
+          isDepositEnabled,
+          depositAmount,
+          balanceAmount
+        };
+      }));
+      setOrderItemsWithDeposit(items);
+    };
+    calculateDeposits();
+  }, [cartItems]);
+
+  const totalDeposit = orderItemsWithDeposit.reduce((sum, item) => sum + item.depositAmount, 0);
+  const totalBalance = orderItemsWithDeposit.reduce((sum, item) => sum + item.balanceAmount, 0);
+  const hasDeposit = totalBalance > 0;
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -35,8 +69,7 @@ export default function CheckoutPage() {
     setLoading(true);
 
     // 模擬訂單生成
-    setTimeout(async () => {
-      try {
+    const processOrder = async () => {
       const mainProductId = cartItems[0]?.pageId || 'unknown';
       const orderId = await orderService.generateOrderId(mainProductId);
 
@@ -45,6 +78,8 @@ export default function CheckoutPage() {
         userId: user?.id || 'guest',
         items: [...cartItems],
         totalAmount: totalPrice,
+        depositAmount: hasDeposit ? totalDeposit : undefined,
+        balanceAmount: hasDeposit ? totalBalance : undefined,
         status: 'PENDING',
         customerInfo: {
           name: formData.name,
@@ -61,7 +96,7 @@ export default function CheckoutPage() {
         paidAt: new Date().toISOString()
       };
 
-      // 存入 localStorage
+      // 存入 localforage
       await orderService.create(newOrder);
 
       // 如果有登入，更新使用者資料
@@ -87,12 +122,9 @@ export default function CheckoutPage() {
       
       // 跳轉至成功頁面
       navigate('/checkout-success', { state: { orderId: newOrder.id } });
-      } catch (error) {
-        console.error('Failed to create order:', error);
-        alert('操作失敗');
-        setLoading(false);
-      }
-    }, 1500);
+    };
+
+    setTimeout(processOrder, 1500);
   };
 
   if (cartItems.length === 0) {
@@ -106,8 +138,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const inputClass = "w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all";
-  const labelClass = "block text-sm font-bold text-stone-700 mb-2 flex items-center gap-2";
+  const labelClass = "flex items-center gap-2 mb-2";
 
   return (
     <div className="min-h-screen bg-stone-50 pt-32 pb-20">
@@ -127,57 +158,52 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className={labelClass}><User size={16}/> 姓名</label>
-                    <input 
+                    <Label className={labelClass}><User size={16}/> 姓名</Label>
+                    <Input 
                       required
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="您的姓名"
                     />
                   </div>
                   <div>
-                    <label className={labelClass}><Phone size={16}/> 聯絡電話</label>
-                    <input 
+                    <Label className={labelClass}><Phone size={16}/> 聯絡電話</Label>
+                    <Input 
                       required
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="0912-345-678"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className={labelClass}><Mail size={16}/> 電子郵件</label>
-                    <input 
+                    <Label className={labelClass}><Mail size={16}/> 電子郵件</Label>
+                    <Input 
                       required
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="example@mail.com"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className={labelClass}><MapPin size={16}/> 服務地址</label>
-                    <input 
+                    <Label className={labelClass}><MapPin size={16}/> 服務地址</Label>
+                    <Input 
                       required
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="請輸入完整地址"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className={labelClass}><MessageSquare size={16}/> LINE ID (選填)</label>
-                    <input 
+                    <Label className={labelClass}><MessageSquare size={16}/> LINE ID (選填)</Label>
+                    <Input 
                       name="lineId"
                       value={formData.lineId}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="您的 LINE ID"
                     />
                   </div>
@@ -192,32 +218,30 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className={labelClass}><User size={16}/> 緊急聯絡人姓名 (選填)</label>
-                    <input 
+                    <Label className={labelClass}><User size={16}/> 緊急聯絡人姓名 (選填)</Label>
+                    <Input 
                       name="emergencyContactName"
                       value={formData.emergencyContactName}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="聯絡人姓名"
                     />
                   </div>
                   <div>
-                    <label className={labelClass}><Phone size={16}/> 緊急聯絡人電話 (選填)</label>
-                    <input 
+                    <Label className={labelClass}><Phone size={16}/> 緊急聯絡人電話 (選填)</Label>
+                    <Input 
                       name="emergencyContactPhone"
                       value={formData.emergencyContactPhone}
                       onChange={handleInputChange}
-                      className={inputClass} 
                       placeholder="聯絡人電話"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className={labelClass}><MessageSquare size={16}/> 特殊需求 (選填)</label>
-                    <textarea 
+                    <Label className={labelClass}><MessageSquare size={16}/> 特殊需求 (選填)</Label>
+                    <Textarea 
                       name="specialRequirements"
                       value={formData.specialRequirements}
                       onChange={(e) => setFormData(prev => ({ ...prev, specialRequirements: e.target.value }))}
-                      className={`${inputClass} h-32 resize-none`} 
+                      className="h-32" 
                       placeholder="請輸入任何需要我們特別注意的事項..."
                     />
                   </div>
@@ -263,23 +287,28 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              <div className="flex items-center justify-between pt-4">
-                <button 
-                  type="button"
-                  onClick={() => navigate('/cart')}
-                  className="flex items-center gap-2 text-stone-500 font-bold hover:text-stone-900 transition-colors"
-                >
-                  <ArrowLeft size={18} />
-                  返回購物車
-                </button>
-                <button 
-                  type="submit"
-                  disabled={loading}
-                  className="bg-primary hover:bg-primary-dark text-white px-10 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? '處理中...' : '確認下單'}
-                  {!loading && <CheckCircle2 size={18} />}
-                </button>
+              <div className="pt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <button 
+                    type="button"
+                    onClick={() => navigate('/cart')}
+                    className="flex items-center gap-2 text-stone-500 font-bold hover:text-stone-900 transition-colors"
+                  >
+                    <ArrowLeft size={18} />
+                    返回購物車
+                  </button>
+                  <Button 
+                    type="submit"
+                    isLoading={loading}
+                    size="lg"
+                  >
+                    {loading ? '處理中...' : '確認下單'}
+                    {!loading && <CheckCircle2 size={18} />}
+                  </Button>
+                </div>
+                <p className="text-right tracking-wider text-sm text-stone-500 font-medium">
+                  將有專人立即為您服務
+                </p>
               </div>
             </form>
           </div>
@@ -318,10 +347,28 @@ export default function CheckoutPage() {
                   <span>運費</span>
                   <span className="text-emerald-600 font-bold">免運費</span>
                 </div>
-                <div className="border-t border-stone-100 pt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-stone-900">總計</span>
-                  <span className="text-2xl font-black text-primary">NT$ {totalPrice.toLocaleString()}</span>
-                </div>
+                
+                {hasDeposit ? (
+                  <>
+                    <div className="border-t border-stone-100 pt-4 flex justify-between items-center">
+                      <span className="text-stone-500">總計</span>
+                      <span className="text-stone-900 font-bold">NT$ {totalPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-stone-500">尾款 (服務完成後支付)</span>
+                      <span className="text-stone-900 font-bold">NT$ {totalBalance.toLocaleString()}</span>
+                    </div>
+                    <div className="border-t border-stone-100 pt-4 flex justify-between items-center">
+                      <span className="text-lg font-bold text-stone-900">應付訂金</span>
+                      <span className="text-2xl font-black text-primary">NT$ {totalDeposit.toLocaleString()}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="border-t border-stone-100 pt-4 flex justify-between items-center">
+                    <span className="text-lg font-bold text-stone-900">總計</span>
+                    <span className="text-2xl font-black text-primary">NT$ {totalPrice.toLocaleString()}</span>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 p-4 bg-stone-50 rounded-2xl border border-stone-100">

@@ -21,11 +21,12 @@ export default function MajorItemEditor({ control, register, activeTab, watch, s
     name: "content.cases"
   });
 
-  const handleServiceSelect = (index: number, pageId: string) => {
+  const handleServiceSelect = async (index: number, pageId: string) => {
     const selectedPage = subItemPages.find((p: any) => p.id === pageId);
     if (selectedPage) {
       const currentService = watch(`content.services.${index}`);
-      const productData = selectedPage.content?.subItem?.productId ? productService.getById(selectedPage.content.subItem.productId) : null;
+      const productId = selectedPage.content?.subItem?.productId;
+      const productData = productId ? await productService.getById(productId) : null;
       updateService(index, {
         ...currentService,
         targetPageId: pageId,
@@ -38,10 +39,10 @@ export default function MajorItemEditor({ control, register, activeTab, watch, s
 
   // 💡 樣式常數：嚴格對齊 UI 規範
   const labelClass = "block text-xs font-bold text-stone-500 uppercase mb-1";
-  const inputClass = "w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all text-sm";
+  const inputClass = "w-full px-3 py-2 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all text-sm";
   const cardClass = "bg-white p-6 rounded-2xl shadow-sm border border-stone-200 relative";
   const innerCardClass = "bg-stone-50 p-4 rounded-xl border border-stone-200";
-  const primaryBtn = "bg-[#8B5E34] hover:bg-black text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all";
+  const primaryBtn = "bg-[#8B5E34] hover:bg-black text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all";
   const secondaryBtn = "bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors";
 
   // --- 1. Hero 區塊 ---

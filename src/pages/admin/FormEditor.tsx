@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Trash2, GripVertical, ClipboardCheck, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, GripVertical, ClipboardCheck, Eye } from 'lucide-react';
+import SaveButton from '../../components/admin/SaveButton';
+import CreateButton from '../../components/admin/CreateButton';
 import { formService } from '../../services/formService';
 import { Form, FormField, FormFieldType, FormFieldOption } from '../../types/form';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +11,8 @@ export default function FormEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
 
   const [form, setForm] = useState<Omit<Form, 'id' | 'createdAt' | 'updatedAt'>>({
     name: '',
@@ -40,22 +43,25 @@ export default function FormEditor() {
       return;
     }
 
-    setIsSaving(true);
+    setSaveStatus('saving');
     try {
       if (isEditing && id) {
-        await formService.update(id, form as any);
+        formService.update(id, form as any);
       } else {
-        await formService.create(form as any);
+        formService.create(form as any);
       }
       
       // Simulate delay for feedback
       await new Promise(resolve => setTimeout(resolve, 800));
-      alert('表單已儲存');
-      navigate('/admin/forms');
+      setSaveStatus('saved');
+      
+      setTimeout(() => {
+        alert('表單已儲存');
+        navigate('/admin/forms');
+      }, 500);
     } catch (error: any) {
+      setSaveStatus('idle');
       alert(error.message || '儲存失敗');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -83,6 +89,19 @@ export default function FormEditor() {
     }));
   };
 
+  const applyBookingTemplate = () => {
+    setForm({
+      ...form,
+      fields: [
+        { id: uuidv4(), label: '姓名', type: 'text', required: true },
+        { id: uuidv4(), label: '聯絡電話', type: 'text', required: true },
+        { id: uuidv4(), label: '電子郵件', type: 'text', required: true },
+        { id: uuidv4(), label: '服務地址', type: 'text', required: true },
+        { id: uuidv4(), label: 'LINE ID', type: 'text', required: false, placeholder: '選填' }
+      ]
+    });
+    setShowTemplateConfirm(false);
+  };
   const moveField = (index: number, direction: 'up' | 'down') => {
     if (
       (direction === 'up' && index === 0) || 
@@ -303,26 +322,21 @@ export default function FormEditor() {
 
   return (
     <div className="max-w-4xl mx-auto pb-20">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/admin/forms')}
-            className="p-2 hover:bg-stone-200 rounded-full transition-colors"
-          >
-            <ArrowLeft size={24} className="text-stone-600" />
-          </button>
-          <h1 className="text-2xl font-bold text-stone-900">
-            {isEditing ? '編輯表單' : '新增表單'}
-          </h1>
+      <div className="sticky top-0 z-20 bg-stone-50/80 backdrop-blur-md border-b border-stone-200 -mx-4 px-4 py-4 mb-8 sm:-mx-8 sm:px-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/admin/forms')}
+              className="p-2 hover:bg-stone-200 rounded-full transition-colors"
+            >
+              <ArrowLeft size={24} className="text-stone-600" />
+            </button>
+            <h1 className="text-2xl font-bold text-stone-900">
+              {isEditing ? '編輯表單' : '新增表單'}
+            </h1>
+          </div>
+          <SaveButton status={saveStatus} onClick={handleSave} type="button" />
         </div>
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-colors ${isSaving ? 'bg-green-600 text-white' : 'bg-primary text-white hover:bg-primary/90'}`}
-        >
-          <Save size={20} />
-          {isSaving ? '儲存中...' : '儲存表單'}
-        </button>
       </div>
 
       <div className="space-y-8">
@@ -424,33 +438,18 @@ export default function FormEditor() {
               {form.purpose === 'BOOKING' && (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (window.confirm('確定要套用預約表單預設欄位嗎？這將會覆蓋現有的欄位。')) {
-                      setForm({
-                        ...form,
-                        fields: [
-                          { id: uuidv4(), label: '姓名', type: 'text', required: true },
-                          { id: uuidv4(), label: '聯絡電話', type: 'text', required: true },
-                          { id: uuidv4(), label: '電子郵件', type: 'text', required: true },
-                          { id: uuidv4(), label: '服務地址', type: 'text', required: true },
-                          { id: uuidv4(), label: 'LINE ID', type: 'text', required: false, placeholder: '選填' }
-                        ]
-                      });
-                    }
-                  }}
+                  onClick={() => setShowTemplateConfirm(true)}
                   className="flex items-center gap-2 text-stone-600 hover:text-stone-800 font-medium bg-stone-100 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ClipboardCheck size={20} />
                   套用預約範本
                 </button>
               )}
-              <button
+              <CreateButton
                 onClick={addField}
-                className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium bg-primary/10 px-4 py-2 rounded-lg transition-colors"
-              >
-                <Plus size={20} />
-                新增欄位
-              </button>
+                text="新增欄位"
+                icon={Plus}
+              />
             </div>
           </div>
 
@@ -463,13 +462,11 @@ export default function FormEditor() {
                 <h3 className="text-lg font-medium text-stone-900 mb-2">尚未新增任何欄位</h3>
                 <p className="text-stone-500 mb-6">點擊上方按鈕開始建立表單欄位</p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <button
+                  <CreateButton
                     onClick={addField}
-                    className="inline-flex items-center gap-2 bg-stone-900 text-white px-6 py-2.5 rounded-lg hover:bg-stone-800 transition-colors"
-                  >
-                    <Plus size={20} />
-                    新增第一個欄位
-                  </button>
+                    text="新增第一個欄位"
+                    icon={Plus}
+                  />
                   {form.purpose === 'BOOKING' && (
                     <button
                       type="button"
@@ -499,6 +496,40 @@ export default function FormEditor() {
           </div>
         </section>
       </div>
+
+      {/* 範本確認 Modal */}
+      {showTemplateConfirm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-stone-100 flex items-center gap-3 text-primary">
+              <ClipboardCheck size={24} />
+              <h2 className="text-xl font-bold">確認套用預約範本</h2>
+            </div>
+            <div className="p-6">
+              <p className="text-stone-600 mb-2">
+                您確定要套用預約表單預設欄位嗎？
+              </p>
+              <p className="text-sm text-stone-400">
+                這將會覆蓋現有的所有欄位，且無法復原。
+              </p>
+            </div>
+            <div className="p-6 bg-stone-50 flex justify-end gap-3">
+              <button
+                onClick={() => setShowTemplateConfirm(false)}
+                className="px-4 py-2 text-stone-600 hover:text-stone-800 font-medium"
+              >
+                取消
+              </button>
+              <button
+                onClick={applyBookingTemplate}
+                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-bold shadow-sm"
+              >
+                確認套用
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

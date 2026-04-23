@@ -1,48 +1,88 @@
 import { FormSubmission } from '../types/form';
 import { v4 as uuidv4 } from 'uuid';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import localforage from 'localforage';
 
+// 這是存在你瀏覽器裡的鑰匙，不用後端，不用 API
 const STORAGE_KEY = 'haolingju_submissions';
 
-export const submissionService = {
-  // Read from Supabase first, fallback to localStorage
-  getAll: async (): Promise<FormSubmission[]> => {
-    if (isSupabaseConfigured) {
-      try {
-        const { data, error } = await supabase.from('submissions').select('*');
-        if (!error && data) {
-          const submissions = data.map(row => ({
-            id: row.id,
-            formId: row.form_id,
-            userId: row.user_id,
-            pageSlug: row.page_slug,
-            pageTitle: row.page_title,
-            data: row.data || {},
-            createdAt: row.created_at,
-            status: row.status,
-          } as FormSubmission));
-          // Update cache
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
-          return submissions;
-        }
-      } catch (err) {
-        console.error('submissionService.getAll Supabase error:', err);
-      }
-    }
+// Configure localforage
+localforage.config({
+  name: 'haolingju',
+  storeName: 'submissions'
+});
 
-    // Fallback to localStorage
+export const submissionService = {
+  // 讀取：從瀏覽器拿資料
+  getAll: async (): Promise<FormSubmission[]> => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
+      const stored = await localforage.getItem<FormSubmission[]>(STORAGE_KEY);
+      if (stored) return stored;
+
+      // Migration from localStorage
+      const oldStored = localStorage.getItem(STORAGE_KEY);
+      if (oldStored) {
+        try {
+          const parsed = JSON.parse(oldStored);
+          await localforage.setItem(STORAGE_KEY, parsed);
+          // Clear localStorage to free up space
+          localStorage.removeItem(STORAGE_KEY); 
+          return parsed;
+        } catch (e) {
+          console.error('Failed to parse old submissions', e);
+        }
+      }
+
+      return [];
     } catch (error) {
       console.error('Failed to load submissions:', error);
       return [];
     }
   },
 
+  generateBookingId: async (formId: string): Promise<string> => {
+    const submissions = await submissionService.getAll();
+    
+    // 1. Generate Form Abbreviation
+    // e.g., home-organize-booking-form -> HOME-ORG
+    const parts = formId.replace(/-form$/, '').split('-');
+    const formAbbr = parts.slice(0, 2).map(p => p.toUpperCase()).join('-');
+    
+    // 2. Generate Date Prefix (YYMMDD)
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const datePrefix = `${yy}${mm}${dd}`;
+    
+    // 3. Generate Sequence
+    // Format: BK-[FORM]-[YYMMDD]-[SEQ]
+    const prefix = `BK-${formAbbr}-${datePrefix}-`;
+    
+    const todaySubmissions = submissions.filter(s => s.bookingId && s.bookingId.startsWith(prefix));
+    
+    let maxSequence = 0;
+    todaySubmissions.forEach(s => {
+      const seqStr = s.bookingId!.slice(-3);
+      const seq = parseInt(seqStr, 10);
+      if (!isNaN(seq) && seq > maxSequence) {
+        maxSequence = seq;
+      }
+    });
+    
+    const sequence = String(maxSequence + 1).padStart(3, '0');
+    
+    return `${prefix}${sequence}`;
+  },
+
+  getById: async (id: string): Promise<FormSubmission | null> => {
+    const all = await submissionService.getAll();
+    return all.find(s => s.id === id) || null;
+  },
+
+  // 存檔：把表單內容寫進瀏覽器
   create: async (submission: Omit<FormSubmission, 'id' | 'createdAt'>): Promise<FormSubmission> => {
     console.log('Creating submission for form:', submission.formId);
-
+    
     // Process data to handle Files (JSON.stringify doesn't support them)
     const processedData = { ...submission.data };
     Object.keys(processedData).forEach(key => {
@@ -52,67 +92,46 @@ export const submissionService = {
       }
     });
 
+    const bookingId = await submissionService.generateBookingId(submission.formId);
+
     const newSubmission: FormSubmission = {
       ...submission,
       data: processedData,
       id: uuidv4(),
+      bookingId,
       createdAt: new Date().toISOString(),
       status: 'PENDING'
     };
-
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from('submissions').insert({
-        id: newSubmission.id,
-        form_id: newSubmission.formId,
-        user_id: newSubmission.userId || null,
-        page_slug: newSubmission.pageSlug,
-        page_title: newSubmission.pageTitle,
-        data: newSubmission.data,
-        status: newSubmission.status,
-        created_at: newSubmission.createdAt,
-      });
-      if (error) throw new Error(error.message);
-    }
-
-    // Also update localStorage cache
+    
     try {
       const all = await submissionService.getAll();
       all.push(newSubmission);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      await localforage.setItem(STORAGE_KEY, all);
       console.log('Submission saved successfully. Total count:', all.length);
-
-      // Trigger a storage event for other tabs
+      
+      // Trigger a storage event for other tabs (localforage doesn't trigger this automatically)
       window.dispatchEvent(new Event('storage'));
+      
+      return newSubmission;
     } catch (error) {
-      console.error('Failed to save submission to cache:', error);
+      console.error('Failed to save submission:', error);
+      throw error;
     }
-
-    return newSubmission;
   },
 
   updateStatus: async (id: string, status: FormSubmission['status']): Promise<void> => {
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from('submissions').update({ status }).eq('id', id);
-      if (error) throw new Error(error.message);
-    }
-
-    // Update cache
     const all = await submissionService.getAll();
     const index = all.findIndex(s => s.id === id);
     if (index !== -1 && status) {
       all[index].status = status;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      await localforage.setItem(STORAGE_KEY, all);
       window.dispatchEvent(new Event('storage'));
     }
   },
 
   delete: async (id: string): Promise<void> => {
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from('submissions').delete().eq('id', id);
-      if (error) throw new Error(error.message);
-    }
-
     const all = await submissionService.getAll();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all.filter(s => s.id !== id)));
+    await localforage.setItem(STORAGE_KEY, all.filter(s => s.id !== id));
+    window.dispatchEvent(new Event('storage'));
   }
 };

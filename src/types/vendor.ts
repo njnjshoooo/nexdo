@@ -16,7 +16,17 @@ export interface Vendor {
   // 信賴與營運資訊
   status: 'active' | 'suspended' | 'reviewing'; // 合作狀態
   certifications: string[]; // 專業證照 / 認證 (附件 URL)
-  billingCycle: 'monthly' | 'cash'; // 結帳週期
+  
+  // 結算與財務設定
+  commissionRate?: number; // 分潤比例 (%)
+  settlementCycle?: 'Monthly' | 'Bi-weekly' | 'Weekly'; // 結算週期
+  bankInfo?: {
+    bankCode: string; // 銀行代碼
+    bank: string; // 匯款銀行
+    bankName: string; // 分行名稱
+    accountName: string; // 戶名
+    accountNumber: string; // 帳號
+  };
   
   createdAt: string;
   updatedAt: string;

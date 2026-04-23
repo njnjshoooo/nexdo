@@ -7,6 +7,7 @@ import { Article } from '../types/article';
 import { DEFAULT_BLOG_TEMPLATE } from '../types/admin';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Card, CardContent, CardDescription, CardFooter, CardImage, CardImageWrapper, CardTitle } from '../components/ui/Card';
 
 export default function Blog() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -75,9 +76,38 @@ export default function Blog() {
   const totalPages = Math.ceil(filteredArticles.length / postsPerPage);
 
   // Get recommended services
-  const recommendedServices = blogConfig.recommendedServiceIds
-    ?.map(id => pageService.getById(id))
-    .filter(p => !!p) || [];
+  const [loadedRecommendedServices, setLoadedRecommendedServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadRecommended = async () => {
+      const ids = blogConfig.recommendedServiceIds || [];
+      const services = await Promise.all(ids.map(async id => {
+        const p = pageService.getById(id);
+        if (!p) return null;
+
+        let image = p.content.hero.backgroundImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop';
+        let description = p.content.hero.description;
+
+        if (p.content.subItem?.productId) {
+          const product = await productService.getById(p.content.subItem.productId);
+          if (product) {
+            if (product.image) image = product.image;
+            if (product.description) description = product.description;
+          }
+        }
+
+        return {
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          image,
+          description
+        };
+      }));
+      setLoadedRecommendedServices(services.filter(Boolean));
+    };
+    loadRecommended();
+  }, [blogConfig.recommendedServiceIds]);
 
   return (
     <div className="pt-20"> {/* Add pt-20 to avoid overlapping with Header */}
@@ -123,27 +153,25 @@ export default function Blog() {
             {/* Left 70%: Featured Post */}
             <div className="lg:col-span-7">
               {featuredPost && (
-                <Link to={`/blog/${featuredPost.slug}`} className="block group h-full">
-                  <div className="bg-white rounded-[2rem] shadow-sm border border-stone-200 overflow-hidden transition-all hover:shadow-md h-full flex flex-col">
-                    <div className="aspect-[2/1] overflow-hidden">
-                      <img 
+                <Link to={`/blog/${featuredPost.slug}`} className="block h-full">
+                  <Card className="rounded-[2rem] h-full">
+                    <CardImageWrapper className="aspect-[2/1]">
+                      <CardImage 
                         src={featuredPost.coverImage || 'https://picsum.photos/seed/blog/1200/600'} 
                         alt={featuredPost.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        referrerPolicy="no-referrer"
                       />
-                    </div>
-                    <div className="p-8 flex flex-col flex-grow">
+                    </CardImageWrapper>
+                    <CardContent className="p-8">
                       {featuredPost.categoryId && (
-                        <span className="text-[#8B5E34] text-sm font-bold tracking-wider mb-2">{featuredPost.categoryId}</span>
+                        <span className="text-[#8B5E34] text-sm font-bold tracking-wider mb-2 block">{featuredPost.categoryId}</span>
                       )}
-                      <h2 className="text-3xl font-bold text-stone-900 mb-4 group-hover:text-[#8B5E34] transition-colors">{featuredPost.title}</h2>
-                      <p className="text-stone-600 line-clamp-3 mb-6 flex-grow">{featuredPost.summary || featuredPost.content.substring(0, 150)}</p>
+                      <CardTitle className="text-3xl mb-4 group-hover:text-[#8B5E34]">{featuredPost.title}</CardTitle>
+                      <CardDescription className="line-clamp-3 mb-6 flex-grow">{featuredPost.summary || featuredPost.content.substring(0, 150)}</CardDescription>
                       <div className="text-sm text-stone-400 font-medium mt-auto">
                         {new Date(featuredPost.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </Link>
               )}
             </div>
@@ -189,27 +217,25 @@ export default function Blog() {
           {displayPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayPosts.map(post => (
-                <Link key={post.id} to={`/blog/${post.slug}`} className="block group">
-                  <div className="bg-white rounded-3xl shadow-sm border border-stone-200 overflow-hidden transition-all hover:shadow-md h-full flex flex-col">
-                    <div className="aspect-[3/2] overflow-hidden">
-                      <img 
+                <Link key={post.id} to={`/blog/${post.slug}`} className="block h-full">
+                  <Card className="h-full">
+                    <CardImageWrapper className="aspect-[3/2]">
+                      <CardImage 
                         src={post.coverImage || 'https://picsum.photos/seed/blog/600/400'} 
                         alt={post.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        referrerPolicy="no-referrer"
                       />
-                    </div>
-                    <div className="p-6 flex flex-col flex-grow">
+                    </CardImageWrapper>
+                    <CardContent className="p-6">
                       {post.categoryId && (
-                        <span className="text-[#8B5E34] text-xs font-bold tracking-wider mb-2">{post.categoryId}</span>
+                        <span className="text-[#8B5E34] text-xs font-bold tracking-wider mb-2 block">{post.categoryId}</span>
                       )}
-                      <h3 className="text-xl font-bold text-stone-900 mb-3 group-hover:text-[#8B5E34] transition-colors line-clamp-2">{post.title}</h3>
-                      <p className="text-stone-600 text-sm line-clamp-2 mb-4 flex-grow">{post.summary || post.content.substring(0, 100)}</p>
+                      <CardTitle className="text-xl mb-3 group-hover:text-[#8B5E34] line-clamp-2">{post.title}</CardTitle>
+                      <CardDescription className="text-sm line-clamp-2 mb-4 flex-grow">{post.summary || post.content.substring(0, 100)}</CardDescription>
                       <div className="text-xs text-stone-400 font-medium mt-auto">
                         {new Date(post.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </Link>
               ))}
             </div>
@@ -256,39 +282,41 @@ export default function Blog() {
         )}
 
         {/* Recommended Services Module */}
-        {recommendedServices.length > 0 && (
+        {loadedRecommendedServices.length > 0 && (
           <section className="mt-20 border-t border-stone-200 pt-16">
             <h2 className="text-3xl font-bold text-stone-900 mb-8">好鄰居的貼心推薦</h2>
             <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scrollbar-hide pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
-              {recommendedServices.map(page => (
+              {loadedRecommendedServices.map(service => (
                 <motion.div
-                  key={page.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col border border-stone-100 min-w-[83%] md:min-w-0 snap-start flex-shrink-0"
+                  key={service.id}
+                  className="min-w-[83%] md:min-w-0 snap-start flex-shrink-0"
                   whileHover={{ y: -5 }}
                 >
-                  <div className="w-full h-48 bg-stone-200 rounded-xl mb-6 overflow-hidden">
-                    <img 
-                      src={(page.content.subItem?.productId ? productService.getById(page.content.subItem.productId)?.image : undefined) || page.content.hero.backgroundImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                      alt={page.title} 
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-stone-900 mb-3">{page.title}</h3>
-                  <p className="text-stone-600 text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
-                    {(page.content.subItem?.productId ? productService.getById(page.content.subItem.productId)?.description : undefined) || page.content.hero.description}
-                  </p>
-                  
-                  <div className="flex justify-end mt-auto">
-                    <Link 
-                      to={`/${page.slug}`}
-                      className="inline-flex items-center gap-1 bg-[#885200] hover:bg-[#663D00] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
-                    >
-                      服務介紹
-                      <ArrowRight size={14} />
-                    </Link>
-                  </div>
+                  <Card className="rounded-2xl h-full">
+                    <CardImageWrapper className="w-full h-48 border-b border-stone-100">
+                      <CardImage 
+                        src={service.image} 
+                        alt={service.title} 
+                      />
+                    </CardImageWrapper>
+                    
+                    <CardContent className="p-6">
+                      <CardTitle className="text-xl mb-3">{service.title}</CardTitle>
+                      <CardDescription className="text-sm mb-8 flex-grow line-clamp-3">
+                        {service.description}
+                      </CardDescription>
+                      
+                      <div className="flex justify-end mt-auto">
+                        <Link 
+                          to={`/${service.slug}`}
+                          className="inline-flex items-center gap-1 bg-[#885200] hover:bg-[#663D00] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
+                        >
+                          服務介紹
+                          <ArrowRight size={14} />
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               ))}
             </div>

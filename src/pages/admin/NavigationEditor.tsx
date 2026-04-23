@@ -5,12 +5,17 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Trash2, ChevronDown, ChevronRight, FileText, LayoutTemplate, CheckCircle2, Search, MousePointer2 } from 'lucide-react';
+import { GripVertical, Plus, Trash2, ChevronDown, ChevronRight, FileText, LayoutTemplate, CheckCircle2, MousePointer2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { NavItem } from '../../types/navigation';
 import { navigationService } from '../../services/navigationService';
 import { pageService } from '../../services/pageService';
+import { articleService } from '../../services/articleService';
 import { Page } from '../../types/admin';
+import { Article } from '../../types/article';
+import SaveButton from '../../components/admin/SaveButton';
+import AdminTable from '../../components/admin/AdminTable';
+import AdminSearchInput from '../../components/admin/search/AdminSearchInput';
 
 // --- 核心邏輯：展平與還原樹狀結構 ---
 interface FlattenedItem extends NavItem {
@@ -43,21 +48,19 @@ function unflatten(flattenedItems: FlattenedItem[]): NavItem[] {
 }
 
 // --- 視覺組件 ---
-function SidebarDraggableItem({ page, onAdd }: { page: any, onAdd: (page: any) => void }) {
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: `sidebar-${page.id}`,
-    data: { type: 'sidebarItem', page }
-  });
+function SidebarItem({ item, onAdd, type }: { item: any, onAdd: (item: any, type: 'page' | 'article' | 'custom') => void, type: 'page' | 'article' | 'custom' }) {
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes} className="p-3 mb-2 bg-white border border-stone-200 rounded-xl shadow-sm flex items-center gap-3 cursor-grab hover:border-stone-400 transition-all">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${page.isShell ? 'bg-stone-100 text-stone-600' : 'bg-blue-50 text-blue-600'}`}>
-        {page.isShell ? <LayoutTemplate size={18} /> : <FileText size={18} />}
+    <div className="p-3 mb-2 bg-white border border-stone-200 rounded-xl shadow-sm flex items-center gap-3 hover:border-stone-400 transition-all">
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${type === 'custom' ? 'bg-stone-100 text-stone-600' : 'bg-blue-50 text-blue-600'}`}>
+        {type === 'custom' ? <LayoutTemplate size={18} /> : <FileText size={18} />}
       </div>
       <div className="text-left overflow-hidden flex-1">
-        <div className="text-sm font-bold text-stone-800 truncate">{page.title}</div>
-        <div className="text-[10px] uppercase font-bold text-stone-400">{page.isShell ? '空殼' : '頁面'}</div>
+        <div className="text-sm font-bold text-stone-800 truncate">{item.title}</div>
+        <div className="text-[10px] uppercase font-bold text-stone-400">
+          {type === 'custom' ? '自訂連結' : type === 'article' ? '文章' : '頁面'}
+        </div>
       </div>
-      <button onClick={(e) => { e.stopPropagation(); onAdd(page); }} className="p-1.5 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-primary transition-colors">
+      <button onClick={(e) => { e.stopPropagation(); onAdd(item, type); }} className="p-1.5 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-primary transition-colors">
         <Plus size={18} />
       </button>
     </div>
@@ -85,7 +88,7 @@ function SortableNavItem({ item, depth, onUpdate, onDelete, isExpanded, onToggle
           <input type="text" value={item.label} onChange={(e) => onUpdate(item.id, { label: e.target.value, isCustomLabel: true })} className="col-span-4 border rounded-lg px-3 py-1.5 text-sm font-bold outline-none focus:border-stone-400" />
           <input type="text" value={item.url} onChange={(e) => onUpdate(item.id, { url: e.target.value })} className="col-span-6 border rounded-lg px-3 py-1.5 text-sm font-mono text-stone-500 bg-stone-50" />
           <div className="col-span-2 flex justify-end">
-            <button onClick={() => onDelete(item.id)} className="p-2 text-stone-400 hover:text-red-500"><Trash2 size={18}/></button>
+            <AdminTable.Delete onClick={() => onDelete(item.id)} />
           </div>
         </div>
       </div>
@@ -96,31 +99,54 @@ function SortableNavItem({ item, depth, onUpdate, onDelete, isExpanded, onToggle
 export default function NavigationEditor() {
   const [items, setItems] = useState<NavItem[]>([]);
   const [pages, setPages] = useState<Page[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [shellTitle, setShellTitle] = useState('');
+  const [articles, setArticles] = useState<Article[]>([]);
+  
+  const [expandedSection, setExpandedSection] = useState<'pages' | 'articles' | 'custom' | null>('pages');
+  const [searchQueryPages, setSearchQueryPages] = useState('');
+  const [searchQueryArticles, setSearchQueryArticles] = useState('');
+  const [customTitle, setCustomTitle] = useState('');
+  const [customUrl, setCustomUrl] = useState('');
+
   const [toast, setToast] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => {
     const settings = navigationService.getSettings();
     setItems(settings.items || []);
     setPages(pageService.getAll());
+    setArticles(articleService.getAll());
     setExpandedIds(new Set(settings.items.map(i => i.id)));
   }, []);
 
   const flattenedItems = useMemo(() => flatten(items, expandedIds), [items, expandedIds]);
   const usedPageIds = useMemo(() => new Set(flatten(items, new Set(items.map(i => i.id))).map(i => i.pageSlug).filter(Boolean)), [items]);
 
-  const handleAddItem = (page: any) => {
+  const handleAddItem = (item: any, type: 'page' | 'article' | 'custom') => {
+    let url = '#';
+    let templateType = undefined;
+    let pageSlug = undefined;
+
+    if (type === 'page') {
+      url = `/${item.slug}`;
+      templateType = item.template;
+      pageSlug = item.id || item.slug;
+    } else if (type === 'article') {
+      url = `/blog/${item.slug}`;
+      templateType = 'BLOG';
+      pageSlug = item.id || item.slug;
+    } else if (type === 'custom') {
+      url = item.url;
+    }
+
     const newItem: NavItem = {
       id: uuidv4(),
-      label: page.title,
-      url: page.isShell ? '#' : `/${page.slug}`,
-      templateType: page.isShell ? undefined : (page.template as any),
-      pageSlug: page.isShell ? undefined : (page.id || page.slug),
+      label: item.title,
+      url: url,
+      templateType: templateType,
+      pageSlug: pageSlug,
       openInNewWindow: false,
       children: []
     };
@@ -134,12 +160,6 @@ export default function NavigationEditor() {
     setOffsetLeft(0);
 
     if (!over) return;
-
-    if (active.data.current?.type === 'sidebarItem') {
-      handleAddItem(active.data.current?.page);
-      setShellTitle('');
-      return;
-    }
 
     const activeIndex = flattenedItems.findIndex(i => i.id === active.id);
     const overIndex = flattenedItems.findIndex(i => i.id === over.id);
@@ -168,58 +188,144 @@ export default function NavigationEditor() {
   };
 
   const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      await navigationService.updateSettings({ items });
-      setToast('導覽列設定已儲存');
-    } catch (error) {
-      console.error('儲存導覽列失敗:', error);
-      alert('操作失敗');
-    } finally {
-      setIsSaving(false);
-      setTimeout(() => setToast(null), 2000);
-    }
+    setSaveStatus('saving');
+    await new Promise(resolve => setTimeout(resolve, 800));
+    navigationService.updateSettings({ items });
+    setToast('導覽列設定已儲存');
+    setSaveStatus('saved');
+    setTimeout(() => {
+      setToast(null);
+      setSaveStatus('idle');
+    }, 2000);
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {toast && <div className="fixed bottom-6 right-6 bg-stone-800 text-white px-6 py-3 rounded-2xl shadow-xl z-50 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4"><CheckCircle2 size={18} className="text-green-400" /> {toast}</div>}
+    <div className="space-y-8">
+      {toast && <div className="fixed bottom-6 right-6 bg-stone-800 text-white px-6 py-3 rounded-xl shadow-xl z-50 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4"><CheckCircle2 size={18} className="text-green-400" /> {toast}</div>}
 
-      <div className="flex items-center justify-between bg-white p-6 rounded-3xl border border-stone-200 shadow-sm">
-        <div><h1 className="text-2xl font-bold text-stone-900">導覽條管理</h1><p className="text-sm text-stone-500">管理網站選單結構與層級</p></div>
-        <button onClick={handleSave} disabled={isSaving} className={`px-8 py-2.5 rounded-xl font-bold transition-all text-white ${isSaving ? 'bg-green-600' : 'bg-[#885200] hover:bg-[#663D00]'}`}>
-          {isSaving ? '儲存中...' : '儲存變更'}
-        </button>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-stone-900 mb-2">導覽條管理</h1>
+          <p className="text-stone-500">管理網站選單結構與層級</p>
+        </div>
+        <SaveButton 
+          onClick={handleSave}
+          status={saveStatus}
+          label="儲存變更"
+        />
       </div>
 
-      <DndContext 
-        sensors={useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(KeyboardSensor))}
-        collisionDetection={closestCenter}
-        onDragStart={(e) => setActiveId(e.active.id as string)}
-        onDragMove={(e) => setOffsetLeft(e.delta.x)}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="w-full lg:w-80 space-y-6">
-            <div className="bg-white p-6 rounded-3xl border border-stone-200 sticky top-6">
-              <h3 className="font-bold text-stone-800 mb-4 flex items-center gap-2 text-sm"><Search size={16}/> 搜尋頁面資產</h3>
-              <input type="text" placeholder="輸入關鍵字..." className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm mb-6 outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              
-              <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 mb-6">
-                <h4 className="text-[10px] font-bold text-stone-500 uppercase mb-3 tracking-widest">新建選單空殼 (灰)</h4>
-                <input type="text" placeholder="輸入名稱後拖曳" className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm mb-4 outline-none focus:bg-white transition-all" value={shellTitle} onChange={(e) => setShellTitle(e.target.value)} />
-                <SidebarDraggableItem page={{ id: 'shell-logic', title: shellTitle || '請先輸入名稱', isShell: true }} onAdd={handleAddItem} />
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-80 space-y-4">
+          {/* Pages Accordion */}
+          <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+            <button 
+              onClick={() => setExpandedSection(expandedSection === 'pages' ? null : 'pages')}
+              className="w-full p-4 flex items-center justify-between bg-stone-50 hover:bg-stone-100 transition-colors"
+            >
+              <span className="font-bold text-stone-700">頁面</span>
+              {expandedSection === 'pages' ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+            {expandedSection === 'pages' && (
+              <div className="p-4 border-t border-stone-200">
+                <AdminSearchInput 
+                  placeholder="搜尋頁面名稱..." 
+                  value={searchQueryPages} 
+                  onChange={(e) => setSearchQueryPages(e.target.value)} 
+                  className="mb-4"
+                />
+                <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                  {pages.filter(p => p.isPublished && p.title.includes(searchQueryPages) && !usedPageIds.has(p.id)).map(p => (
+                    <SidebarItem key={p.id} item={p} onAdd={handleAddItem} type="page" />
+                  ))}
+                  {pages.filter(p => p.isPublished && p.title.includes(searchQueryPages) && !usedPageIds.has(p.id)).length === 0 && (
+                    <div className="text-center text-stone-400 text-sm py-4">沒有可用的頁面</div>
+                  )}
+                </div>
               </div>
-
-              <div className="space-y-1 max-h-[300px] overflow-y-auto">
-                <h4 className="text-[10px] font-bold text-stone-400 uppercase mb-2">現有頁面</h4>
-                {pages.filter(p => p.title.includes(searchQuery) && !usedPageIds.has(p.id)).map(p => <SidebarDraggableItem key={p.id} page={p} onAdd={handleAddItem} />)}
-              </div>
-            </div>
+            )}
           </div>
 
-          <div className="flex-1 bg-stone-50 p-8 rounded-3xl border border-stone-200 min-h-[600px]">
+          {/* Articles Accordion */}
+          <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+            <button 
+              onClick={() => setExpandedSection(expandedSection === 'articles' ? null : 'articles')}
+              className="w-full p-4 flex items-center justify-between bg-stone-50 hover:bg-stone-100 transition-colors"
+            >
+              <span className="font-bold text-stone-700">文章</span>
+              {expandedSection === 'articles' ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+            {expandedSection === 'articles' && (
+              <div className="p-4 border-t border-stone-200">
+                <AdminSearchInput 
+                  placeholder="搜尋文章名稱..." 
+                  value={searchQueryArticles} 
+                  onChange={(e) => setSearchQueryArticles(e.target.value)} 
+                  className="mb-4"
+                />
+                <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                  {articles.filter(a => a.isPublished && a.title.includes(searchQueryArticles) && !usedPageIds.has(a.id)).map(a => (
+                    <SidebarItem key={a.id} item={a} onAdd={handleAddItem} type="article" />
+                  ))}
+                  {articles.filter(a => a.isPublished && a.title.includes(searchQueryArticles) && !usedPageIds.has(a.id)).length === 0 && (
+                    <div className="text-center text-stone-400 text-sm py-4">沒有可用的文章</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Custom Link Accordion */}
+          <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+            <button 
+              onClick={() => setExpandedSection(expandedSection === 'custom' ? null : 'custom')}
+              className="w-full p-4 flex items-center justify-between bg-stone-50 hover:bg-stone-100 transition-colors"
+            >
+              <span className="font-bold text-stone-700">自訂連結</span>
+              {expandedSection === 'custom' ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+            {expandedSection === 'custom' && (
+              <div className="p-4 border-t border-stone-200">
+                <input 
+                  type="text" 
+                  placeholder="連結文字" 
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm mb-3 outline-none focus:border-stone-400 transition-all" 
+                  value={customTitle} 
+                  onChange={(e) => setCustomTitle(e.target.value)} 
+                />
+                <input 
+                  type="text" 
+                  placeholder="網址 (例如: https://...)" 
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm mb-4 outline-none focus:border-stone-400 transition-all" 
+                  value={customUrl} 
+                  onChange={(e) => setCustomUrl(e.target.value)} 
+                />
+                <button 
+                  onClick={() => {
+                    if(customTitle && customUrl) {
+                      handleAddItem({ id: uuidv4(), title: customTitle, url: customUrl }, 'custom');
+                      setCustomTitle('');
+                      setCustomUrl('');
+                    }
+                  }}
+                  disabled={!customTitle || !customUrl}
+                  className="w-full py-2 bg-stone-800 text-white rounded-lg text-sm font-medium hover:bg-stone-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus size={16} /> 新增至導覽條
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 bg-stone-50 p-8 rounded-xl border border-stone-200 min-h-[600px]">
+          <DndContext 
+            sensors={useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(KeyboardSensor))}
+            collisionDetection={closestCenter}
+            onDragStart={(e) => setActiveId(e.active.id as string)}
+            onDragMove={(e) => setOffsetLeft(e.delta.x)}
+            onDragEnd={handleDragEnd}
+          >
             <SortableContext items={flattenedItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
               {flattenedItems.map(item => (
                 <SortableNavItem 
@@ -238,11 +344,11 @@ export default function NavigationEditor() {
                   onToggleExpand={(id: string) => setExpandedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; })}
                 />
               ))}
-              {items.length === 0 && <div className="h-64 flex flex-col items-center justify-center text-stone-300 border-2 border-dashed border-stone-200 rounded-3xl"><MousePointer2 size={48} className="mb-4 opacity-10" /><p>拖曳項目至此處</p></div>}
+              {items.length === 0 && <div className="h-64 flex flex-col items-center justify-center text-stone-300 border-2 border-dashed border-stone-200 rounded-3xl"><MousePointer2 size={48} className="mb-4 opacity-10" /><p>點擊左側「＋」新增項目</p></div>}
             </SortableContext>
-          </div>
+          </DndContext>
         </div>
-      </DndContext>
+      </div>
     </div>
   );
 }

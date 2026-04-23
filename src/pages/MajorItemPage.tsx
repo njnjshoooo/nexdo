@@ -5,7 +5,7 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import { pageService } from '../services/pageService';
 import { productService } from '../services/productService';
 import { formService } from '../services/formService';
-import { Page } from '../types/admin';
+import { Page, Product } from '../types/admin';
 import DynamicForm from '../components/form/DynamicForm';
 import ServiceCarousel from '../components/ServiceCarousel';
 
@@ -31,6 +31,25 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
   }
 
   const { hero, services, cases, servicesSectionTitle } = currentPage.content;
+  const [productDataMap, setProductDataMap] = useState<Record<string, Product>>({});
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      const newMap: Record<string, Product> = {};
+      for (const item of services) {
+        const targetPage = item.targetPageId ? pageService.getById(item.targetPageId) : null;
+        const productId = targetPage?.content?.subItem?.productId;
+        if (productId) {
+          const product = await productService.getById(productId);
+          if (product) {
+            newMap[productId] = product;
+          }
+        }
+      }
+      setProductDataMap(newMap);
+    };
+    fetchProductData();
+  }, [services]);
 
   return (
     <div className="bg-[#FFF9F2] min-h-screen">
@@ -52,7 +71,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-lg bg-white/80 backdrop-blur-md p-8 md:p-12 rounded-[2rem] shadow-2xl"
+            className="max-w-lg bg-white/80 backdrop-blur-md p-8 md:p-12 rounded-2xl shadow-2xl"
           >
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight text-stone-900 mb-6 whitespace-pre-line">
               {hero.title}
@@ -100,7 +119,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
 
                 // Dynamic Data Fetching Logic
                 const subItemContent = targetPage?.content?.subItem;
-                const productData = subItemContent?.productId ? productService.getById(subItemContent.productId) : null;
+                const productData = subItemContent?.productId ? productDataMap[subItemContent.productId] : null;
                 const displayTitle = item.title || productData?.name || '';
                 const displayDescription = item.description || productData?.description || '';
                 const displayImage = item.image || productData?.image || '';
@@ -147,7 +166,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-stone-100 h-full"
+                    className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-stone-100 h-full"
                   >
                     {linkUrl ? (
                       <Link to={linkUrl} className="block h-full">

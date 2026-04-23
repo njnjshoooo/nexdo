@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Vendor } from '../../../types/vendor';
-import { Settings as SettingsIcon, Save, Lock, Mail } from 'lucide-react';
+import { Settings as SettingsIcon, Lock, Mail } from 'lucide-react';
+import SaveButton from '../../../components/admin/SaveButton';
 
 interface SettingsProps {
   vendor: Vendor;
@@ -63,13 +64,12 @@ export default function Settings({ vendor }: SettingsProps) {
                     className="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 bg-white"
                   />
                 </div>
-                <button 
+                <SaveButton 
+                  status="idle"
                   onClick={handleSaveEmail}
-                  className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors"
-                >
-                  <Save size={18} />
-                  儲存 Email
-                </button>
+                  label="儲存 Email"
+                  className="px-6 py-2"
+                />
               </div>
             </div>
           </section>
@@ -108,13 +108,12 @@ export default function Settings({ vendor }: SettingsProps) {
                     className="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 bg-white"
                   />
                 </div>
-                <button 
+                <SaveButton 
+                  status="idle"
                   onClick={handleSavePassword}
-                  className="flex items-center gap-2 px-6 py-2 bg-stone-800 text-white rounded-xl font-bold hover:bg-stone-900 transition-colors"
-                >
-                  <Save size={18} />
-                  更新密碼
-                </button>
+                  label="更新密碼"
+                  className="px-6 py-2 bg-stone-800 hover:bg-stone-900 shadow-stone-800/20"
+                />
               </div>
             </div>
           </section>

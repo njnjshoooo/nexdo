@@ -1,110 +1,89 @@
 import { Vendor } from '../types/vendor';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+
+const STORAGE_KEY = 'vendors';
+
+const defaultVendors: Vendor[] = [
+  {
+    id: 'tidyman',
+    name: '居家整聊室',
+    taxId: '88888888',
+    type: '居家整聊',
+    contactName: '賴芝芝',
+    jobTitle: '課程顧問',
+    phone: '02-8888-8888',
+    extension: '888',
+    address: '台北市信義區松德路',
+    account: 'tidyman@tidyman.com',
+    password: '888888',
+    status: 'active',
+    certifications: [],
+    commissionRate: 80,
+    settlementCycle: 'Monthly',
+    bankInfo: {
+      bankCode: '808',
+      bank: '玉山銀行',
+      bankName: '信義分行',
+      accountName: '居家整聊有限公司',
+      accountNumber: '1234567890123'
+    },
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'hobbystudio',
+    name: '習慣健康國際',
+    taxId: '82977822',
+    type: '樂齡健康',
+    contactName: '林阿茹',
+    jobTitle: '課程顧問',
+    phone: '02-2222-2222',
+    extension: '222',
+    address: '台北市大同區長安西路',
+    account: 'hobbystudio@hobbystudio.com',
+    password: '222222',
+    status: 'active',
+    certifications: [],
+    commissionRate: 70,
+    settlementCycle: 'Monthly',
+    bankInfo: {
+      bankCode: '808',
+      bank: '玉山銀行',
+      bankName: '信義分行',
+      accountName: '好習慣運動有限公司',
+      accountNumber: '1234567890135'
+    },
+    createdAt: '2026-03-24T00:00:00Z',
+    updatedAt: '2026-03-24T00:00:00Z',
+  }
+];
 
 export const vendorService = {
-  async login(account: string, password: string): Promise<Vendor | null> {
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabase.rpc('verify_vendor_password', {
-        p_account: account,
-        p_password: password,
-      });
-      if (error || !data?.success) return null;
-      return data.vendor;
+  getAll: (): Vendor[] => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      // Initialize if not exists
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultVendors));
+      return defaultVendors;
+    } catch (error) {
+      console.error('Failed to load vendors:', error);
+      return defaultVendors;
     }
-    // localStorage fallback
-    const stored = localStorage.getItem('haolingju_vendors');
-    const vendors = stored ? JSON.parse(stored) : [];
-    return vendors.find((v: any) => v.account === account && v.password === password) || null;
   },
 
-  async getAll(): Promise<Vendor[]> {
-    if (isSupabaseConfigured) {
-      const { data } = await supabase.from('vendors').select('*');
-      return (data || []).map(row => ({
-        id: row.id,
-        name: row.name,
-        taxId: row.tax_id,
-        type: row.type,
-        contactName: row.contact_name,
-        jobTitle: row.job_title,
-        phone: row.phone,
-        extension: row.extension,
-        address: row.address,
-        account: row.account,
-        status: row.status,
-        certifications: row.certifications || [],
-        billingCycle: row.billing_cycle,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      }));
-    }
-    const stored = localStorage.getItem('haolingju_vendors');
-    return stored ? JSON.parse(stored) : [];
-  },
-
-  async getById(id: string): Promise<Vendor | null> {
-    const all = await vendorService.getAll();
+  getById: (id: string): Vendor | null => {
+    const all = vendorService.getAll();
     return all.find(v => v.id === id) || null;
   },
 
-  async create(
-    data: Omit<Vendor, 'id' | 'createdAt' | 'updatedAt'> & { password: string }
-  ): Promise<Vendor> {
-    const newVendor = {
-      ...data,
-      id: `vendor-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from('vendors').insert({
-        id: newVendor.id,
-        name: newVendor.name,
-        tax_id: newVendor.taxId,
-        type: newVendor.type,
-        contact_name: newVendor.contactName,
-        job_title: newVendor.jobTitle,
-        phone: newVendor.phone,
-        extension: newVendor.extension,
-        address: newVendor.address,
-        account: newVendor.account,
-        password_hash: data.password, // Note: in production, hash on server
-        status: newVendor.status,
-        certifications: newVendor.certifications,
-        billing_cycle: newVendor.billingCycle,
-      });
-      if (error) throw new Error(error.message);
+  saveAll: (vendors: Vendor[]): void => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(vendors));
+      window.dispatchEvent(new Event('storage'));
+    } catch (error) {
+      console.error('Failed to save vendors:', error);
     }
-
-    const { password: _, ...vendorWithoutPw } = newVendor;
-    return vendorWithoutPw as Vendor;
-  },
-
-  async update(id: string, updates: Partial<Vendor>): Promise<void> {
-    if (isSupabaseConfigured) {
-      const dbData: Record<string, any> = {};
-      if (updates.name !== undefined) dbData.name = updates.name;
-      if (updates.taxId !== undefined) dbData.tax_id = updates.taxId;
-      if (updates.type !== undefined) dbData.type = updates.type;
-      if (updates.contactName !== undefined) dbData.contact_name = updates.contactName;
-      if (updates.jobTitle !== undefined) dbData.job_title = updates.jobTitle;
-      if (updates.phone !== undefined) dbData.phone = updates.phone;
-      if (updates.extension !== undefined) dbData.extension = updates.extension;
-      if (updates.address !== undefined) dbData.address = updates.address;
-      if (updates.status !== undefined) dbData.status = updates.status;
-      if (updates.certifications !== undefined) dbData.certifications = updates.certifications;
-      if (updates.billingCycle !== undefined) dbData.billing_cycle = updates.billingCycle;
-      const { error } = await supabase.from('vendors').update(dbData).eq('id', id);
-      if (error) throw new Error(error.message);
-    }
-  },
-
-  async delete(id: string): Promise<boolean> {
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from('vendors').delete().eq('id', id);
-      if (error) throw new Error(error.message);
-    }
-    return true;
-  },
+  }
 };

@@ -64,12 +64,6 @@ export default function ImageUploader({ value, onChange, className = '', placeho
           </div>
         )}
       </div>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="w-full mt-2 py-2 bg-stone-800 text-white rounded-lg text-sm font-medium hover:bg-stone-900 transition-colors"
-      >
-        {value ? '更換圖片' : '上傳圖片'}
-      </button>
 
       <MediaLibraryModal 
         isOpen={isModalOpen} 

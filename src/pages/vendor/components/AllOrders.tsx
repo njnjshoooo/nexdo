@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Order, OrderStatusUpdate } from '../../../types/admin';
 import { Vendor } from '../../../types/vendor';
 import { orderService } from '../../../services/orderService';
-import { Eye, Clock, AlertCircle, PlayCircle, CheckCircle, XCircle, Search, Upload } from 'lucide-react';
-import ImageUploader from '../../../components/admin/ImageUploader';
+import { Clock, AlertCircle, PlayCircle, CheckCircle, XCircle, Search, Upload, Copy, QrCode, CreditCard } from 'lucide-react';
+import { OrderStatus, getOrderStatusDisplay } from '../../../constants/orderStatus';
+import OrderStatusBadge from '../../../components/admin/OrderStatusBadge';
+import SaveButton from '../../../components/admin/SaveButton';
+import VendorImageUploader from '../../../components/vendor/VendorImageUploader';
+import { QRCodeSVG } from 'qrcode.react';
+import AdminTable from '../../../components/admin/AdminTable';
+import { Pagination } from '../../../components/ui/Pagination';
 
 interface AllOrdersProps {
   vendor: Vendor;
@@ -19,6 +25,11 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
   // Form state for status updates
   const [cancelReason, setCancelReason] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [receiptPhotoUrl, setReceiptPhotoUrl] = useState('');
+  const [paymentProofUrl, setPaymentProofUrl] = useState('');
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (feedback) {
@@ -31,12 +42,16 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
     loadData();
   }, [vendor.id]);
 
-  const loadData = () => {
-    const allOrders = orderService.getAll();
+  const loadData = async () => {
+    const allOrders = await orderService.getAll();
     const vendorOrders = allOrders.filter(o => 
       o.vendorId === vendor.id && 
-      o.status !== 'QUOTE_PENDING' && 
-      o.status !== 'QUOTED'
+      o.status !== 'QUOTING' && 
+      o.status !== 'QUOTE_REVIEW' &&
+      o.status !== 'PENDING' &&
+      o.status !== 'PENDING_PAYMENT' &&
+      o.status !== 'PAYOUT_REQUEST' &&
+      o.status !== 'PAID'
     );
     setOrders(vendorOrders);
   };
@@ -66,6 +81,17 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
     return matchesSearch && matchesStatus;
   });
 
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
   const maskPhone = (phone: string, status: string) => {
     if (status === 'PENDING') {
       if (!phone || phone.length < 10) return phone;
@@ -74,58 +100,42 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
     return phone;
   };
 
-  const getStatusDisplay = (status: Order['status']) => {
-    switch (status) {
-      case 'UNPAID': 
-        return <span className="flex items-center gap-1.5 text-stone-500 bg-stone-100 px-2.5 py-1 rounded-full text-xs font-bold"><Clock size={14} /> 待付款</span>;
-      case 'QUOTE_PENDING':
-        return <span className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-full text-xs font-bold"><Clock size={14} /> 待報價</span>;
-      case 'QUOTED':
-        return <span className="flex items-center gap-1.5 text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full text-xs font-bold"><CheckCircle size={14} /> 已報價</span>;
-      case 'PENDING': 
-        return <span className="flex items-center gap-1.5 text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full text-xs font-bold"><AlertCircle size={14} /> 新派案</span>;
-      case 'ACTIVE': 
-        return <span className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full text-xs font-bold"><PlayCircle size={14} /> 媒合成功</span>;
-      case 'COMPLETED': 
-        return <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full text-xs font-bold"><CheckCircle size={14} /> 完成服務</span>;
-      case 'PENDING_PAYMENT':
-        return <span className="flex items-center gap-1.5 text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full text-xs font-bold"><Clock size={14} /> 申請結案中</span>;
-      case 'PAID':
-        return <span className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full text-xs font-bold"><CheckCircle size={14} /> 已結案</span>;
-      case 'CANCELING':
-        return <span className="flex items-center gap-1.5 text-red-600 bg-red-50 px-2.5 py-1 rounded-full text-xs font-bold animate-pulse"><XCircle size={14} /> 申請取消中</span>;
-      case 'CANCELLED': 
-        return <span className="flex items-center gap-1.5 text-stone-500 bg-stone-100 px-2.5 py-1 rounded-full text-xs font-bold"><XCircle size={14} /> 已取消</span>;
-    }
-  };
-
   const handleComplete = async () => {
-    if (!selectedOrder || !photoUrl) {
-      alert('請上傳服務完成照片');
+    if (!selectedOrder || !photoUrl || !receiptPhotoUrl) {
+      alert('請上傳服務完成照片與簽收單');
       return;
     }
 
+    const hasBalance = selectedOrder.balanceAmount !== undefined && selectedOrder.balanceAmount > 0;
+    const requiresPaymentProof = hasBalance && (selectedOrder.status === 'ACTIVE' || selectedOrder.status === 'WAITING_BALANCE' || selectedOrder.status === 'BALANCE_PAID');
+
+    if (requiresPaymentProof && !paymentProofUrl) {
+      alert('請上傳支付憑證截圖');
+      return;
+    }
+
+    const targetStatus = 'COMPLETED';
+
     const newUpdate: OrderStatusUpdate = {
-      status: 'COMPLETED',
+      status: targetStatus,
       timestamp: new Date().toISOString(),
-      photoUrl
+      photoUrl,
+      receiptPhotoUrl,
+      paymentProofPhotoUrl: paymentProofUrl
     };
 
     const updates = {
-      status: 'COMPLETED' as const,
+      status: targetStatus as any,
       servicePhotoUrl: photoUrl,
+      receiptPhotoUrl: receiptPhotoUrl,
+      paymentProofPhotoUrl: paymentProofUrl,
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    try {
-      await orderService.update(selectedOrder.id, updates);
-      setSelectedOrder(null);
-      loadData();
-      setFeedback({ type: 'success', message: '已完成服務！' });
-    } catch (error) {
-      console.error('Failed to complete order:', error);
-      alert('操作失敗');
-    }
+    await orderService.update(selectedOrder.id, updates);
+    setSelectedOrder(null);
+    await loadData();
+    setFeedback({ type: 'success', message: requiresPaymentProof ? '已提交完工回報與支付憑證，等待審核中。' : '已完成服務！' });
   };
 
   const handleCancel = async () => {
@@ -135,51 +145,21 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
     }
 
     const newUpdate: OrderStatusUpdate = {
-      status: 'CANCELING',
+      status: 'REFUND_PENDING',
       timestamp: new Date().toISOString(),
       note: cancelReason
     };
 
     const updates = {
-      status: 'CANCELING' as const,
+      status: 'REFUND_PENDING' as const,
       cancelReason,
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    try {
-      await orderService.update(selectedOrder.id, updates);
-      setSelectedOrder(null);
-      loadData();
-      setFeedback({ type: 'success', message: '已申請取消訂單，請等待後台審核。' });
-    } catch (error) {
-      console.error('Failed to cancel order:', error);
-      alert('操作失敗');
-    }
-  };
-
-  const handleRequestClosure = async () => {
-    if (!selectedOrder) return;
-
-    const newUpdate: OrderStatusUpdate = {
-      status: 'PENDING_PAYMENT',
-      timestamp: new Date().toISOString(),
-      note: '廠商申請結案'
-    };
-
-    const updates = {
-      status: 'PENDING_PAYMENT' as const,
-      statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
-    };
-
-    try {
-      await orderService.update(selectedOrder.id, updates);
-      setSelectedOrder(null);
-      loadData();
-      setFeedback({ type: 'success', message: '已申請結案，請等待後台審核。' });
-    } catch (error) {
-      console.error('Failed to request closure:', error);
-      alert('操作失敗');
-    }
+    await orderService.update(selectedOrder.id, updates);
+    setSelectedOrder(null);
+    await loadData();
+    setFeedback({ type: 'success', message: '已申請取消訂單，請等待後台審核。' });
   };
 
   if (selectedOrder) {
@@ -188,7 +168,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
         <div className="flex justify-between items-center mb-6 border-b border-stone-100 pb-4">
           <h2 className="text-xl font-bold text-stone-900 flex items-center gap-3">
             訂單詳情 #{selectedOrder.id}
-            {getStatusDisplay(selectedOrder.status)}
+            <OrderStatusBadge status={selectedOrder.status} role="vendor" />
           </h2>
           <button onClick={() => setSelectedOrder(null)} className="text-stone-500 hover:text-stone-700">返回列表</button>
         </div>
@@ -256,15 +236,29 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
                   {new Date(update.timestamp).toLocaleString()}
                 </div>
                 <div className="flex-1 bg-stone-50 p-3 rounded-lg text-sm">
+                  <p className="font-bold text-stone-900 mb-1">{getOrderStatusDisplay(update.status, 'vendor') || update.status}</p>
+                  {update.note && <p className="text-stone-600">{update.note}</p>}
+                  
                   {update.status === 'ACTIVE' && (
                     <p>媒合成功，服務人員：{update.staffName} ({update.staffPhone})，確定的服務日期：{update.assignedDate} {update.assignedTime}</p>
                   )}
                   {update.status === 'COMPLETED' && (
-                    <div>
-                      <p>完成服務，並上傳服務完成照。</p>
-                      {update.photoUrl && (
-                        <img src={update.photoUrl} alt="服務完成照" className="mt-2 rounded-lg max-w-xs" />
-                      )}
+                    <div className="space-y-4 mt-2">
+                      <p>完成服務，並上傳服務完成照與簽收單。</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {update.photoUrl && (
+                          <div>
+                            <p className="text-xs text-stone-500 mb-1">服務完成照</p>
+                            <img src={update.photoUrl} alt="服務完成照" className="rounded-lg w-full aspect-video object-cover border border-stone-200" />
+                          </div>
+                        )}
+                        {update.receiptPhotoUrl && (
+                          <div>
+                            <p className="text-xs text-stone-500 mb-1">簽收單</p>
+                            <img src={update.receiptPhotoUrl} alt="簽收單" className="rounded-lg w-full aspect-video object-cover border border-stone-200" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                   {update.status === 'CANCELLED' && (
@@ -279,42 +273,139 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
           </div>
         </div>
 
-        {selectedOrder.status === 'ACTIVE' && (
+        {(selectedOrder.status === 'ACTIVE' || selectedOrder.status === 'WAITING_BALANCE' || selectedOrder.status === 'BALANCE_PAID') && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-stone-100 pt-6">
-            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-              <h4 className="font-bold text-red-800 mb-2">申請取消</h4>
-              <textarea 
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="請填寫取消原因..."
-                className="w-full h-20 px-3 py-2 border border-red-200 rounded-lg text-sm mb-3 outline-none focus:ring-2 focus:ring-red-500/20 resize-none"
-              />
-              <button 
-                onClick={handleCancel}
-                disabled={!cancelReason}
-                className="w-full py-2 bg-white text-red-600 border border-red-200 rounded-lg font-bold hover:bg-red-50 transition-colors disabled:opacity-50"
-              >
-                送出取消申請
-              </button>
+            <div className="space-y-6">
+              {(() => {
+                const hasBalance = selectedOrder.balanceAmount !== undefined && selectedOrder.balanceAmount > 0;
+                const showBalanceSection = hasBalance && (selectedOrder.status === 'ACTIVE' || selectedOrder.status === 'WAITING_BALANCE' || selectedOrder.status === 'BALANCE_PAID');
+                
+                if (!showBalanceSection) return null;
+                
+                return (
+                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20">
+                    <h4 className="font-bold text-primary mb-4 flex items-center gap-2">
+                      <CreditCard size={20} />
+                      結清尾款
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-primary/10">
+                        <span className="text-stone-600">待收尾款金額</span>
+                        <span className="text-xl font-black text-primary">
+                          NT$ {selectedOrder.balanceAmount?.toLocaleString()}
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-col gap-3">
+                        <button 
+                          onClick={() => setShowQRCode(!showQRCode)}
+                          className="w-full py-3 bg-white border border-primary text-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
+                        >
+                          <QrCode size={20} />
+                          {showQRCode ? '隱藏收款 QR Code' : '顯示收款 QR Code'}
+                        </button>
+                        
+                        {showQRCode && (
+                          <div className="flex flex-col items-center p-4 bg-white rounded-xl border border-stone-100 shadow-inner animate-in fade-in zoom-in duration-200">
+                            <QRCodeSVG 
+                              value={`${window.location.origin}/payment/${selectedOrder.id}`}
+                              size={180}
+                              level="H"
+                              includeMargin={true}
+                            />
+                            <p className="text-[10px] text-stone-400 mt-2">請客戶掃描上方 QR Code 進行支付</p>
+                          </div>
+                        )}
+
+                        <button 
+                          onClick={() => {
+                            const url = `${window.location.origin}/payment/${selectedOrder.id}`;
+                            navigator.clipboard.writeText(url);
+                            setFeedback({ type: 'success', message: '支付連結已複製！' });
+                          }}
+                          className="w-full py-3 bg-stone-100 text-stone-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-stone-200 transition-colors"
+                        >
+                          <Copy size={20} />
+                          複製支付連結
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                <h4 className="font-bold text-red-800 mb-2">申請取消</h4>
+                <textarea 
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="請填寫取消原因..."
+                  className="w-full h-20 px-3 py-2 border border-red-200 rounded-lg text-sm mb-3 outline-none focus:ring-2 focus:ring-red-500/20 resize-none"
+                />
+                <SaveButton 
+                  status="idle"
+                  onClick={handleCancel}
+                  disabled={!cancelReason}
+                  label="送出取消申請"
+                  className="w-full py-2 bg-red-600 text-white border border-red-600 hover:bg-red-700 shadow-red-100/50"
+                />
+              </div>
             </div>
 
             <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-              <h4 className="font-bold text-emerald-800 mb-2">服務完成</h4>
-              <div className="mb-3">
-                <label className="block text-sm text-emerald-700 mb-2">上傳服務完成照片</label>
-                <ImageUploader 
-                  value={photoUrl} 
-                  onChange={setPhotoUrl} 
-                  placeholder="點擊上傳服務完成照片"
-                />
+              <h4 className="font-bold text-emerald-800 mb-4">服務完成回報</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-emerald-700 mb-2">1. 上傳服務完成照片</label>
+                  <VendorImageUploader 
+                    value={photoUrl} 
+                    onChange={setPhotoUrl} 
+                    placeholder="點擊上傳服務完成照片"
+                    label=""
+                    aspectRatio="video"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-emerald-700 mb-2">2. 上傳簽收單照片</label>
+                  <VendorImageUploader 
+                    value={receiptPhotoUrl} 
+                    onChange={setReceiptPhotoUrl} 
+                    placeholder="點擊上傳簽收單照片"
+                    label=""
+                    aspectRatio="video"
+                  />
+                </div>
+                {(() => {
+                  const hasBalance = selectedOrder.balanceAmount !== undefined && selectedOrder.balanceAmount > 0;
+                  const showBalanceSection = hasBalance && (selectedOrder.status === 'ACTIVE' || selectedOrder.status === 'WAITING_BALANCE' || selectedOrder.status === 'BALANCE_PAID');
+                  
+                  if (!showBalanceSection) return null;
+                  
+                  return (
+                    <div>
+                      <label className="block text-sm font-bold text-emerald-700 mb-2">3. 上傳支付憑證截圖 <span className="text-red-500">*</span></label>
+                      <VendorImageUploader 
+                        value={paymentProofUrl} 
+                        onChange={setPaymentProofUrl} 
+                        placeholder="點擊上傳支付憑證截圖"
+                        label=""
+                        aspectRatio="video"
+                      />
+                    </div>
+                  );
+                })()}
               </div>
-              <button 
+              <SaveButton 
+                status="idle"
                 onClick={handleComplete}
-                disabled={!photoUrl}
-                className="w-full py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 mt-4"
-              >
-                確認完成服務
-              </button>
+                disabled={
+                  !photoUrl || 
+                  !receiptPhotoUrl || 
+                  ((selectedOrder.balanceAmount !== undefined && selectedOrder.balanceAmount > 0 && (selectedOrder.status === 'ACTIVE' || selectedOrder.status === 'WAITING_BALANCE' || selectedOrder.status === 'BALANCE_PAID')) && !paymentProofUrl)
+                }
+                label="提交回報"
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100/50 mt-6"
+              />
             </div>
           </div>
         )}
@@ -324,14 +415,8 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
             <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4">
               <div>
                 <h4 className="font-bold text-stone-900 mb-1">服務已完成</h4>
-                <p className="text-sm text-stone-500">您已上傳照片並標記服務完成。現在可以申請結案以進行後續撥款流程。</p>
+                <p className="text-sm text-stone-500">您已上傳照片並標記服務完成。請等待管理員核准結案以進行後續撥款流程。</p>
               </div>
-              <button 
-                onClick={handleRequestClosure}
-                className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 whitespace-nowrap"
-              >
-                申請結案
-              </button>
             </div>
           </div>
         )}
@@ -367,17 +452,8 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {['ALL', 'PENDING', 'ACTIVE', 'COMPLETED', 'PENDING_PAYMENT', 'PAID', 'CANCELING', 'CANCELLED'].map(status => {
-              const labels: Record<string, string> = {
-                'ALL': '全部',
-                'PENDING': '新派案',
-                'ACTIVE': '媒合成功',
-                'COMPLETED': '完成服務',
-                'PENDING_PAYMENT': '申請結案中',
-                'PAID': '已結案',
-                'CANCELING': '申請取消中',
-                'CANCELLED': '已取消'
-              };
+            {['ALL', 'ACTIVE', 'WAITING_BALANCE', 'COMPLETED', 'PAID', 'REFUND_PENDING', 'REFUNDED', 'CANCELLED'].map(status => {
+              const label = status === 'ALL' ? '全部' : getOrderStatusDisplay(status as OrderStatus, 'vendor');
               const isSelected = statusFilter.includes(status);
               return (
                 <button
@@ -389,7 +465,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
-                  {labels[status]}
+                  {label}
                 </button>
               );
             })}
@@ -398,56 +474,64 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
       </div>
       
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-stone-50 text-stone-500 text-xs uppercase font-bold">
+        <AdminTable.Main>
+          <AdminTable.Head>
             <tr>
-              <th className="px-6 py-4">訂單編號</th>
-              <th className="px-6 py-4">客戶姓名</th>
-              <th className="px-6 py-4">客戶電話</th>
-              <th className="px-6 py-4">服務地址</th>
-              <th className="px-6 py-4">狀態</th>
-              <th className="px-6 py-4">服務人員</th>
-              <th className="px-6 py-4 text-center">操作</th>
+              <AdminTable.Th>訂單編號</AdminTable.Th>
+              <AdminTable.Th>客戶姓名</AdminTable.Th>
+              <AdminTable.Th>客戶電話</AdminTable.Th>
+              <AdminTable.Th>服務地址</AdminTable.Th>
+              <AdminTable.Th>狀態</AdminTable.Th>
+              <AdminTable.Th>服務人員</AdminTable.Th>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            {filteredOrders.map(order => (
-              <tr key={order.id} className="hover:bg-stone-50/50 transition-colors">
-                <td className="px-6 py-4 font-mono text-sm font-bold text-stone-900">{order.id}</td>
-                <td className="px-6 py-4 text-sm text-stone-900">{order.customerInfo.name}</td>
-                <td className="px-6 py-4 text-sm text-stone-500">{maskPhone(order.customerInfo.phone, order.status)}</td>
-                <td className="px-6 py-4 text-sm text-stone-500 truncate max-w-[150px]">{order.customerInfo.address}</td>
-                <td className="px-6 py-4">
-                  {getStatusDisplay(order.status)}
-                </td>
-                <td className="px-6 py-4 text-sm text-stone-500">
-                  {order.status !== 'PENDING' ? order.statusUpdates?.find(u => u.status === 'ACTIVE')?.staffName || '-' : '-'}
-                </td>
-                <td className="px-6 py-4 text-center">
+          </AdminTable.Head>
+          <AdminTable.Body>
+            {paginatedOrders.map(order => (
+              <AdminTable.Row key={order.id}>
+                <AdminTable.Td>
                   <button 
                     onClick={() => {
                       setSelectedOrder(order);
                       setCancelReason('');
                       setPhotoUrl('');
+                      setReceiptPhotoUrl('');
+                      setPaymentProofUrl('');
+                      setShowQRCode(false);
                     }}
-                    className="p-2 text-stone-400 hover:text-primary transition-colors inline-flex"
-                    title="顯示訂單詳情"
+                    className="font-mono text-sm font-bold text-primary hover:underline"
                   >
-                    <Eye size={20} />
+                    {order.id}
                   </button>
-                </td>
-              </tr>
+                </AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-900">{order.customerInfo.name}</AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-500">{maskPhone(order.customerInfo.phone, order.status)}</AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-500 truncate max-w-[150px]">{order.customerInfo.address}</AdminTable.Td>
+                <AdminTable.Td>
+                  <OrderStatusBadge status={order.status} role="vendor" />
+                </AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-500">
+                  {order.status !== 'PENDING' ? order.statusUpdates?.find(u => u.status === 'ACTIVE')?.staffName || '-' : '-'}
+                </AdminTable.Td>
+              </AdminTable.Row>
             ))}
-            {filteredOrders.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-stone-400">
-                  找不到符合條件的訂單
-                </td>
-              </tr>
+            {paginatedOrders.length === 0 && (
+              <AdminTable.Empty colSpan={6}>
+                找不到符合條件的訂單
+              </AdminTable.Empty>
             )}
-          </tbody>
-        </table>
+          </AdminTable.Body>
+        </AdminTable.Main>
       </div>
+
+      {totalPages > 1 && (
+        <div className="p-6 border-t border-stone-100 flex justify-center bg-white">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
+        </div>
+      )}
     </div>
   );
 }

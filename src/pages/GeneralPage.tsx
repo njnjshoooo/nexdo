@@ -70,7 +70,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
         switch (block.type) {
           case 'HERO_1':
             return (
-              <section key={block.id} className={`relative pt-24 pb-16 md:pt-20 md:pb-16 overflow-hidden bg-[#FFF9F2] ${isFirstBlock ? 'mt-20' : ''}`}>
+              <section key={block.id} id={block.id} className={`relative pt-24 pb-16 md:pt-20 md:pb-16 overflow-hidden bg-[#FFF9F2] ${isFirstBlock ? 'mt-20' : ''}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
@@ -96,7 +96,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'SECONDARY_SERVICES':
             return (
-              <section key={block.id} className="py-24 bg-white">
+              <section key={block.id} id={block.id} className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     {block.secondaryServices?.map((service, i) => {
@@ -134,12 +134,16 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             );
 
           case 'ADDITIONAL_SERVICES':
+            const additionalContent = block.additionalServices;
+            const additionalItems = Array.isArray(additionalContent) ? additionalContent : (additionalContent?.items || []);
+            const additionalTitle = Array.isArray(additionalContent) ? '更多專業服務' : (additionalContent?.title || '更多專業服務');
+            
             return (
-              <section key={block.id} className="py-20 bg-stone-50">
+              <section key={block.id} id={block.id} className="py-20 bg-stone-50">
                 <div className="max-w-7xl mx-auto px-4">
-                  <h2 className="text-2xl font-bold text-stone-900 mb-12 text-center">更多專業服務</h2>
+                  <h2 className="text-2xl font-bold text-stone-900 mb-12 text-center">{additionalTitle}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {block.additionalServices?.map((id, i) => {
+                    {additionalItems.map((id, i) => {
                       const p = pageService.getById(id) || pageService.getBySlug(id);
                       if (!p) return null;
                       return (
@@ -162,7 +166,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             }[block.text?.fontSize || 'body'];
 
             return (
-              <section key={block.id} className={`py-16 bg-white ${isFirstBlock ? 'mt-20' : ''}`}>
+              <section key={block.id} id={block.id} className={`py-16 bg-white ${isFirstBlock ? 'mt-20' : ''}`}>
                 <div className="max-w-4xl mx-auto px-6">
                   <div className={`${textStyles} ${
                     block.text?.alignment === 'center' ? 'text-center' : 
@@ -176,7 +180,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'GRID':
             return (
-              <section key={block.id} className={`py-20 bg-stone-50 ${isFirstBlock ? 'mt-20' : ''}`}>
+              <section key={block.id} id={block.id} className={`py-20 bg-stone-50 ${isFirstBlock ? 'mt-20' : ''}`}>
                 <div className="max-w-7xl mx-auto px-4">
                   <h2 className="text-3xl font-bold text-center mb-16 text-stone-900">{block.grid?.title}</h2>
                   <div className={`grid grid-cols-1 gap-8 ${
@@ -223,7 +227,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'HERO_2':
             return (
-              <section key={block.id} className={`relative min-h-[600px] flex items-center overflow-hidden ${isFirstBlock ? 'mt-20' : ''}`}>
+              <section key={block.id} id={block.id} className={`relative min-h-[600px] flex items-center overflow-hidden ${isFirstBlock ? 'mt-20' : ''}`}>
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                   <img 
@@ -281,7 +285,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             const form = formService.getById(block.form.formId);
             if (!form) return null;
             return (
-              <section key={block.id} className="py-16 bg-[#FDF8F3]">
+              <section key={block.id} id={block.id} className="py-16 bg-[#FDF8F3]">
                 <div className="max-w-3xl mx-auto px-4">
                   <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
                     <DynamicForm form={form} pageSlug={currentPage.slug} pageTitle={currentPage.title} />
@@ -291,11 +295,11 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             );
 
           case 'SPACER':
-            return <div key={block.id} style={{ height: block.spacer?.height || 80 }} />;
+            return <div key={block.id} id={block.id} style={{ height: block.spacer?.height || 80 }} />;
 
           case 'SINGLE_IMAGE':
             return (
-              <section key={block.id} className="py-16 bg-white">
+              <section key={block.id} id={block.id} className="py-16 bg-white">
                 <div className="max-w-4xl mx-auto px-6">
                   <img src={block.singleImage?.image} alt={block.singleImage?.caption} className="w-full rounded-3xl shadow-lg" referrerPolicy="no-referrer" />
                   {block.singleImage?.caption && <p className="text-center text-stone-500 mt-4">{block.singleImage.caption}</p>}
@@ -305,7 +309,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'IMAGE_CAROUSEL':
             return (
-              <section key={block.id} className="py-16 bg-white">
+              <section key={block.id} id={block.id} className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {block.imageCarousel?.items?.map((item, i) => (
@@ -318,7 +322,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'IMAGE_TEXT_GRID':
             return (
-              <section key={block.id} className="py-20 bg-white">
+              <section key={block.id} id={block.id} className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4">
                   {/* 改為 md:grid-cols-2 達成 5:5 比例 */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

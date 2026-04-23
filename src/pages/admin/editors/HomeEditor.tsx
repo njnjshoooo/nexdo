@@ -20,14 +20,14 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
   const testimonialIdx = getIdx('TESTIMONIALS');
   const { fields: testimonialFields, append: appendTestimonial, remove: removeTestimonial } = useFieldArray({
     control,
-    name: `content.home.blocks.${testimonialIdx}.items`
+    name: `content.home.blocks.${testimonialIdx}.testimonials.items`
   });
 
   // --- [ 3. 服務項目 Hook ] ---
   const servicesIdx = getIdx('SERVICES');
   const { fields: serviceFields, append: appendService, remove: removeService, update: updateService } = useFieldArray({
     control,
-    name: `content.home.blocks.${servicesIdx}.services`
+    name: `content.home.blocks.${servicesIdx}.services.items`
   });
 
   // --- [ 4. 更多服務 (子項目) Hook ] ---
@@ -40,7 +40,7 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
   const handleServiceSelect = (blockIdx: number, path: string, serviceIdx: number, pageId: string) => {
     const selectedPage = allPages.find(p => p.id === pageId);
     if (selectedPage) {
-      const currentService = watch(`content.home.blocks.${blockIdx}.${path}.${serviceIdx}`);
+      const currentService = watch(`content.home.blocks.${blockIdx}.services.items.${serviceIdx}`);
       updateService(serviceIdx, {
         ...currentService,
         pageId: pageId,
@@ -68,9 +68,30 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
           <div className="space-y-4">
             <div className="space-y-1">
+              <Label>眉標內容</Label>
+              <input {...register(`content.home.blocks.${idx}.hero1.subtitle`)} className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" placeholder="例如：樂齡的居住服務" />
+            </div>
+            <div className="space-y-1">
               <Label>主標題內容</Label>
               <textarea {...register(`content.home.blocks.${idx}.hero1.title`)} rows={3} className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" />
             </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className="p-4 bg-stone-50 rounded-xl border border-stone-100 space-y-3">
+                  <Label>按鈕 {i + 1} 設定</Label>
+                  <input {...register(`content.home.blocks.${idx}.hero1.buttons.${i}.text`)} placeholder="按鈕文字" className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm" />
+                  <input {...register(`content.home.blocks.${idx}.hero1.buttons.${i}.link`)} placeholder="跳轉連結" className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm" />
+                </div>
+              ))}
+            </div>
+
+            <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 space-y-3">
+              <Label>圖片上的「顧客好評」</Label>
+              <textarea {...register(`content.home.blocks.${idx}.hero1.imageTestimonial.text`)} rows={2} placeholder="好評內容" className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm" />
+              <input {...register(`content.home.blocks.${idx}.hero1.imageTestimonial.author`)} placeholder="署名 (例如：台北市 林小姐)" className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm" />
+            </div>
+
             <div className="space-y-1">
               <Label>主視覺圖片</Label>
               <Controller control={control} name={`content.home.blocks.${idx}.hero1.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
@@ -89,26 +110,52 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
           <h2 className="text-xl font-bold text-stone-900">服務項目管理</h2>
           <button type="button" onClick={() => appendService({ title: '', description: '', tags: '', image: '' })} className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"><Plus size={18} /> 新增服務項目</button>
         </div>
+        
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-6 space-y-4">
+          <div className="space-y-1">
+            <Label>區塊眉標</Label>
+            <input {...register(`content.home.blocks.${servicesIdx}.services.subtitle`)} className="w-full px-3 py-2 border border-stone-300 rounded-lg" placeholder="例如：我們提供" />
+          </div>
+          <div className="space-y-1">
+            <Label>區塊主標題</Label>
+            <input {...register(`content.home.blocks.${servicesIdx}.services.title`)} className="w-full px-3 py-2 border border-stone-300 rounded-lg" placeholder="例如：從家庭環境到銀髮健康..." />
+          </div>
+        </div>
+
         <div className="space-y-4">
           {serviceFields.map((field, index) => (
             <div key={field.id} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 relative group">
               <button type="button" onClick={() => removeService(index)} className="absolute top-4 right-4 p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18} /></button>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>{index < 4 ? '核心主要服務' : '延伸次要服務'}</Label>
-                  <select 
-                    {...register(`content.home.blocks.${servicesIdx}.services.${index}.pageId`, {
-                      onChange: (e) => handleServiceSelect(servicesIdx, 'services', index, e.target.value)
-                    })} 
-                    className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all"
-                  >
-                    <option value="">-- 選擇關聯頁面 --</option>
-                    {allPages.filter(p => p.template === 'MAJOR_ITEM').map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                  </select>
-                  <input {...register(`content.home.blocks.${servicesIdx}.services.${index}.title`)} placeholder="服務顯示標題" className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" />
-                  <textarea {...register(`content.home.blocks.${servicesIdx}.services.${index}.description`)} rows={3} placeholder="描述文字內容" className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" />
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="md:col-span-8 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <Label>{index < 4 ? '核心主要服務' : '延伸次要服務'}</Label>
+                      <select 
+                        {...register(`content.home.blocks.${servicesIdx}.services.items.${index}.pageId`, {
+                          onChange: (e) => handleServiceSelect(servicesIdx, 'services', index, e.target.value)
+                        })} 
+                        className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all"
+                      >
+                        <option value="">-- 選擇關聯頁面 --</option>
+                        {allPages.filter(p => p.template === 'MAJOR_ITEM').map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label>主要服務標題</Label>
+                      <input {...register(`content.home.blocks.${servicesIdx}.services.items.${index}.title`)} placeholder="服務顯示標題" className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label>服務描述</Label>
+                    <textarea {...register(`content.home.blocks.${servicesIdx}.services.items.${index}.description`)} rows={3} placeholder="描述文字內容" className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#8B5E34] focus:border-transparent outline-none transition-all" />
+                  </div>
                 </div>
-                <div className="space-y-1"><Label>服務展示圖</Label><Controller control={control} name={`content.home.blocks.${servicesIdx}.services.${index}.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} /></div>
+                <div className="md:col-span-4 space-y-1">
+                  <Label>服務展示圖</Label>
+                  <Controller control={control} name={`content.home.blocks.${servicesIdx}.services.items.${index}.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                </div>
               </div>
             </div>
           ))}
@@ -178,10 +225,26 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
     return (
       <div className="bg-white p-10 rounded-[2.5rem] border border-stone-200 shadow-sm space-y-8">
         <h2 className="text-2xl font-bold text-stone-800 px-2 tracking-tight">預約諮詢步驟</h2>
-        <div className="space-y-2 px-2">
-          <Label>區塊顯示標題</Label>
-          <input {...register(`content.home.blocks.${processIdx}.process.title`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold text-lg bg-white outline-none" placeholder="輸入區塊標題..." />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
+          <div className="space-y-2">
+            <Label>區塊顯示標題</Label>
+            <input {...register(`content.home.blocks.${processIdx}.process.title`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold text-lg bg-white outline-none" placeholder="輸入區塊標題..." />
+          </div>
+          <div className="space-y-2">
+            <Label>區塊副標題</Label>
+            <textarea {...register(`content.home.blocks.${processIdx}.process.description`)} rows={2} className="w-full border border-stone-200 p-4 rounded-2xl bg-white outline-none" placeholder="輸入副標題文字..." />
+          </div>
         </div>
+
+        <div className="px-2 space-y-4">
+          <Label>步驟下方欄位 (Footer Labels)</Label>
+          <div className="grid grid-cols-4 gap-4">
+            {[0, 1, 2, 3].map(i => (
+              <input key={i} {...register(`content.home.blocks.${processIdx}.process.footerLabels.${i}`)} className="w-full border border-stone-200 p-3 rounded-xl bg-white outline-none text-sm" placeholder={`標籤 ${i + 1}`} />
+            ))}
+          </div>
+        </div>
+
         <div className="space-y-6">
           {stepFields.map((field, index) => (
             <div key={field.id} className="p-10 bg-[#F9F9F9] rounded-[2rem] border border-stone-100 relative group transition-all">
@@ -213,9 +276,15 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
     return (
       <div className="bg-white p-10 rounded-[2.5rem] border border-stone-200 shadow-sm space-y-8">
         <h2 className="text-2xl font-bold text-stone-800 px-2 tracking-tight">客戶好評區域</h2>
-        <div className="space-y-2 px-2">
-          <Label>區塊顯示標題</Label>
-          <input {...register(`content.home.blocks.${testimonialIdx}.title`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold text-lg bg-white outline-none" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
+          <div className="space-y-2">
+            <Label>區塊顯示標題</Label>
+            <input {...register(`content.home.blocks.${testimonialIdx}.testimonials.title`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold text-lg bg-white outline-none" />
+          </div>
+          <div className="space-y-2">
+            <Label>區塊副標題</Label>
+            <textarea {...register(`content.home.blocks.${testimonialIdx}.testimonials.description`)} rows={2} className="w-full border border-stone-200 p-4 rounded-2xl bg-white outline-none" placeholder="輸入副標題文字..." />
+          </div>
         </div>
         <div className="space-y-8">
           {testimonialFields.map((field, index) => (
@@ -224,16 +293,22 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>心得內容文字</Label>
-                  <textarea {...register(`content.home.blocks.${testimonialIdx}.items.${index}.content`)} rows={4} className="w-full border border-stone-200 p-6 rounded-3xl text-stone-700 bg-white shadow-sm leading-relaxed outline-none" />
+                  <textarea {...register(`content.home.blocks.${testimonialIdx}.testimonials.items.${index}.content`)} rows={4} className="w-full border border-stone-200 p-6 rounded-3xl text-stone-700 bg-white shadow-sm leading-relaxed outline-none" />
                 </div>
-                <div className="space-y-2">
-                  <Label>客戶署名 / 稱呼</Label>
-                  <input {...register(`content.home.blocks.${testimonialIdx}.items.${index}.author`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold bg-white shadow-sm outline-none" />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>客戶署名 / 稱呼</Label>
+                    <input {...register(`content.home.blocks.${testimonialIdx}.testimonials.items.${index}.author`)} className="w-full border border-stone-200 p-4 rounded-2xl font-bold bg-white shadow-sm outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>職業 / 親屬關係</Label>
+                    <input {...register(`content.home.blocks.${testimonialIdx}.testimonials.items.${index}.role`)} className="w-full border border-stone-200 p-4 rounded-2xl bg-white shadow-sm outline-none" placeholder="例如：上班族 / 父親78歲" />
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-          <button type="button" onClick={() => appendTestimonial({ content: '', author: '', tag: '' })} className="w-full py-10 border-2 border-dashed border-stone-200 rounded-[2.5rem] text-stone-400 font-bold hover:border-stone-400 flex items-center justify-center gap-2 bg-white transition-all shadow-sm"><Plus size={24} /> 新增好評項目</button>
+          <button type="button" onClick={() => appendTestimonial({ content: '', author: '', role: '', tag: '' })} className="w-full py-10 border-2 border-dashed border-stone-200 rounded-[2.5rem] text-stone-400 font-bold hover:border-stone-400 flex items-center justify-center gap-2 bg-white transition-all shadow-sm"><Plus size={24} /> 新增好評項目</button>
         </div>
       </div>
     );

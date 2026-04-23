@@ -16,36 +16,59 @@ export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [article, setArticle] = useState<Article | null>(null);
-  const [relatedServices, setRelatedServices] = useState<Page[]>([]);
   const [ctaForm, setCtaForm] = useState<Form | null>(null);
+  const [loadedRelatedServices, setLoadedRelatedServices] = useState<any[]>([]);
 
   useEffect(() => {
-    if (slug) {
-      const foundArticle = articleService.getBySlug(slug);
-      if (foundArticle && foundArticle.isPublished) {
-        setArticle(foundArticle);
-        
-        // Fetch related services
-        if (foundArticle.relatedServiceIds && foundArticle.relatedServiceIds.length > 0) {
-          const services = foundArticle.relatedServiceIds
-            .map(id => pageService.getById(id))
-            .filter((p): p is Page => !!p);
-          setRelatedServices(services);
-        } else {
-          setRelatedServices([]);
-        }
+    const loadRelated = async () => {
+      if (slug) {
+        const foundArticle = articleService.getBySlug(slug);
+        if (foundArticle && foundArticle.isPublished) {
+          setArticle(foundArticle);
+          
+          // Fetch related services
+          if (foundArticle.relatedServiceIds && foundArticle.relatedServiceIds.length > 0) {
+            const services = await Promise.all(foundArticle.relatedServiceIds.map(async id => {
+              const p = pageService.getById(id);
+              if (!p) return null;
 
-        // Fetch CTA form
-        if (foundArticle.showForm && foundArticle.formId) {
-          const form = formService.getByFormId(foundArticle.formId);
-          if (form) {
-            setCtaForm(form);
+              let image = 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop';
+              let description = '';
+
+              if (p.content.subItem?.productId) {
+                const product = await productService.getById(p.content.subItem.productId);
+                if (product) {
+                  if (product.image) image = product.image;
+                  if (product.description) description = product.description;
+                }
+              }
+
+              return {
+                id: p.id,
+                slug: p.slug,
+                title: p.title,
+                image,
+                description
+              };
+            }));
+            setLoadedRelatedServices(services.filter(Boolean));
+          } else {
+            setLoadedRelatedServices([]);
           }
+
+          // Fetch CTA form
+          if (foundArticle.showForm && foundArticle.formId) {
+            const form = formService.getByFormId(foundArticle.formId);
+            if (form) {
+              setCtaForm(form);
+            }
+          }
+        } else {
+          navigate('/blog');
         }
-      } else {
-        navigate('/blog');
       }
-    }
+    };
+    loadRelated();
   }, [slug, navigate]);
 
   if (!article) return <div className="p-20 text-center">載入中...</div>;
@@ -129,33 +152,33 @@ export default function BlogPostPage() {
         )}
 
         {/* Related Services Module */}
-        {relatedServices.length > 0 && (
+        {loadedRelatedServices.length > 0 && (
           <section className="mt-20 border-t border-stone-200 pt-16">
             <h2 className="text-3xl font-bold text-stone-900 mb-8 text-center">好鄰居的貼心推薦</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedServices.map(page => (
+              {loadedRelatedServices.map(service => (
                 <motion.div
-                  key={page.id}
+                  key={service.id}
                   className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col border border-stone-100"
                   whileHover={{ y: -5 }}
                 >
                   <div className="w-full h-48 bg-stone-200 rounded-xl mb-6 overflow-hidden">
                     <img 
-                      src={(page.content.subItem?.productId ? productService.getById(page.content.subItem.productId)?.image : undefined) || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                      alt={page.title} 
+                      src={service.image} 
+                      alt={service.title} 
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                   
-                  <h3 className="text-xl font-bold text-stone-900 mb-3">{page.title}</h3>
+                  <h3 className="text-xl font-bold text-stone-900 mb-3">{service.title}</h3>
                   <p className="text-stone-600 text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
-                    {page.content.subItem?.productId ? productService.getById(page.content.subItem.productId)?.description : ''}
+                    {service.description}
                   </p>
                   
                   <div className="flex justify-end mt-auto">
                     <Link 
-                      to={`/${page.slug}`}
+                      to={`/${service.slug}`}
                       className="inline-flex items-center gap-1 bg-[#885200] hover:bg-[#663D00] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
                     >
                       服務介紹

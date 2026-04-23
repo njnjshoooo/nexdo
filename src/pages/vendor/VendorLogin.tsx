@@ -25,35 +25,25 @@ export default function VendorLogin() {
     motivation: ''
   });
 
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
-    setIsLoggingIn(true);
 
-    try {
-      const vendor = await vendorService.login(account, password);
-
-      if (vendor) {
-        if (vendor.status !== 'active') {
-          setLoginError('您的帳號目前非合作狀態，請聯繫管理員。');
-          setIsLoggingIn(false);
-          return;
-        }
-        // Store logged in vendor info
-        localStorage.setItem('currentVendor', JSON.stringify(vendor));
-        navigate(`/vendor/${vendor.id}`);
+    const vendors = vendorService.getAll();
+    const vendor = vendors.find((v: any) => v.account === account && v.password === password);
+    
+    if (vendor) {
+      if (vendor.status !== 'active') {
+        setLoginError('您的帳號目前非合作狀態，請聯繫管理員。');
         return;
       }
-
-      setLoginError('帳號或密碼錯誤');
-    } catch (err) {
-      console.error('Vendor login error:', err);
-      setLoginError('登入失敗，請稍後再試。');
-    } finally {
-      setIsLoggingIn(false);
+      // Store logged in vendor info
+      localStorage.setItem('currentVendor', JSON.stringify(vendor));
+      navigate(`/vendor/${vendor.id}`);
+      return;
     }
+    
+    setLoginError('帳號或密碼錯誤');
   };
 
   const handleJoinSubmit = (e: React.FormEvent) => {
@@ -293,10 +283,9 @@ export default function VendorLogin() {
 
               <button
                 type="submit"
-                disabled={isLoggingIn}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
               >
-                {isLoggingIn ? '登入中...' : '登入'}
+                登入
               </button>
             </form>
           )}

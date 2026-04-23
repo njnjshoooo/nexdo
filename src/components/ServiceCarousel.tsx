@@ -9,9 +9,10 @@ import { ServiceItem } from '../types/admin';
 
 interface ServiceCarouselProps {
   services: ServiceItem[];
+  desktopColumns?: 2 | 3;
 }
 
-export default function ServiceCarousel({ services }: ServiceCarouselProps) {
+export default function ServiceCarousel({ services, desktopColumns = 3 }: ServiceCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
@@ -22,6 +23,8 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+  const [loadedServices, setLoadedServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -35,6 +38,30 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
   }, [emblaApi]);
 
   useEffect(() => {
+    const loadData = async () => {
+      const data = await Promise.all(services.map(async (item, index) => {
+        const targetPage = item.targetPageId ? pageService.getById(item.targetPageId) : null;
+        const linkUrl = targetPage ? `/${targetPage.slug}` : null;
+        const subItemContent = targetPage?.content?.subItem;
+        const productData = subItemContent?.productId ? await productService.getById(subItemContent.productId) : null;
+        
+        return {
+          id: item.id || index,
+          linkUrl,
+          displayTitle: item.title || productData?.name || '',
+          displayDescription: item.description || productData?.description || '',
+          displayImage: item.image || productData?.image || '',
+          displayChecklist: (item.items && item.items.length > 0) ? item.items : productData?.checklist?.map(c => c.text) || [],
+          price: item.price
+        };
+      }));
+      setLoadedServices(data);
+      setLoading(false);
+    };
+    loadData();
+  }, [services]);
+
+  useEffect(() => {
     if (!emblaApi) return;
     onSelect();
     setScrollSnaps(emblaApi.scrollSnapList());
@@ -42,38 +69,30 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
+  if (loading) return null;
+
   return (
     <div className="relative group/carousel">
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="overflow-hidden py-12 -my-12" ref={emblaRef}>
         <div className="flex -ml-4 md:-ml-8">
-          {services.map((item, index) => {
-            const targetPage = item.targetPageId ? pageService.getById(item.targetPageId) : null;
-            const linkUrl = targetPage ? `/${targetPage.slug}` : null;
-
-            const subItemContent = targetPage?.content?.subItem;
-            const productData = subItemContent?.productId ? productService.getById(subItemContent.productId) : null;
-            const displayTitle = item.title || productData?.name || '';
-            const displayDescription = item.description || productData?.description || '';
-            const displayImage = item.image || productData?.image || '';
-            const displayChecklist = (item.items && item.items.length > 0) ? item.items : productData?.checklist?.map(c => c.text) || [];
-
+          {loadedServices.map((item, index) => {
             const CardContent = (
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-stone-100 h-full flex flex-col">
                 <div className="h-56 overflow-hidden relative">
                   <img 
-                    src={displayImage} 
-                    alt={displayTitle} 
+                    src={item.displayImage} 
+                    alt={item.displayTitle} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
                 </div>
                 <div className="p-8 flex-grow flex flex-col">
-                  <h3 className="text-2xl font-bold text-[#4A5D3B] mb-3">{displayTitle}</h3>
-                  <p className="text-stone-600 mb-6 leading-relaxed h-20 line-clamp-3">{displayDescription}</p>
+                  <h3 className="text-2xl font-bold text-[#4A5D3B] mb-3">{item.displayTitle}</h3>
+                  <p className="text-stone-600 mb-6 leading-relaxed h-20 line-clamp-3">{item.displayDescription}</p>
                   
                   <div className="space-y-3 mb-8 flex-grow">
-                    {displayChecklist.map((subItem, i) => (
+                    {item.displayChecklist.map((subItem: string, i: number) => (
                       <div key={i} className="flex items-center gap-2 text-stone-700">
                         <CheckCircle size={18} className="text-[#E07A5F]" />
                         <span className="text-sm font-medium">{subItem}</span>
@@ -83,7 +102,7 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
                   
                   <div className="pt-6 border-t border-stone-100 flex items-center justify-between mt-auto">
                     <span className="text-2xl font-bold text-[#E07A5F]">{item.price}</span>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${linkUrl ? 'bg-[#4A5D3B] text-white' : 'bg-[#F5F0EB] text-[#4A5D3B] group-hover:bg-[#4A5D3B] group-hover:text-white'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${item.linkUrl ? 'bg-[#4A5D3B] text-white' : 'bg-[#F5F0EB] text-[#4A5D3B] group-hover:bg-[#4A5D3B] group-hover:text-white'}`}>
                       <ArrowRight size={20} />
                     </div>
                   </div>
@@ -91,10 +110,12 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
               </div>
             );
 
+            const desktopClass = desktopColumns === 2 ? 'lg:flex-[0_0_50%]' : 'lg:flex-[0_0_33.333333%]';
+
             return (
               <div 
-                key={item.id || index} 
-                className="flex-[0_0_83.333333%] min-w-0 pl-4 md:flex-[0_0_50%] md:pl-8 lg:flex-[0_0_33.333333%]"
+                key={`carousel-item-${item.id}`} 
+                className={`flex-[0_0_83.333333%] min-w-0 pl-4 md:flex-[0_0_50%] md:pl-8 ${desktopClass}`}
               >
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -103,8 +124,8 @@ export default function ServiceCarousel({ services }: ServiceCarouselProps) {
                   transition={{ delay: index * 0.1 }}
                   className="group h-full"
                 >
-                  {linkUrl ? (
-                    <Link to={linkUrl} className="block h-full">
+                  {item.linkUrl ? (
+                    <Link to={item.linkUrl} className="block h-full">
                       {CardContent}
                     </Link>
                   ) : (

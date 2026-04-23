@@ -3,7 +3,11 @@ import { Order } from '../../../types/admin';
 import { Vendor } from '../../../types/vendor';
 import { orderService } from '../../../services/orderService';
 import { submissionService } from '../../../services/submissionService';
-import { Eye, Clock, DollarSign, CheckCircle, XCircle, FileText, Camera } from 'lucide-react';
+import { Clock, DollarSign, CheckCircle, XCircle, FileText, Camera } from 'lucide-react';
+import OrderStatusBadge from '../../../components/admin/OrderStatusBadge';
+import SaveButton from '../../../components/admin/SaveButton';
+import AdminTable from '../../../components/admin/AdminTable';
+import { Pagination } from '../../../components/ui/Pagination';
 
 interface PendingQuoteListProps {
   vendor: Vendor;
@@ -14,19 +18,27 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [quoteAmount, setQuoteAmount] = useState<string>('');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadData();
   }, [vendor.id]);
 
-  const loadData = () => {
-    const allOrders = orderService.getAll();
+  const loadData = async () => {
+    const allOrders = await orderService.getAll();
     const pendingQuotes = allOrders.filter(o => 
-      (o.status === 'QUOTE_PENDING' || o.status === 'QUOTED') && 
+      (o.status === 'NEW_QUOTE' || o.status === 'QUOTING' || o.status === 'QUOTE_REVIEW') && 
       o.vendorId === vendor.id
     );
     setOrders(pendingQuotes);
   };
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const paginatedOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleSubmitQuote = async () => {
     if (!selectedOrder || !quoteAmount || isNaN(Number(quoteAmount))) {
@@ -38,33 +50,28 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
     const updates = {
       quotedAmount: amount,
       totalAmount: amount, // Also update totalAmount for display
-      status: 'QUOTED' as const, // Move to quoted status
+      status: 'QUOTE_REVIEW' as const, // Move to quoted status
       statusUpdates: [
         ...(selectedOrder.statusUpdates || []),
         {
-          status: 'QUOTED' as const,
+          status: 'QUOTE_REVIEW' as const,
           timestamp: new Date().toISOString(),
           note: `廠商已回報預估金額: NT$ ${amount.toLocaleString()}`
         }
       ]
     };
 
-    try {
-      await orderService.update(selectedOrder.id, updates);
-
-      // Also update the original submission status to QUOTED
-      if (selectedOrder.submissionId) {
-        await submissionService.updateStatus(selectedOrder.submissionId, 'QUOTED');
-      }
-
-      setSelectedOrder(null);
-      setQuoteAmount('');
-      loadData();
-      setFeedback({ type: 'success', message: '報價已成功送出！' });
-    } catch (error) {
-      console.error('Failed to submit quote:', error);
-      alert('操作失敗');
+    await orderService.update(selectedOrder.id, updates);
+    
+    // Also update the original submission status to QUOTED
+    if (selectedOrder.submissionId) {
+      await submissionService.updateStatus(selectedOrder.submissionId, 'QUOTED');
     }
+
+    setSelectedOrder(null);
+    setQuoteAmount('');
+    await loadData();
+    setFeedback({ type: 'success', message: '報價已成功送出！' });
   };
 
   const parseNotes = (notes?: string) => {
@@ -153,7 +160,7 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
         <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
           <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
             <DollarSign size={20} />
-            {selectedOrder.status === 'QUOTED' ? '已填寫報價' : '填寫預估報價'}
+            {selectedOrder.status === 'QUOTE_REVIEW' ? '已填寫報價' : '填寫預估報價'}
           </h3>
           <div className="flex flex-col md:flex-row gap-4 items-end">
             <div className="flex-1 w-full">
@@ -166,12 +173,12 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
                 className="w-full px-4 py-2 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               />
             </div>
-            <button 
+            <SaveButton 
+              status="idle"
               onClick={handleSubmitQuote}
-              className="w-full md:w-auto px-8 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors shadow-sm"
-            >
-              {selectedOrder.status === 'QUOTED' ? '更新報價' : '送出報價'}
-            </button>
+              label={selectedOrder.status === 'QUOTE_REVIEW' ? '更新報價' : '送出報價'}
+              className="w-full md:w-auto px-8 py-2"
+            />
           </div>
           <p className="text-xs text-stone-500 mt-3 italic">* 此金額為初步預估，實際金額以現場評估後為準。</p>
         </div>
@@ -200,59 +207,56 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
       </div>
       
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-stone-50 text-stone-500 text-xs uppercase font-bold">
+        <AdminTable.Main>
+          <AdminTable.Head>
             <tr>
-              <th className="px-6 py-4">需求單編號</th>
-              <th className="px-6 py-4">客戶姓名</th>
-              <th className="px-6 py-4">服務地址</th>
-              <th className="px-6 py-4">指派時間</th>
-              <th className="px-6 py-4">狀態</th>
-              <th className="px-6 py-4 text-center">操作</th>
+              <AdminTable.Th>需求單編號</AdminTable.Th>
+              <AdminTable.Th>客戶姓名</AdminTable.Th>
+              <AdminTable.Th>服務地址</AdminTable.Th>
+              <AdminTable.Th>指派時間</AdminTable.Th>
+              <AdminTable.Th>狀態</AdminTable.Th>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            {orders.map(order => (
-              <tr key={order.id} className="hover:bg-stone-50/50 transition-colors">
-                <td className="px-6 py-4 font-mono text-sm font-bold text-stone-900">{order.id}</td>
-                <td className="px-6 py-4 text-sm text-stone-900">{order.customerInfo.name}</td>
-                <td className="px-6 py-4 text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</td>
-                <td className="px-6 py-4 text-sm text-stone-500">{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td className="px-6 py-4">
-                  {order.status === 'QUOTE_PENDING' ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
-                      <Clock size={14} /> 待報價
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-600">
-                      <CheckCircle size={14} /> 已報價
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-center">
+          </AdminTable.Head>
+          <AdminTable.Body>
+            {paginatedOrders.map(order => (
+              <AdminTable.Row key={order.id}>
+                <AdminTable.Td>
                   <button 
                     onClick={() => {
                       setSelectedOrder(order);
                       setQuoteAmount('');
                     }}
-                    className="p-2 text-stone-400 hover:text-primary transition-colors inline-flex"
-                    title="查看詳情並報價"
+                    className="font-mono text-sm font-bold text-primary hover:underline"
                   >
-                    <Eye size={20} />
+                    {order.id}
                   </button>
-                </td>
-              </tr>
+                </AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-900">{order.customerInfo.name}</AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</AdminTable.Td>
+                <AdminTable.Td className="text-sm text-stone-500">{new Date(order.createdAt).toLocaleDateString()}</AdminTable.Td>
+                <AdminTable.Td>
+                  <OrderStatusBadge status={order.status} role="vendor" />
+                </AdminTable.Td>
+              </AdminTable.Row>
             ))}
-            {orders.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-stone-400">
-                  目前沒有待報價的需求單
-                </td>
-              </tr>
+            {paginatedOrders.length === 0 && (
+              <AdminTable.Empty colSpan={5}>
+                目前沒有待報價的需求單
+              </AdminTable.Empty>
             )}
-          </tbody>
-        </table>
+          </AdminTable.Body>
+        </AdminTable.Main>
       </div>
+
+      {totalPages > 1 && (
+        <div className="p-6 border-t border-stone-100 flex justify-center">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
+        </div>
+      )}
     </div>
   );
 }

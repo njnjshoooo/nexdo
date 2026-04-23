@@ -7,10 +7,11 @@ import { pageService } from '../../services/pageService';
 import { formService } from '../../services/formService';
 import { Form } from '../../types/form';
 import { 
-  Save, ArrowLeft, Check, BookOpen, Image as ImageIcon, Tag, 
+  ArrowLeft, BookOpen, Image as ImageIcon, Tag, 
   Link as LinkIcon, Heading2, Bold, Italic, Minus, Quote, List,
   MessageSquare
 } from 'lucide-react';
+import SaveButton from '../../components/admin/SaveButton';
 import ImageUploader from '../../components/admin/ImageUploader';
 
 export default function ArticleEditor() {
@@ -110,10 +111,10 @@ export default function ArticleEditor() {
     setSaveStatus('saving');
     try {
       if (isNew) {
-        const newArticle = await articleService.create(data);
+        const newArticle = articleService.create(data);
         navigate(`/admin/articles/${newArticle.slug}`, { replace: true });
       } else {
-        await articleService.update(data.id, data);
+        articleService.update(data.id, data);
         if (urlSlug !== data.slug) {
           navigate(`/admin/articles/${data.slug}`, { replace: true });
         }
@@ -130,38 +131,30 @@ export default function ArticleEditor() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-7xl mx-auto pb-20">
-      <div className="flex items-center justify-between mb-8 sticky top-0 bg-stone-50/90 backdrop-blur-md py-4 z-20 border-b border-stone-200">
-        <div className="flex items-center gap-4">
-          <button type="button" onClick={() => navigate('/admin/articles')} className="p-2 hover:bg-stone-200 rounded-full transition-colors">
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-stone-900">{isNew ? '新建文章' : '編輯文章'}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`w-2 h-2 rounded-full ${isPublished ? 'bg-green-500' : 'bg-stone-300'}`} />
-              <span className="text-xs text-stone-500 font-medium">{isPublished ? '已發布' : '草稿'}</span>
+      <div className="sticky top-0 z-20 bg-stone-50/80 backdrop-blur-md border-b border-stone-200 -mx-4 px-4 py-4 mb-8 sm:-mx-8 sm:px-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button type="button" onClick={() => navigate('/admin/articles')} className="p-2 hover:bg-stone-200 rounded-full transition-colors">
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold text-stone-900">{isNew ? '新建文章' : '編輯文章'}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`w-2 h-2 rounded-full ${isPublished ? 'bg-green-500' : 'bg-stone-300'}`} />
+                <span className="text-xs text-stone-500 font-medium">{isPublished ? '已發布' : '草稿'}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setValue('isPublished', !isPublished)}
-            className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
-          >
-            {isPublished ? '切換為草稿' : '發布文章'}
-          </button>
-          <button 
-            type="submit" 
-            disabled={saveStatus === 'saving'}
-            className={`px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all ${
-              saveStatus === 'saving' 
-                ? 'bg-green-600 text-white cursor-not-allowed' 
-                : 'bg-[#8B5E34] text-white shadow-lg shadow-brown-200/50 hover:bg-black'
-            }`}
-          >
-            {saveStatus === 'saving' ? '儲存中...' : '儲存變更'} {saveStatus === 'saved' ? <Check size={18} /> : saveStatus === 'saving' ? null : <Save size={18} />}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setValue('isPublished', !isPublished)}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+            >
+              {isPublished ? '切換為草稿' : '發布文章'}
+            </button>
+            <SaveButton status={saveStatus} />
+          </div>
         </div>
       </div>
 

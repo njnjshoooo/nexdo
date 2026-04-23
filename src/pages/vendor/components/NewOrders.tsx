@@ -4,7 +4,10 @@ import { Vendor, Staff } from '../../../types/vendor';
 import { orderService } from '../../../services/orderService';
 import { staffService } from '../../../services/staffService';
 import { submissionService } from '../../../services/submissionService';
-import { Eye, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import OrderStatusBadge from '../../../components/admin/OrderStatusBadge';
+import SaveButton from '../../../components/admin/SaveButton';
+import AdminTable from '../../../components/admin/AdminTable';
 
 interface NewOrdersProps {
   vendor: Vendor;
@@ -37,12 +40,11 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
 
   const loadData = async () => {
     // In a real app, we'd filter by vendorId and status='PENDING'
-    const allOrders = orderService.getAll();
+    const allOrders = await orderService.getAll();
     const newOrders = allOrders.filter(o => o.status === 'PENDING' && o.vendorId === vendor.id);
     setOrders(newOrders);
-
-    const staff = await staffService.getAll(vendor.id);
-    setStaffList(staff);
+    
+    setStaffList(staffService.getAll(vendor.id));
   };
 
   const handleAccept = async () => {
@@ -72,30 +74,25 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
       statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
     };
 
-    try {
-      await orderService.update(selectedOrder.id, updates);
+    await orderService.update(selectedOrder.id, updates);
 
-      // Update associated submission to ACTIVE
-      if (selectedOrder.submissionId) {
-        await submissionService.updateStatus(selectedOrder.submissionId, 'ACTIVE');
-      }
-
-      setSelectedOrder(null);
-      loadData();
-      setFeedback({ type: 'success', message: '已成功接案！' });
-    } catch (error) {
-      console.error('Failed to accept order:', error);
-      alert('操作失敗');
+    // Update associated submission to ACTIVE
+    if (selectedOrder.submissionId) {
+      await submissionService.updateStatus(selectedOrder.submissionId, 'ACTIVE');
     }
+
+    setSelectedOrder(null);
+    await loadData();
+    setFeedback({ type: 'success', message: '已成功接案！' });
   };
 
-  const autoSelectOptions = async (order: Order) => {
+  const autoSelectOptions = (order: Order) => {
     if (order.items.length > 0) {
       const firstItem = order.items[0];
-
+      
       // Auto select time if available
       if (firstItem.expectedTime) {
-        setSelectedTime(firstItem.expectedTime);
+        setSelectedTime(firstItem.expectedTime.split(',')[0].trim());
       }
 
       // Auto select date only if there's exactly one option
@@ -106,8 +103,8 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
         }
       }
     }
-
-    const staff = await staffService.getAll(vendor.id);
+    
+    const staff = staffService.getAll(vendor.id);
     if (staff.length === 1) {
       setSelectedStaffId(staff[0].id);
     }
@@ -119,21 +116,22 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
       return;
     }
 
-    const updates = {
-      vendorNotes: rejectReason,
-      // Status remains PENDING, but maybe we unassign vendorId or mark it somehow
-      // For now, we just add notes. In a real system, it might go back to admin.
+    const newUpdate: OrderStatusUpdate = {
+      status: 'UNAVAILABLE',
+      timestamp: new Date().toISOString(),
+      note: `廠商無法配合：${rejectReason}`
     };
 
-    try {
-      await orderService.update(selectedOrder.id, updates);
-      setSelectedOrder(null);
-      loadData();
-      setFeedback({ type: 'success', message: '已送出無法配合原因' });
-    } catch (error) {
-      console.error('Failed to reject order:', error);
-      alert('操作失敗');
-    }
+    const updates = {
+      status: 'UNAVAILABLE' as const,
+      vendorNotes: rejectReason,
+      statusUpdates: [...(selectedOrder.statusUpdates || []), newUpdate]
+    };
+
+    await orderService.update(selectedOrder.id, updates);
+    setSelectedOrder(null);
+    await loadData();
+    setFeedback({ type: 'success', message: '已送出無法配合原因' });
   };
 
   const maskPhone = (phone: string) => {
@@ -205,11 +203,15 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
 
                 {selectedDate && it.expectedTime && (
                   <div className="mb-3">
-                    <p className="text-sm text-stone-500 mb-2">期望時段：</p>
-                    <label className={`px-3 py-1.5 rounded-lg border text-sm cursor-pointer transition-colors ${selectedTime === it.expectedTime ? 'bg-primary/10 border-primary text-primary font-bold' : 'bg-white border-stone-200 text-stone-600 hover:border-primary/50'}`}>
-                      <input type="radio" name={`time-${idx}`} value={it.expectedTime} checked={selectedTime === it.expectedTime} onChange={(e) => setSelectedTime(e.target.value)} className="sr-only" />
-                      {it.expectedTime} (可執行)
-                    </label>
+                    <p className="text-sm text-stone-500 mb-2">期望時段 (請勾選一個)：</p>
+                    <div className="flex flex-wrap gap-2">
+                      {it.expectedTime.split(',').map(time => time.trim()).map((time, i) => (
+                        <label key={i} className={`px-3 py-1.5 rounded-lg border text-sm cursor-pointer transition-colors ${selectedTime === time ? 'bg-primary/10 border-primary text-primary font-bold' : 'bg-white border-stone-200 text-stone-600 hover:border-primary/50'}`}>
+                          <input type="radio" name={`time-${idx}`} value={time} checked={selectedTime === time} onChange={(e) => setSelectedTime(e.target.value)} className="sr-only" />
+                          {time} (可執行)
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -226,13 +228,13 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
               placeholder="請填寫原因，例如：時間皆無法配合，提議新時段..."
               className="w-full h-20 px-3 py-2 border border-red-200 rounded-lg text-sm mb-3 outline-none focus:ring-2 focus:ring-red-500/20 resize-none"
             />
-            <button 
+            <SaveButton 
+              status="idle"
               onClick={handleReject}
               disabled={!rejectReason}
-              className="w-full py-2 bg-white text-red-600 border border-red-200 rounded-lg font-bold hover:bg-red-50 transition-colors disabled:opacity-50"
-            >
-              送出無法配合原因
-            </button>
+              label="送出無法配合原因"
+              className="w-full py-2 !bg-red-600 !text-white hover:!bg-red-700 shadow-red-100/50"
+            />
           </div>
 
           <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
@@ -262,12 +264,12 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
                 人員電話：{staffList.find(s => s.id === selectedStaffId)?.phone}
               </p>
             )}
-            <button 
+            <SaveButton 
+              status="idle"
               onClick={handleAccept}
-              className="w-full py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-colors"
-            >
-              確認接案
-            </button>
+              label="確認接案"
+              className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100/50"
+            />
           </div>
         </div>
 
@@ -296,31 +298,21 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
           </h2>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-stone-50 text-stone-500 text-xs uppercase font-bold">
+        <AdminTable.Container>
+          <AdminTable.Main>
+            <AdminTable.Head>
               <tr>
-                <th className="px-6 py-4">訂單編號</th>
-                <th className="px-6 py-4">客戶姓名</th>
-                <th className="px-6 py-4">客戶電話</th>
-                <th className="px-6 py-4">服務地址</th>
-                <th className="px-6 py-4">狀態</th>
-                <th className="px-6 py-4 text-center">操作</th>
+                <AdminTable.Th>訂單編號</AdminTable.Th>
+                <AdminTable.Th>客戶姓名</AdminTable.Th>
+                <AdminTable.Th>客戶電話</AdminTable.Th>
+                <AdminTable.Th>服務地址</AdminTable.Th>
+                <AdminTable.Th>狀態</AdminTable.Th>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
+            </AdminTable.Head>
+            <AdminTable.Body>
               {orders.map(order => (
-                <tr key={order.id} className="hover:bg-stone-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-sm font-bold text-stone-900">{order.id}</td>
-                  <td className="px-6 py-4 text-sm text-stone-900">{order.customerInfo.name}</td>
-                  <td className="px-6 py-4 text-sm text-stone-500">{maskPhone(order.customerInfo.phone)}</td>
-                  <td className="px-6 py-4 text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-orange-50 text-orange-600">
-                      <AlertCircle size={14} /> 新派案
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
+                <AdminTable.Row key={order.id}>
+                  <AdminTable.Td>
                     <button 
                       onClick={() => {
                         setSelectedOrder(order);
@@ -330,24 +322,27 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
                         setRejectReason('');
                         autoSelectOptions(order);
                       }}
-                      className="p-2 text-stone-400 hover:text-primary transition-colors inline-flex"
-                      title="顯示訂單詳情"
+                      className="font-mono text-sm font-bold text-primary hover:underline"
                     >
-                      <Eye size={20} />
+                      {order.id}
                     </button>
-                  </td>
-                </tr>
+                  </AdminTable.Td>
+                  <AdminTable.Td className="text-sm text-stone-900">{order.customerInfo.name}</AdminTable.Td>
+                  <AdminTable.Td className="text-sm text-stone-500">{maskPhone(order.customerInfo.phone)}</AdminTable.Td>
+                  <AdminTable.Td className="text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</AdminTable.Td>
+                  <AdminTable.Td>
+                    <OrderStatusBadge status={order.status} role="vendor" />
+                  </AdminTable.Td>
+                </AdminTable.Row>
               ))}
               {orders.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-stone-400">
-                    目前沒有新派案
-                  </td>
-                </tr>
+                <AdminTable.Empty colSpan={5}>
+                  目前沒有新派案
+                </AdminTable.Empty>
               )}
-            </tbody>
-          </table>
-        </div>
+            </AdminTable.Body>
+          </AdminTable.Main>
+        </AdminTable.Container>
       </div>
 
       {/* Feedback Toast for list view */}

@@ -4,17 +4,13 @@ import { ArrowUpRight, MessageCircle } from 'lucide-react';
 
 export default function Hero({ data }: { data?: any }) {
   // 💡 資料提取與預設值設定（確保後台沒填資料時，畫面依然精美）
-  const title = data?.title || "陪伴您把居家環境變安全，\n擁有安心自在的樂齡日常。";
-  const image = data?.image || "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?q=80&w=2070&auto=format&fit=crop";
-  const buttons = data?.buttons || [
-    { text: '居住安全', link: '/home-safety' },
-    { text: '清潔收納', link: '/cleaning' },
-    { text: '樂齡健康', link: '/health' },
-    { text: '租房搬家', link: '/rent-and-move' },
-  ];
-  const floatingCard = {
-    text: data?.floatingCard?.text || "「謝謝你們，讓媽媽願意接受浴室改裝，現在她洗澡安全多了，我也終於能放心。」",
-    author: data?.floatingCard?.author || "台北市 林小姐 (42歲)"
+  const subtitle = data?.subtitle || "";
+  const title = data?.title || "";
+  const image = data?.image || "";
+  const buttons = data?.buttons || [];
+  const imageTestimonial = {
+    text: data?.imageTestimonial?.text || "",
+    author: data?.imageTestimonial?.author || ""
   };
 
   return (
@@ -34,7 +30,7 @@ export default function Hero({ data }: { data?: any }) {
             className="space-y-8"
           >
             <h2 className="text-xl font-bold text-primary tracking-wide">
-              樂齡的居住服務
+              {subtitle}
             </h2>
             
             {/* 💡 動態標題：支援換行符號 */}
@@ -82,10 +78,10 @@ export default function Hero({ data }: { data?: any }) {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-stone-900">
-                      {floatingCard.text}
+                      {imageTestimonial.text}
                     </p>
                     <p className="text-xs text-stone-500 mt-1">
-                      — {floatingCard.author}
+                      — {imageTestimonial.author}
                     </p>
                   </div>
                 </div>

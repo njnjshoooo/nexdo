@@ -26,6 +26,7 @@ export default function VendorDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [pendingQuotesCount, setPendingQuotesCount] = useState(0);
+  const [pendingClosureCount, setPendingClosureCount] = useState(0);
 
   useEffect(() => {
     const storedVendor = localStorage.getItem('currentVendor');
@@ -43,16 +44,22 @@ export default function VendorDashboard() {
 
   useEffect(() => {
     if (vendor) {
-      // Calculate counts
-      const allOrders = orderService.getAll();
-      const newOrders = allOrders.filter(o => o.status === 'PENDING' && o.vendorId === vendor.id);
-      setNewOrdersCount(newOrders.length);
+      const fetchCounts = async () => {
+        // Calculate counts
+        const allOrders = await orderService.getAll();
+        const newOrders = allOrders.filter(o => o.status === 'PENDING' && o.vendorId === vendor.id);
+        setNewOrdersCount(newOrders.length);
 
-      const pendingQuotes = allOrders.filter(o => 
-        (o.status === 'QUOTE_PENDING' || o.status === 'QUOTED') && 
-        o.vendorId === vendor.id
-      );
-      setPendingQuotesCount(pendingQuotes.length);
+        const pendingQuotes = allOrders.filter(o => 
+          (o.status === 'NEW_QUOTE' || o.status === 'QUOTING' || o.status === 'QUOTE_REVIEW') && 
+          o.vendorId === vendor.id
+        );
+        setPendingQuotesCount(pendingQuotes.length);
+
+        const pendingClosure = allOrders.filter(o => o.status === 'PAYOUT_REQUEST' && o.vendorId === vendor.id && !o.statementId);
+        setPendingClosureCount(pendingClosure.length);
+      };
+      fetchCounts();
     }
   }, [vendor, activeTab]); 
 
@@ -80,7 +87,7 @@ export default function VendorDashboard() {
     { id: 'pending-quotes', label: '待報價列表', icon: <FileText size={20} />, badge: pendingQuotesCount },
     { id: 'new-orders', label: '新案列表', icon: <ListTodo size={20} />, badge: newOrdersCount },
     { id: 'all-orders', label: '訂單總表', icon: <ClipboardList size={20} /> },
-    { id: 'pending-closure', label: '待結案列表', icon: <CheckSquare size={20} /> },
+    { id: 'pending-closure', label: '財務結算列表', icon: <CheckSquare size={20} />, badge: pendingClosureCount },
     { id: 'staff', label: '服務人員管理', icon: <Users size={20} /> },
     { id: 'billing', label: '財務中心', icon: <CreditCard size={20} /> },
     { id: 'settings', label: '帳號設定', icon: <SettingsIcon size={20} /> },

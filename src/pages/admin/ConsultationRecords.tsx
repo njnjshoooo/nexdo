@@ -4,6 +4,8 @@ import { FormSubmission, Form } from '../../types/form';
 import { submissionService } from '../../services/submissionService';
 import { formService } from '../../services/formService';
 import { Trash2, Eye, X, ArrowLeft, FilterX, MessageCircle } from 'lucide-react';
+import AdminTable from '../../components/admin/AdminTable';
+import { Pagination } from '../../components/ui/Pagination';
 
 export default function ConsultationRecords() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,7 +14,11 @@ export default function ConsultationRecords() {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [forms, setForms] = useState<Record<string, Form>>({});
   const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<FormSubmission | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadData();
@@ -60,14 +66,25 @@ export default function ConsultationRecords() {
     setSearchParams({});
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('確定要刪除這筆諮詢紀錄嗎？此動作無法復原。')) {
-      try {
-        await submissionService.delete(id);
-        await loadData();
-      } catch (error) {
-        alert('刪除失敗');
-      }
+  const handleDelete = (id: string) => {
+    const item = submissions.find(s => s.id === id);
+    if (item) {
+      setItemToDelete(item);
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await submissionService.delete(itemToDelete.id);
+      setShowDeleteConfirm(false);
+      setItemToDelete(null);
+      await loadData();
+    } catch (error) {
+      console.error('刪除失敗:', error);
+      alert('刪除失敗');
     }
   };
 
@@ -102,6 +119,17 @@ export default function ConsultationRecords() {
     );
   };
 
+  const totalPages = Math.ceil(submissions.length / itemsPerPage);
+  const paginatedSubmissions = submissions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [formNameFilter]);
+
   if (loading) {
     return <div className="p-8 text-center text-stone-500">載入諮詢紀錄中...</div>;
   }
@@ -126,67 +154,73 @@ export default function ConsultationRecords() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-stone-50 border-b border-stone-200">
-              <tr>
-                <th className="px-6 py-4 text-sm font-medium text-stone-500">諮詢日期</th>
-                <th className="px-6 py-4 text-sm font-medium text-stone-500">表單名稱</th>
-                <th className="px-6 py-4 text-sm font-medium text-stone-500">內容摘要</th>
-                <th className="px-6 py-4 text-sm font-medium text-stone-500 text-right">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-200">
-              {submissions.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-stone-500">
-                    目前沒有諮詢紀錄
-                  </td>
-                </tr>
-              ) : (
-                submissions.map(submission => {
-                  const form = forms[submission.formId];
-                  const firstField = form?.fields?.find(f => f.type !== 'hidden');
-                  const summary = firstField ? submission.data[firstField.id] : '';
+      <AdminTable.Container>
+        <AdminTable.Main>
+          <AdminTable.Head>
+            <tr>
+              <AdminTable.Th>諮詢日期</AdminTable.Th>
+              <AdminTable.Th>表單名稱</AdminTable.Th>
+              <AdminTable.Th>內容摘要</AdminTable.Th>
+              <AdminTable.Th className="text-right">操作</AdminTable.Th>
+            </tr>
+          </AdminTable.Head>
+          <AdminTable.Body>
+            {paginatedSubmissions.length === 0 ? (
+              <AdminTable.Empty colSpan={4}>
+                目前沒有諮詢紀錄
+              </AdminTable.Empty>
+            ) : (
+              paginatedSubmissions.map(submission => {
+                const form = forms[submission.formId];
+                const firstField = form?.fields?.find(f => f.type !== 'hidden');
+                const summary = firstField ? submission.data[firstField.id] : '';
 
-                  return (
-                    <tr key={submission.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-stone-900 whitespace-nowrap">
-                        {formatDate(submission.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-stone-900">
-                        {form ? form.name : <span className="text-stone-400 italic">未知表單</span>}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-stone-600 max-w-xs truncate">
-                        {Array.isArray(summary) ? summary.join(', ') : summary}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedSubmission(submission)}
-                            className="p-2 text-stone-400 hover:text-stone-600 transition-colors"
-                            title="查看詳情"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(submission.id)}
-                            className="p-2 text-stone-400 hover:text-red-500 transition-colors"
-                            title="刪除"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                return (
+                  <AdminTable.Row key={submission.id}>
+                    <AdminTable.Td className="text-sm text-stone-900 whitespace-nowrap">
+                      {formatDate(submission.createdAt)}
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-900">
+                      {form ? form.name : <span className="text-stone-400 italic">未知表單</span>}
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-600 max-w-xs truncate">
+                      {Array.isArray(summary) ? summary.join(', ') : summary}
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setSelectedSubmission(submission)}
+                          className="p-2 text-stone-400 hover:text-stone-600 transition-colors"
+                          title="查看詳情"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(submission.id)}
+                          className="p-2 text-stone-400 hover:text-red-500 transition-colors"
+                          title="刪除"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </AdminTable.Td>
+                  </AdminTable.Row>
+                );
+              })
+            )}
+          </AdminTable.Body>
+        </AdminTable.Main>
+      </AdminTable.Container>
+
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         </div>
-      </div>
+      )}
 
       {/* 詳情 Modal */}
       {selectedSubmission && (
@@ -233,6 +267,51 @@ export default function ConsultationRecords() {
                 className="px-6 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-medium shadow-sm"
               >
                 關閉
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 刪除確認 Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-stone-100 flex items-center gap-3 text-red-600">
+              <Trash2 size={24} />
+              <h2 className="text-xl font-bold">確認刪除諮詢紀錄</h2>
+            </div>
+            <div className="p-6">
+              <p className="text-stone-600 mb-2">
+                您確定要刪除這筆諮詢紀錄嗎？
+              </p>
+              <p className="text-sm text-stone-400">
+                此動作無法復原，相關的諮詢資訊將會永久移除。
+              </p>
+              {itemToDelete && (
+                <div className="mt-4 p-3 bg-stone-50 rounded-lg border border-stone-100">
+                  <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">諮詢客戶</p>
+                  <p className="text-stone-800 font-bold">
+                    {itemToDelete.data['name'] || itemToDelete.data['姓名'] || '未知客戶'}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="p-6 bg-stone-50 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setItemToDelete(null);
+                }}
+                className="px-4 py-2 text-stone-600 hover:text-stone-800 font-medium"
+              >
+                取消
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-bold shadow-sm"
+              >
+                確認刪除
               </button>
             </div>
           </div>

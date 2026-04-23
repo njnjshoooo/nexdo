@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'motion/react';
 import { User, Settings, Save, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Select } from '../components/ui/Select';
+import { Label } from '../components/ui/Label';
+import { Button } from '../components/ui/Button';
 
 export default function ProfileSettingsPage() {
   const { user, updateProfile } = useAuth();
@@ -118,36 +123,33 @@ export default function ProfileSettingsPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">電子郵件 (帳號)</label>
-                <input 
+                <Label>電子郵件 (帳號)</Label>
+                <Input 
                   type="email" 
                   value={formData.email}
                   disabled
-                  className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-stone-500 cursor-not-allowed"
                 />
                 <p className="text-xs text-stone-400 mt-2">電子郵件作為登入帳號，無法修改</p>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-2">新密碼</label>
-                  <input 
+                  <Label>新密碼</Label>
+                  <Input 
                     type="password" 
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="若不修改請留白"
-                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-stone-700 mb-2">確認新密碼</label>
-                  <input 
+                  <Label>確認新密碼</Label>
+                  <Input 
                     type="password" 
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="再次輸入新密碼"
-                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                   />
                 </div>
               </div>
@@ -168,58 +170,53 @@ export default function ProfileSettingsPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">姓名 <span className="text-red-500">*</span></label>
-                <input 
+                <Label>姓名 <span className="text-red-500">*</span></Label>
+                <Input 
                   type="text" 
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">稱謂</label>
-                <select 
+                <Label>稱謂</Label>
+                <Select 
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 >
                   <option value="">請選擇稱謂</option>
                   <option value="先生">先生</option>
                   <option value="小姐">小姐</option>
                   <option value="女士">女士</option>
-                </select>
+                </Select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">聯絡電話</label>
-                <input 
+                <Label>聯絡電話</Label>
+                <Input 
                   type="tel" 
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">LINE ID</label>
-                <input 
+                <Label>LINE ID</Label>
+                <Input 
                   type="text" 
                   name="lineId"
                   value={formData.lineId}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-stone-700 mb-2">聯絡地址</label>
-                <input 
+                <Label>聯絡地址</Label>
+                <Input 
                   type="text" 
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
             </div>
@@ -239,51 +236,44 @@ export default function ProfileSettingsPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">緊急聯絡人姓名</label>
-                <input 
+                <Label>緊急聯絡人姓名</Label>
+                <Input 
                   type="text" 
                   name="emergencyContactName"
                   value={formData.emergencyContactName}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-stone-700 mb-2">緊急聯絡人電話</label>
-                <input 
+                <Label>緊急聯絡人電話</Label>
+                <Input 
                   type="tel" 
                   name="emergencyContactPhone"
                   value={formData.emergencyContactPhone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-stone-700 mb-2">特殊需求或備註</label>
-                <textarea 
+                <Label>特殊需求或備註</Label>
+                <Textarea 
                   name="specialRequirements"
                   value={formData.specialRequirements}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
                 />
               </div>
             </div>
           </motion.div>
 
           <div className="flex justify-end">
-            <button 
+            <Button 
               type="submit"
-              disabled={isSaving}
-              className="bg-primary text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all flex items-center gap-2 disabled:opacity-50"
+              isLoading={isSaving}
+              size="lg"
             >
-              {isSaving ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Save size={20} />
-              )}
+              {!isSaving && <Save size={20} />}
               儲存設定
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { Order } from '../../types/admin';
+import { vendorService } from '../../services/vendorService';
 import { Vendor } from '../../types/vendor';
-import { ArrowLeft, Save, User, Package, CreditCard, MessageSquare, Briefcase, Camera, XCircle, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowLeft, User, Package, CreditCard, MessageSquare, Briefcase, Camera, XCircle, CheckCircle2, Clock, FileText, Download, X, Edit2 } from 'lucide-react';
+import SaveButton from '../../components/admin/SaveButton';
+import ConfirmModal from '../../components/ConfirmModal';
+import AssignVendorModal from '../../components/admin/AssignVendorModal';
+
+import { OrderStatus, getOrderStatusDisplay } from '../../constants/orderStatus';
 
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [vendors, setVendors] = useState<Vendor[]>(() => vendorService.getAll());
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   // Form state
@@ -28,25 +34,31 @@ export default function OrderDetail() {
     emergencyContactPhone: '',
     specialRequirements: ''
   });
+  const [items, setItems] = useState<Order['items']>([]);
+  const [previewImage, setPreviewImage] = useState<{ url: string, title: string, filename: string } | null>(null);
+  const [showRefundConfirmModal, setShowRefundConfirmModal] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+
+  const loadOrder = async () => {
+    if (!id) return;
+    const foundOrder = await orderService.getById(id);
+    if (foundOrder) {
+      setOrder(foundOrder);
+      setStatus(foundOrder.status);
+      setVendorId(foundOrder.vendorId || '');
+      setCustomerServiceNotes(foundOrder.customerServiceNotes || '');
+      setCustomerInfo(foundOrder.customerInfo);
+      setItems(foundOrder.items);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     // Load vendors
-    const storedVendors = localStorage.getItem('vendors');
-    if (storedVendors) {
-      setVendors(JSON.parse(storedVendors));
-    }
+    const storedVendors = vendorService.getAll();
+    setVendors(storedVendors);
 
-    if (id) {
-      const foundOrder = orderService.getById(id);
-      if (foundOrder) {
-        setOrder(foundOrder);
-        setStatus(foundOrder.status);
-        setVendorId(foundOrder.vendorId || '');
-        setCustomerServiceNotes(foundOrder.customerServiceNotes || '');
-        setCustomerInfo(foundOrder.customerInfo);
-      }
-      setLoading(false);
-    }
+    loadOrder();
   }, [id]);
 
   useEffect(() => {
@@ -58,33 +70,70 @@ export default function OrderDetail() {
 
   const handleSave = async () => {
     if (!order) return;
-    setSaving(true);
-
-    try {
-      // If status is changed to a paid status and paidAt is not set, set it
-      let updatedPaidAt = order.paidAt;
-      if (status !== 'UNPAID' && status !== 'CANCELLED' && !order.paidAt) {
-        updatedPaidAt = new Date().toISOString();
-      } else if (status === 'UNPAID') {
-        updatedPaidAt = undefined;
-      }
-
-      await orderService.update(order.id, {
-        customerServiceNotes,
-        customerInfo,
-        paidAt: updatedPaidAt
-      });
-
-      // Update local state to reflect changes immediately
-      setOrder(prev => prev ? { ...prev, customerServiceNotes, customerInfo, paidAt: updatedPaidAt } : null);
-
-      setFeedback({ type: 'success', message: '儲存成功' });
-    } catch (error) {
-      console.error('儲存訂單失敗:', error);
-      setFeedback({ type: 'error', message: '操作失敗' });
-    } finally {
-      setSaving(false);
+    setSaveStatus('saving');
+    
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // If status is changed to a paid status and paidAt is not set, set it
+    let updatedPaidAt = order.paidAt;
+    if (status !== 'UNPAID' && status !== 'CANCELLED' && !order.paidAt) {
+      updatedPaidAt = new Date().toISOString();
+    } else if (status === 'UNPAID') {
+      updatedPaidAt = undefined;
     }
+
+    // Check for changes in items (expectedDates and expectedTime)
+    const statusUpdates = [...(order.statusUpdates || [])];
+    let itemsChanged = false;
+    items.forEach((item, index) => {
+      const originalItem = order.items[index];
+      if (item.expectedDates !== originalItem.expectedDates) {
+        statusUpdates.push({
+          status: order.status,
+          timestamp: new Date().toISOString(),
+          note: `管理員修改預約日期：由 ${originalItem.expectedDates || '未填寫'} 改為 ${item.expectedDates || '未填寫'}`
+        });
+        itemsChanged = true;
+      }
+      if (item.expectedTime !== originalItem.expectedTime) {
+        statusUpdates.push({
+          status: order.status,
+          timestamp: new Date().toISOString(),
+          note: `管理員修改預約時段：由 ${originalItem.expectedTime || '未填寫'} 改為 ${item.expectedTime || '未填寫'}`
+        });
+        itemsChanged = true;
+      }
+    });
+
+    const updates: Partial<Order> = {
+      customerServiceNotes,
+      customerInfo,
+      paidAt: updatedPaidAt,
+      items
+    };
+
+    if (itemsChanged) {
+      updates.statusUpdates = statusUpdates;
+    }
+
+    await orderService.update(order.id, updates);
+    
+    // Update local state to reflect changes immediately
+    setOrder(prev => prev ? { ...prev, ...updates } : null);
+    
+    setSaveStatus('saved');
+    setFeedback({ type: 'success', message: '儲存成功' });
+    
+    setTimeout(() => setSaveStatus('idle'), 2000);
+  };
+
+  const handleItemChange = (index: number, field: 'expectedDates' | 'expectedTime', value: string) => {
+    setItems(prev => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], [field]: value };
+      return newItems;
+    });
   };
 
   const handleCustomerInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -102,110 +151,96 @@ export default function OrderDetail() {
     return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
 
-  const getStatusText = (status: string) => {
-    const statusMap: Record<string, string> = {
-      'UNPAID': '待付款',
-      'PENDING': '待處理',
-      'ACTIVE': '已媒合',
-      'COMPLETED': '已完成',
-      'PENDING_PAYMENT': '待結案審核',
-      'PAID': '已結案',
-      'CANCELING': '申請取消中',
-      'CANCELLED': '已取消'
-    };
-    return statusMap[status] || status;
-  };
-
-  const handleDispatch = async () => {
-    if (!vendorId) {
+  const handleDispatch = async (selectedVendorId: string) => {
+    if (!selectedVendorId) {
       setFeedback({ type: 'error', message: '請先選擇要指派的廠商！' });
       return;
     }
+    
+    // First save any pending changes (like expectedDates/expectedTime)
+    await handleSave();
 
-    try {
-      const newUpdate = {
-        status: 'PENDING' as const,
-        timestamp: new Date().toISOString(),
-        note: `管理員指派廠商: ${vendors.find(v => v.id === vendorId)?.name || vendorId}`
-      };
+    const newUpdate = {
+      status: 'PENDING' as const,
+      timestamp: new Date().toISOString(),
+      note: `管理員指派廠商: ${vendors.find(v => v.id === selectedVendorId)?.name || selectedVendorId}`
+    };
 
-      const updates = {
-        vendorId,
-        status: 'PENDING' as const,
-        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-      };
+    const updates = { 
+      vendorId: selectedVendorId,
+      status: 'PENDING' as const,
+      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+    };
 
-      await orderService.update(order!.id, updates);
-      setOrder(prev => prev ? { ...prev, ...updates } : null);
-      setStatus('PENDING');
-      setFeedback({ type: 'success', message: '任務已成功派發！' });
-    } catch (error) {
-      console.error('派發任務失敗:', error);
-      setFeedback({ type: 'error', message: '操作失敗' });
-    }
+    await orderService.update(order!.id, updates);
+    setOrder(prev => prev ? { ...prev, ...updates } : null);
+    setStatus('PENDING');
+    setVendorId(selectedVendorId);
+    setShowAssignModal(false);
+    setFeedback({ type: 'success', message: '任務已成功派發！' });
+  };
+
+  const handleOpenAssignModal = async () => {
+    // Save first before opening modal
+    await handleSave();
+    setShowAssignModal(true);
   };
 
   const handleApproveClosure = async () => {
+    const newUpdate = {
+      status: 'PAYOUT_REQUEST' as const,
+      timestamp: new Date().toISOString(),
+      note: '管理員核准結案，進入財務結算流程'
+    };
+    const updates = { 
+      status: 'PAYOUT_REQUEST' as const,
+      statusUpdates: [...(order?.statusUpdates || []), newUpdate]
+    };
+    await orderService.update(order!.id, updates);
+    setOrder(prev => prev ? { ...prev, ...updates } : null);
+    setStatus('PAYOUT_REQUEST');
+    setFeedback({ type: 'success', message: '已核准結案，進入財務結算流程' });
+  };
+
+  const handleDownloadImage = async (url: string, filename: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     try {
-      const newUpdate = {
-        status: 'PAID' as const,
-        timestamp: new Date().toISOString(),
-        note: '管理員核准結案'
-      };
-      const updates = {
-        status: 'PAID' as const,
-        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-      };
-      await orderService.update(order!.id, updates);
-      setOrder(prev => prev ? { ...prev, ...updates } : null);
-      setStatus('PAID');
-      setFeedback({ type: 'success', message: '已核准結案' });
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error('核准結案失敗:', error);
-      setFeedback({ type: 'error', message: '操作失敗' });
+      console.error('Download failed:', error);
+      window.open(url, '_blank');
     }
   };
 
-  const handleApproveCancel = async () => {
+  const handleRequestRefund = async () => {
+    if (!order) return;
     try {
-      const newUpdate = {
-        status: 'CANCELLED' as const,
-        timestamp: new Date().toISOString(),
-        note: '管理員核准取消'
-      };
-      const updates = {
-        status: 'CANCELLED' as const,
-        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-      };
-      await orderService.update(order!.id, updates);
-      setOrder(prev => prev ? { ...prev, ...updates } : null);
-      setStatus('CANCELLED');
-      setFeedback({ type: 'success', message: '已核准取消' });
+      await orderService.update(order.id, {
+        status: 'REFUND_PENDING',
+        statusUpdates: [
+          ...(order.statusUpdates || []),
+          {
+            status: 'REFUND_PENDING',
+            timestamp: new Date().toISOString(),
+            note: '管理員發起退款申請'
+          }
+        ]
+      });
+      setShowRefundConfirmModal(false);
+      loadOrder();
+      setFeedback({ type: 'success', message: '已申請退款，訂單進入退款管理' });
     } catch (error) {
-      console.error('核准取消失敗:', error);
-      setFeedback({ type: 'error', message: '操作失敗' });
-    }
-  };
-
-  const handleRejectCancel = async () => {
-    try {
-      const newUpdate = {
-        status: 'ACTIVE' as const,
-        timestamp: new Date().toISOString(),
-        note: '管理員拒絕取消，恢復為已媒合'
-      };
-      const updates = {
-        status: 'ACTIVE' as const,
-        cancelReason: undefined,
-        statusUpdates: [...(order?.statusUpdates || []), newUpdate]
-      };
-      await orderService.update(order!.id, updates);
-      setOrder(prev => prev ? { ...prev, ...updates } : null);
-      setStatus('ACTIVE');
-      setFeedback({ type: 'success', message: '已拒絕取消' });
-    } catch (error) {
-      console.error('拒絕取消失敗:', error);
-      setFeedback({ type: 'error', message: '操作失敗' });
+      console.error('Failed to request refund', error);
+      setFeedback({ type: 'error', message: '申請退款失敗' });
     }
   };
 
@@ -234,14 +269,11 @@ export default function OrderDetail() {
           </button>
           <h1 className="text-3xl font-bold text-stone-900">訂單詳情</h1>
         </div>
-        <button 
+        <SaveButton 
           onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-dark transition-colors disabled:opacity-50"
-        >
-          <Save size={18} />
-          {saving ? '儲存中...' : '儲存變更'}
-        </button>
+          status={saveStatus}
+          label="儲存變更"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -271,9 +303,9 @@ export default function OrderDetail() {
                 <p className="text-xs font-bold text-stone-400 uppercase mb-1">狀態</p>
                 <div className="flex items-center gap-3">
                   <div className="px-3 py-2 border border-stone-200 rounded-xl text-sm font-bold bg-stone-50 text-stone-700">
-                    {getStatusText(status)}
+                    {getOrderStatusDisplay(status as OrderStatus)}
                   </div>
-                  {(status === 'COMPLETED' || status === 'PENDING_PAYMENT') && (
+                  {(status === 'COMPLETED') && (
                     <button 
                       onClick={handleApproveClosure}
                       className="flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors"
@@ -281,21 +313,10 @@ export default function OrderDetail() {
                       <CheckCircle2 size={16} /> 核准結案
                     </button>
                   )}
-                  {status === 'CANCELING' && (
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={handleApproveCancel}
-                        className="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 transition-colors"
-                      >
-                        核准取消
-                      </button>
-                      <button 
-                        onClick={handleRejectCancel}
-                        className="bg-stone-200 text-stone-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-stone-300 transition-colors"
-                      >
-                        拒絕取消
-                      </button>
-                    </div>
+                  {status === 'UNAVAILABLE' && (
+                    <span className="text-sm text-red-600 font-bold">
+                      請重新指派廠商
+                    </span>
                   )}
                 </div>
               </div>
@@ -310,24 +331,16 @@ export default function OrderDetail() {
             </h2>
             <div className="flex items-end gap-4">
               <div className="flex-1">
-                <p className="text-xs font-bold text-stone-400 uppercase mb-1">選擇廠商</p>
-                <select 
-                  value={vendorId}
-                  onChange={(e) => setVendorId(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="">尚未指派</option>
-                  {vendors.map(v => (
-                    <option key={v.id} value={v.id}>{v.name}</option>
-                  ))}
-                </select>
+                <p className="text-xs font-bold text-stone-400 uppercase mb-1">目前指派廠商</p>
+                <div className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm font-bold bg-stone-50 text-stone-700">
+                  {vendorId ? (vendors.find(v => v.id === vendorId)?.name || vendorId) : '尚未指派'}
+                </div>
               </div>
               <button
-                onClick={handleDispatch}
-                disabled={!vendorId || order.vendorId === vendorId}
-                className="bg-stone-900 text-white px-6 py-2 rounded-xl font-bold hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-[38px] whitespace-nowrap"
+                onClick={handleOpenAssignModal}
+                className="bg-stone-900 text-white px-6 py-2 rounded-xl font-bold hover:bg-stone-800 transition-colors h-[38px] whitespace-nowrap"
               >
-                派發任務
+                {status === 'UNAVAILABLE' ? '重新指派' : '指派任務'}
               </button>
             </div>
           </section>
@@ -478,7 +491,7 @@ export default function OrderDetail() {
             </h2>
             
             <div className="space-y-4 mb-6">
-              {order.items.map((item, idx) => (
+              {items.map((item, idx) => (
                 <div key={idx} className="flex flex-col gap-2 pb-4 border-b border-stone-50 last:border-0 last:pb-0">
                   <div className="flex justify-between items-start gap-4">
                     <div>
@@ -495,28 +508,52 @@ export default function OrderDetail() {
                     <p className="font-bold text-stone-900 text-sm">NT$ {(item.price * item.quantity).toLocaleString()}</p>
                   </div>
                   
-                  {(item.expectedDates?.length || item.expectedTime || item.notes) && (
-                    <div className="bg-stone-50 rounded-xl p-3 text-xs space-y-1.5 mt-2">
-                      {item.expectedDates && item.expectedDates.length > 0 && (
-                        <div className="flex gap-2">
-                          <span className="text-stone-400 font-medium min-w-[60px]">期望日期:</span>
-                          <span className="text-stone-700">{item.expectedDates}</span>
-                        </div>
-                      )}
-                      {item.expectedTime && (
-                        <div className="flex gap-2">
-                          <span className="text-stone-400 font-medium min-w-[60px]">期望時段:</span>
-                          <span className="text-stone-700">{item.expectedTime}</span>
-                        </div>
-                      )}
-                      {item.notes && (
-                        <div className="flex gap-2">
-                          <span className="text-stone-400 font-medium min-w-[60px]">備註需求:</span>
-                          <span className="text-stone-700 whitespace-pre-wrap">{item.notes}</span>
-                        </div>
-                      )}
+                  <div className="bg-stone-50 rounded-xl p-3 text-xs space-y-2 mt-2">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-stone-400 font-medium min-w-[60px]">期望日期:</span>
+                        {(status === 'PENDING' || status === 'UNAVAILABLE') ? (
+                          <div className="relative flex-1 flex items-center">
+                            <input
+                              type="text"
+                              value={item.expectedDates || ''}
+                              onChange={(e) => handleItemChange(idx, 'expectedDates', e.target.value)}
+                              className="w-full px-2 py-1 border border-stone-200 rounded text-stone-700 outline-none focus:border-primary pr-6"
+                              placeholder="例如：2026/04/10"
+                            />
+                            <Edit2 size={12} className="absolute right-2 text-stone-400 pointer-events-none" />
+                          </div>
+                        ) : (
+                          <span className="text-stone-700">{item.expectedDates || '未填寫'}</span>
+                        )}
+                      </div>
                     </div>
-                  )}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-stone-400 font-medium min-w-[60px]">期望時段:</span>
+                        {(status === 'PENDING' || status === 'UNAVAILABLE') ? (
+                          <div className="relative flex-1 flex items-center">
+                            <input
+                              type="text"
+                              value={item.expectedTime || ''}
+                              onChange={(e) => handleItemChange(idx, 'expectedTime', e.target.value)}
+                              className="w-full px-2 py-1 border border-stone-200 rounded text-stone-700 outline-none focus:border-primary pr-6"
+                              placeholder="例如：上午 09:00 - 12:00"
+                            />
+                            <Edit2 size={12} className="absolute right-2 text-stone-400 pointer-events-none" />
+                          </div>
+                        ) : (
+                          <span className="text-stone-700">{item.expectedTime || '未填寫'}</span>
+                        )}
+                      </div>
+                    </div>
+                    {item.notes && (
+                      <div className="flex gap-2">
+                        <span className="text-stone-400 font-medium min-w-[60px]">備註需求:</span>
+                        <span className="text-stone-700 whitespace-pre-wrap">{item.notes}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -548,15 +585,23 @@ export default function OrderDetail() {
             </div>
 
             <button 
-              className="w-full py-3 bg-white border-2 border-red-100 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors"
-              onClick={() => {
-                // Handle refund logic
-                setFeedback({ type: 'success', message: '退款申請已送出' });
-              }}
+              className="w-full py-3 bg-white border-2 border-red-100 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setShowRefundConfirmModal(true)}
+              disabled={status === 'REFUNDED' || status === 'REFUND_PENDING'}
             >
-              退款
+              {status === 'REFUNDED' ? '已完成退款' : status === 'REFUND_PENDING' ? '退款處理中' : '申請退款'}
             </button>
           </section>
+
+          <ConfirmModal
+            isOpen={showRefundConfirmModal}
+            onClose={() => setShowRefundConfirmModal(false)}
+            onConfirm={handleRequestRefund}
+            title="確認申請退款"
+            message="確定要為此訂單申請退款嗎？確認後訂單狀態將變更為「退款處理中」，並進入退款管理列表。"
+            confirmText="確認申請"
+            variant="danger"
+          />
 
           {/* Vendor Feedback Section */}
           {(order.cancelReason || order.servicePhotoUrl || order.vendorNotes) && (
@@ -566,15 +611,19 @@ export default function OrderDetail() {
                 廠商回報資訊
               </h2>
               <div className="space-y-6">
-                {status === 'PENDING_PAYMENT' && (
-                  <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                    <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                      <CheckCircle2 size={18} />
-                      <span className="text-sm font-bold">廠商申請結案</span>
-                    </div>
-                    <p className="text-sm text-emerald-800 font-medium">廠商已完成服務並正式提交結案申請，請審核服務內容與照片後進行結案。</p>
+              {(status === 'PENDING_PAYMENT' || status === 'COMPLETED') && (
+                <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                  <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                    <CheckCircle2 size={18} />
+                    <span className="text-sm font-bold">{status === 'COMPLETED' ? '廠商已回報完工' : '廠商申請結案'}</span>
                   </div>
-                )}
+                  <p className="text-sm text-emerald-800 font-medium">
+                    {status === 'COMPLETED' 
+                      ? '廠商已完成服務並上傳相關憑證，請審核後進行結案。' 
+                      : '廠商已完成服務並正式提交結案申請，請審核服務內容與照片後進行結案。'}
+                  </p>
+                </div>
+              )}
                 {order.cancelReason && (
                   <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
                     <div className="flex items-center gap-2 text-red-600 mb-2">
@@ -590,7 +639,10 @@ export default function OrderDetail() {
                       <Camera size={18} className="text-primary" />
                       <span className="text-sm font-bold uppercase">服務完成照片</span>
                     </div>
-                    <div className="relative group">
+                    <div 
+                      className="relative group cursor-pointer"
+                      onClick={() => setPreviewImage({ url: order.servicePhotoUrl!, title: '服務完成照片', filename: `${order.id}_服務完成照` })}
+                    >
                       <img 
                         src={order.servicePhotoUrl} 
                         alt="服務完成照片" 
@@ -598,6 +650,67 @@ export default function OrderDetail() {
                         referrerPolicy="no-referrer"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-2xl pointer-events-none" />
+                      <button 
+                        onClick={(e) => handleDownloadImage(order.servicePhotoUrl!, `${order.id}_服務完成照`, e)}
+                        className="absolute bottom-3 right-3 p-2 bg-white/90 hover:bg-white text-stone-700 hover:text-primary rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-all"
+                        title="下載圖片"
+                      >
+                        <Download size={18} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {order.receiptPhotoUrl && (
+                  <div>
+                    <div className="flex items-center gap-2 text-stone-900 mb-3">
+                      <FileText size={18} className="text-primary" />
+                      <span className="text-sm font-bold uppercase">簽收單照片</span>
+                    </div>
+                    <div 
+                      className="relative group cursor-pointer"
+                      onClick={() => setPreviewImage({ url: order.receiptPhotoUrl!, title: '簽收單照片', filename: `${order.id}_簽收單` })}
+                    >
+                      <img 
+                        src={order.receiptPhotoUrl} 
+                        alt="簽收單照片" 
+                        className="rounded-2xl border border-stone-100 max-w-full h-auto shadow-sm"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-2xl pointer-events-none" />
+                      <button 
+                        onClick={(e) => handleDownloadImage(order.receiptPhotoUrl!, `${order.id}_簽收單`, e)}
+                        className="absolute bottom-3 right-3 p-2 bg-white/90 hover:bg-white text-stone-700 hover:text-primary rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-all"
+                        title="下載圖片"
+                      >
+                        <Download size={18} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {order.paymentProofPhotoUrl && (
+                  <div>
+                    <div className="flex items-center gap-2 text-stone-900 mb-3">
+                      <CreditCard size={18} className="text-primary" />
+                      <span className="text-sm font-bold uppercase">支付憑證截圖</span>
+                    </div>
+                    <div 
+                      className="relative group cursor-pointer"
+                      onClick={() => setPreviewImage({ url: order.paymentProofPhotoUrl!, title: '支付憑證截圖', filename: `${order.id}_支付憑證截圖` })}
+                    >
+                      <img 
+                        src={order.paymentProofPhotoUrl} 
+                        alt="支付憑證截圖" 
+                        className="rounded-2xl border border-stone-100 max-w-full h-auto shadow-sm"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-2xl pointer-events-none" />
+                      <button 
+                        onClick={(e) => handleDownloadImage(order.paymentProofPhotoUrl!, `${order.id}_支付憑證截圖`, e)}
+                        className="absolute bottom-3 right-3 p-2 bg-white/90 hover:bg-white text-stone-700 hover:text-primary rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-all"
+                        title="下載圖片"
+                      >
+                        <Download size={18} />
+                      </button>
                     </div>
                   </div>
                 )}
@@ -627,7 +740,7 @@ export default function OrderDetail() {
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-1">
                       <span className="text-xs font-bold text-stone-900 bg-stone-100 px-2 py-0.5 rounded-full">
-                        {getStatusText(update.status)}
+                        {getOrderStatusDisplay(update.status as OrderStatus)}
                       </span>
                       <span className="text-[10px] text-stone-400 font-mono">
                         {formatDate(update.timestamp)}
@@ -654,6 +767,15 @@ export default function OrderDetail() {
         </div>
       </div>
 
+      <AssignVendorModal
+        isOpen={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        onAssign={handleDispatch}
+        vendors={vendors}
+        currentVendorId={vendorId}
+        isReassign={status === 'UNAVAILABLE'}
+      />
+
       {/* Feedback Toast */}
       {feedback && (
         <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl z-50 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
@@ -661,6 +783,38 @@ export default function OrderDetail() {
         }`}>
           {feedback.type === 'success' ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
           <span className="font-bold">{feedback.message}</span>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+            <div className="absolute -top-12 right-0 flex items-center gap-4">
+              <button 
+                onClick={() => handleDownloadImage(previewImage.url, previewImage.filename)}
+                className="flex items-center gap-2 text-white hover:text-primary transition-colors bg-black/50 px-4 py-2 rounded-full"
+              >
+                <Download size={18} />
+                <span className="font-bold text-sm">下載圖片</span>
+              </button>
+              <button 
+                onClick={() => setPreviewImage(null)}
+                className="p-2 text-white hover:text-red-400 transition-colors bg-black/50 rounded-full"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <img 
+              src={previewImage.url} 
+              alt={previewImage.title}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              referrerPolicy="no-referrer"
+            />
+          </div>
         </div>
       )}
     </div>

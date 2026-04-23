@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FileText, Settings, LogOut, ClipboardCheck, Inbox, BookOpen, Users, Package, DollarSign, ShieldCheck, Image as ImageIcon, Briefcase, Calendar, MessageSquare } from 'lucide-react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, FileText, Settings, LogOut, ClipboardCheck, ChevronDown, ChevronRight, BookOpen, Users, Package, DollarSign, ShieldCheck, Image as ImageIcon, Briefcase, Calendar, MessageSquare, Home, Wallet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types/auth';
 import { submissionService } from '../../services/submissionService';
@@ -10,6 +10,8 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
   const [permissions, setPermissions] = useState<string[]>([]);
   const [pendingAppointments, setPendingAppointments] = useState(0);
+  const location = useLocation();
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -44,6 +46,68 @@ export default function Sidebar() {
     return permissions.includes(permission);
   };
 
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+    );
+  };
+
+  // Auto-expand based on current path
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith('/admin/consultations') || path.startsWith('/admin/appointments') || path.startsWith('/admin/orders') || path.startsWith('/admin/finance')) {
+      if (!expandedCategories.includes('營運管理')) setExpandedCategories(prev => [...prev, '營運管理']);
+    } else if (path.startsWith('/admin/pages') || path.startsWith('/admin/navigation') || path.startsWith('/admin/articles') || path.startsWith('/admin/media')) {
+      if (!expandedCategories.includes('內容管理')) setExpandedCategories(prev => [...prev, '內容管理']);
+    } else if (path.startsWith('/admin/vendors') || path.startsWith('/admin/users')) {
+      if (!expandedCategories.includes('資源管理')) setExpandedCategories(prev => [...prev, '資源管理']);
+    } else if (path.startsWith('/admin/settings') || path.startsWith('/admin/permissions')) {
+      if (!expandedCategories.includes('系統配置')) setExpandedCategories(prev => [...prev, '系統配置']);
+    }
+  }, [location.pathname]);
+
+  const navItems = [
+    { title: '儀表板', icon: LayoutDashboard, path: '/admin', end: true },
+    {
+      title: '營運管理',
+      icon: Briefcase,
+      items: [
+        { title: '諮詢紀錄', path: '/admin/consultations', permission: 'form' },
+        { title: '預約管理', path: '/admin/appointments', permission: 'form', badge: pendingAppointments },
+        { title: '訂單管理', path: '/admin/orders', permission: 'product' },
+        { title: '財務結算', path: '/admin/finance', permission: 'member' },
+      ]
+    },
+    { title: '產品管理', icon: Package, path: '/admin/products', permission: 'product' },
+    {
+      title: '內容管理',
+      icon: BookOpen,
+      items: [
+        { title: '頁面管理', path: '/admin/pages', permission: 'page' },
+        { title: '導覽列管理', path: '/admin/navigation', permission: 'page' },
+        { title: '文章管理', path: '/admin/articles', permission: 'article' },
+        { title: '媒體庫', path: '/admin/media', permission: 'media' },
+      ]
+    },
+    { title: '表單工具', icon: ClipboardCheck, path: '/admin/forms', permission: 'form' },
+    {
+      title: '資源管理',
+      icon: Users,
+      items: [
+        { title: '廠商管理', path: '/admin/vendors', permission: 'member' },
+        { title: '會員管理', path: '/admin/users', permission: 'member' },
+      ]
+    },
+    {
+      title: '系統配置',
+      icon: Settings,
+      items: [
+        { title: '系統設定', path: '/admin/settings' },
+        { title: '權限管理', path: '/admin/permissions', permission: 'member' },
+      ]
+    }
+  ];
+
   return (
     <div className="w-64 bg-stone-900 text-stone-300 min-h-screen flex flex-col">
       <div className="p-6 border-b border-stone-800">
@@ -55,199 +119,74 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        <NavLink
-          to="/admin"
-          end
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-            }`
-          }
-        >
-          <LayoutDashboard size={20} />
-          <span>儀表板</span>
-        </NavLink>
+      <nav className="flex-1 p-4 space-y-1">
+        {navItems.map((item) => {
+          if (item.permission && !hasPermission(item.permission)) return null;
 
-        {hasPermission('product') && (
-          <>
-            <NavLink
-              to="/admin/products"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <Package size={20} />
-              <span>產品管理</span>
-            </NavLink>
-            <NavLink
-              to="/admin/orders"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <DollarSign size={20} />
-              <span>訂單管理</span>
-            </NavLink>
-          </>
-        )}
-
-        {hasPermission('page') && (
-          <>
-            <NavLink
-              to="/admin/pages"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <FileText size={20} />
-              <span>頁面管理</span>
-            </NavLink>
-            <NavLink
-              to="/admin/navigation"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <LayoutDashboard size={20} />
-              <span>導覽列管理</span>
-            </NavLink>
-          </>
-        )}
-
-        {hasPermission('form') && (
-          <>
-            <NavLink
-              to="/admin/appointments"
-              className={({ isActive }) =>
-                `flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <div className="flex items-center gap-3">
-                <Calendar size={20} />
-                <span>預約管理</span>
+          if (item.items) {
+            const isExpanded = expandedCategories.includes(item.title);
+            return (
+              <div key={item.title}>
+                <button
+                  onClick={() => toggleCategory(item.title)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-stone-800 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon size={20} />
+                    <span>{item.title}</span>
+                  </div>
+                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+                {isExpanded && (
+                  <div className="pl-4 space-y-1 mt-1">
+                    {item.items.map((subItem) => {
+                      if (subItem.permission && !hasPermission(subItem.permission)) return null;
+                      return (
+                        <NavLink
+                          key={subItem.path}
+                          to={subItem.path}
+                          className={({ isActive }) =>
+                            `flex items-center justify-between px-4 py-2 rounded-lg text-sm transition-colors ${
+                              isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
+                            }`
+                          }
+                        >
+                          <span>{subItem.title}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              {pendingAppointments > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                  {pendingAppointments}
-                </span>
-              )}
-            </NavLink>
-            <NavLink
-              to="/admin/consultations"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <MessageSquare size={20} />
-              <span>諮詢紀錄</span>
-            </NavLink>
-            <NavLink
-              to="/admin/forms"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <ClipboardCheck size={20} />
-              <span>表單管理</span>
-            </NavLink>
-          </>
-        )}
-
-        {hasPermission('article') && (
-          <NavLink
-            to="/admin/articles"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-              }`
-            }
-          >
-            <BookOpen size={20} />
-            <span>文章管理</span>
-          </NavLink>
-        )}
-
-        {hasPermission('media') && (
-          <NavLink
-            to="/admin/media"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-              }`
-            }
-          >
-            <ImageIcon size={20} />
-            <span>媒體庫</span>
-          </NavLink>
-        )}
-
-        {hasPermission('member') && (
-          <>
-            <NavLink
-              to="/admin/users"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <Users size={20} />
-              <span>會員管理</span>
-            </NavLink>
-            <NavLink
-              to="/admin/vendors"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <Briefcase size={20} />
-              <span>廠商管理</span>
-            </NavLink>
-            <NavLink
-              to="/admin/permissions"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-                }`
-              }
-            >
-              <ShieldCheck size={20} />
-              <span>權限管理</span>
-            </NavLink>
-          </>
-        )}
-
-        <NavLink
-          to="/admin/settings"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
-            }`
+            );
           }
-        >
-          <Settings size={20} />
-          <span>系統設定</span>
-        </NavLink>
+
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive ? 'bg-primary text-white' : 'hover:bg-stone-800'
+                }`
+              }
+            >
+              <item.icon size={20} />
+              <span>{item.title}</span>
+            </NavLink>
+          );
+        })}
       </nav>
 
-      <div className="p-4 border-t border-stone-800">
+      <div className="p-4 border-t border-stone-800 space-y-1">
+        <Link 
+          to="/"
+          className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-stone-800 text-stone-300 transition-colors"
+        >
+          <Home size={20} />
+          <span>返回前台</span>
+        </Link>
         <button 
           onClick={logout}
           className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-stone-800 text-red-400 transition-colors"

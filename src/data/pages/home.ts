@@ -18,6 +18,7 @@ export const homePage: Page = {
           id: 'hero',
           type: 'HERO_1',
           hero1: {
+            subtitle: '樂齡的居住服務',
             title: '陪伴您把居家環境變安全，\n擁有安心自在的樂齡日常。',
             image: 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&q=80&w=1200',
             buttons: [
@@ -26,8 +27,7 @@ export const homePage: Page = {
               { text: '樂齡健康', link: '/health' },
               { text: '租房搬家', link: '/rent-and-move' },
             ],
-            // 💡 漂浮小卡資料
-            floatingCard: {
+            imageTestimonial: {
               text: '「謝謝你們，讓媽媽願意接受浴室改裝，現在她洗澡安全多了，我也終於能放心。」',
               author: '台北市 林小姐 (42歲)'
             }
@@ -36,62 +36,44 @@ export const homePage: Page = {
         {
           id: 'services-block',
           type: 'SERVICES',
-          services: [
-            // 💡 第一個項目：對應綠底樣式 (居住安全)
-            {
-              pageId: 'home-safety',
-              title: '居住安全', // 💡 補上這個
-              description: '陪您看見家裡習以為常的隱形風險，把家打理成最安心的樣子。',
-              tags: ['#衛浴裝修', '#安全評估', '#舊屋診斷'],
-              image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200',
-              testimonial: {
-                text: '很多人的第一步，都是從居住安全開始',
-                author: '王先生 | 新北市'
+          services: {
+            subtitle: '我們提供',
+            title: '從家庭環境到銀髮健康，提供全面的生活服務',
+            items: [
+              // 💡 第一個項目：對應綠底樣式 (居住安全)
+              {
+                pageId: 'home-safety',
+                testimonial: {
+                  text: '很多人的第一步，都是從居住安全開始',
+                  author: '王先生 | 新北市'
+                }
+              },
+              // 💡 第二個項目：對應白底樣式 (收納清潔)
+              {
+                pageId: 'cleaning',
+                testimonial: {
+                  text: '清掉的不職是雜物，更是心裡的負擔',
+                  author: '林小姐 | 台北市'
+                }
+              },
+              // 💡 第三個項目：對應白底樣式 (樂齡健康)
+              {
+                pageId: 'health',
+                testimonial: {
+                  text: '身體硬朗了，想去哪裡玩都不是問題',
+                  author: '陳伯伯 | 桃園市'
+                }
+              },
+              // 💡 第四個項目：對應白底樣式 (租房搬家)
+              {
+                pageId: 'rent-and-move',
+                testimonial: {
+                  text: '生活品質提升，出門更方便了',
+                  author: '王伯伯｜宜蘭縣'
+                }
               }
-            },
-            // 💡 第二個項目：對應白底樣式 (收納清潔)
-            {
-              pageId: 'cleaning',
-              title: '收納清潔', // 💡 補上這個
-              description: '打理好囤積的角落，還給你更舒適自在的空間。',
-              tags: ['#室內清運', '#居家整聊', '#收納整理'],
-              image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=1200',
-              testimonial: {
-                text: '清掉的不職是雜物，更是心裡的負擔',
-                author: '林小姐 | 台北市'
-              }
-            },
-            // 💡 第三個項目：對應白底樣式 (樂齡健康)
-            {
-              pageId: 'health',
-              title: '樂齡健康', // 💡 補上這個
-              description: '打理好身體的基礎，去哪裡、吃什麼都能自己作主。',
-              tags: ['#到府體適能', '#牙科衛教', '#營養諮詢'],
-              image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=1200',
-              testimonial: {
-                text: '身體硬朗了，想去哪裡玩都不是問題',
-                author: '陳伯伯 | 桃園市'
-              }
-            },
-            // 💡 第四個項目：對應白底樣式 (租房搬家)
-            {
-              pageId: 'rent-and-move',
-              title: '適老換屋', // 💡 補上這個
-              description: '輕鬆轉換生活環境，享受更適合的居住空間。',
-              tags: ['#代租代管', '#適老換屋', '#安心移居'],
-              image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=1200',
-              testimonial: {
-                text: '生活品質提升，出門更方便了',
-                author: '王伯伯｜宜蘭縣'
-              }
-            }
-          ]
-        },
-        {
-          id: 'additional-services-block',
-          type: 'ADDITIONAL_SERVICES',
-          // 💡 這裡放你想在橫向捲軸顯示的 SubItem 頁面 ID 或 Slug
-          additionalServices: ['health-fitness', 'moving', 'finance'] 
+            ]
+          }
         },
         {
           id: 'more-services-block',
@@ -114,6 +96,7 @@ export const homePage: Page = {
           process: {
           title: '簡單四步驟，開啟安心生活',
           description: '我們簡化了繁瑣的流程，讓您能快速獲得專業協助。全程透明溝通，尊重您與長輩的每一個決定。',
+          footerLabels: ['免費', '專業診斷', '透明報價', '安心保固'],
           steps: [
               {
               icon: 'MessageCircle', // 💡 改用字串，組件內再轉換
@@ -146,29 +129,33 @@ export const homePage: Page = {
         {
           id: 'testimonials-block',
           type: 'TESTIMONIALS',
-          items: [
-            {
-              content: "原本很擔心爸爸會排斥裝扶手，覺得那是『老人才需要的東西』。但好齡居的顧問很會溝通，說是為了『更方便運動』，爸爸反而很開心接受了。現在浴室安全多了！",
-              author: "陳小姐",
-              role: "上班族 / 父親78歲",
-              rating: 5,
-              tag: "浴室防滑",
-            },
-            {
-              content: "媽媽獨居在老公寓，堆滿了幾十年的雜物。整聊師非常有耐心，不是強迫丟棄，而是聽媽媽講故事，最後清出了好多空間。媽媽說房子變亮了，心情也變好了。",
-              author: "林先生",
-              role: "工程師 / 母親78歲",
-              rating: 5,
-              tag: "居家整聊",
-            },
-            {
-              content: "工作太忙實在沒辦法一直陪著長輩看醫生或運動。好齡居的體適能教練直接到家裡，教練很幽默，現在阿公每週都很期待上課，精神真的變好很多。",
-              author: "張太太",
-              role: "家庭主婦 / 公公85歲",
-              rating: 5,
-              tag: "樂齡健康",
-            }
-          ]
+          testimonials: {
+            title: '真實故事，看見改變的可能',
+            description: '每一個委託背後，都是一份對家人的愛。看看其他家庭如何透過好齡居，找回生活的平衡與安心。',
+            items: [
+              {
+                content: "原本很擔心爸爸會排斥裝扶手，覺得那是『老人才需要的東西』。但好齡居的顧問很會溝通，說是為了『更方便運動』，爸爸反而很開心接受了。現在浴室安全多了！",
+                author: "陳小姐",
+                role: "上班族 / 父親78歲",
+                rating: 5,
+                tag: "浴室防滑",
+              },
+              {
+                content: "媽媽獨居在老公寓，堆滿了幾十年的雜物。整聊師非常有耐心，不是強迫丟棄，而是聽媽媽講故事，最後清出了好多空間。媽媽說房子變亮了，心情也變好了。",
+                author: "林先生",
+                role: "工程師 / 母親78歲",
+                rating: 5,
+                tag: "居家整聊",
+              },
+              {
+                content: "工作太忙實在沒辦法一直陪著長輩看醫生或運動。好齡居的體適能教練直接到家裡，教練很幽默，現在阿公每週都很期待上課，精神真的變好很多。",
+                author: "張太太",
+                role: "家庭主婦 / 公公85歲",
+                rating: 5,
+                tag: "樂齡健康",
+              }
+            ]
+          }
         }
       ]
     }

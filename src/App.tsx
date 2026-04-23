@@ -38,6 +38,7 @@ import AppointmentManagement from './pages/admin/AppointmentManagement';
 import ConsultationRecords from './pages/admin/ConsultationRecords';
 import UserManagement from './pages/admin/UserManagement';
 import VendorManagement from './pages/admin/VendorManagement';
+import FinanceManagement from './pages/admin/FinanceManagement';
 import ProductList from './pages/admin/ProductList';
 import OrderList from './pages/admin/OrderList';
 import OrderDetail from './pages/admin/OrderDetail';
@@ -83,6 +84,7 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<PermissionGuard permission="member"><UserManagement /></PermissionGuard>} />
         <Route path="vendors" element={<PermissionGuard permission="member"><VendorManagement /></PermissionGuard>} />
+        <Route path="finance" element={<PermissionGuard permission="member"><FinanceManagement /></PermissionGuard>} />
         <Route path="permissions" element={<PermissionGuard permission="member"><PermissionManagement /></PermissionGuard>} />
         <Route path="navigation" element={<PermissionGuard permission="page"><NavigationEditor /></PermissionGuard>} />
 

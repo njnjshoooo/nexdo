@@ -23,6 +23,7 @@ export interface FormField {
   placeholder?: string;
   hiddenValueType?: 'page_slug' | 'page_title' | 'custom'; // For hidden fields
   customHiddenValue?: string;
+  multiple?: boolean; // For file uploads
 }
 
 export interface Form {
@@ -45,4 +46,5 @@ export interface FormSubmission {
   data: Record<string, any>;
   createdAt: string;
   status?: 'PENDING' | 'ASSIGNED' | 'QUOTED' | 'PROCESSED' | 'ACTIVE';
+  bookingId?: string;
 }

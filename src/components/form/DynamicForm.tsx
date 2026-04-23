@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Form, FormField } from '../../types/form';
-import { Upload } from 'lucide-react';
+import { Upload, CheckCircle2 } from 'lucide-react';
 import { submissionService } from '../../services/submissionService';
 import { useAuth } from '../../contexts/AuthContext';
+import FormMultiImageUploader from './FormMultiImageUploader';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Select } from '../ui/Select';
+import { Label } from '../ui/Label';
+import { Button } from '../ui/Button';
 
 interface DynamicFormProps {
   form: Form;
@@ -19,6 +25,14 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Calculate min date (today + 4 days)
+  const getMinDate = () => {
+    const today = new Date();
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + 4);
+    return minDate.toISOString().split('T')[0];
+  };
+
   // Initialize hidden fields and pre-fill user data
   useEffect(() => {
     const initialData: Record<string, any> = { ...propInitialData };
@@ -33,8 +47,8 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
           initialData[field.id] = field.customHiddenValue || '';
         }
       } 
-      // 2. Initialize checkboxes as arrays
-      else if (field.type === 'checkbox') {
+      // 2. Initialize checkboxes and multi-file as arrays
+      else if (field.type === 'checkbox' || (field.type === 'file' && field.multiple)) {
         initialData[field.id] = [];
       }
       
@@ -100,15 +114,23 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
+    const minDate = getMinDate();
+    const preferredDates: string[] = [];
+
     form.fields.forEach(field => {
+      const value = formData[field.id];
+      
       if (field.required && field.type !== 'hidden') {
-        const value = formData[field.id];
         if (field.type === 'checkbox') {
           if (!value || value.length === 0) {
             newErrors[field.id] = '此欄位為必填';
           }
         } else if (field.type === 'file') {
-          if (!value) {
+          if (field.multiple) {
+            if (!value || value.length === 0) {
+              newErrors[field.id] = '請上傳照片';
+            }
+          } else if (!value) {
             newErrors[field.id] = '請上傳檔案';
           }
         } else {
@@ -117,7 +139,32 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
           }
         }
       }
+
+      // Additional validation for "期望日期"
+      if (field.type === 'date' && field.label.includes('期望日期') && value) {
+        if (value < minDate) {
+          newErrors[field.id] = '請選擇 4 天後的日期';
+        }
+        preferredDates.push(value);
+      }
     });
+
+    // Mutual exclusion for preferred dates
+    if (preferredDates.length > 1) {
+      const uniqueDates = new Set(preferredDates);
+      if (uniqueDates.size !== preferredDates.length) {
+        // Find which fields have duplicate values
+        form.fields.forEach(field => {
+          if (field.type === 'date' && field.label.includes('期望日期')) {
+            const val = formData[field.id];
+            if (val && preferredDates.filter(d => d === val).length > 1) {
+              newErrors[field.id] = '期望日期不可重複';
+            }
+          }
+        });
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -174,54 +221,41 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
 
     return (
       <div key={field.id} className="mb-6">
-        <label className="block text-sm font-medium text-stone-700 mb-2">
+        <Label>
           {field.label} {field.required && <span className="text-red-500">*</span>}
-        </label>
+        </Label>
 
         {field.type === 'text' && (
-          <input
+          <Input
             type="text"
             value={value}
             onChange={(e) => handleChange(field.id, e.target.value)}
             placeholder={field.placeholder}
-            className={`w-full px-4 py-3 bg-stone-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors ${
-              error ? 'border-red-500 focus:border-red-500' : 'border-stone-200 focus:border-primary'
-            }`}
+            error={!!error}
           />
         )}
 
         {field.type === 'textarea' && (
-          <textarea
+          <Textarea
             value={value}
             onChange={(e) => handleChange(field.id, e.target.value)}
             placeholder={field.placeholder}
             rows={4}
-            className={`w-full px-4 py-3 bg-stone-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors resize-none ${
-              error ? 'border-red-500 focus:border-red-500' : 'border-stone-200 focus:border-primary'
-            }`}
+            error={!!error}
           />
         )}
 
         {field.type === 'select' && (
-          <div className="relative">
-            <select
-              value={value}
-              onChange={(e) => handleChange(field.id, e.target.value)}
-              className={`w-full px-4 py-3 bg-stone-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors appearance-none ${
-                error ? 'border-red-500 focus:border-red-500' : 'border-stone-200 focus:border-primary'
-              }`}
-            >
-              <option value="" disabled>請選擇</option>
-              {(field.options || []).map(opt => (
-                <option key={opt.id} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
-              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          </div>
+          <Select
+            value={value}
+            onChange={(e) => handleChange(field.id, e.target.value)}
+            error={!!error}
+          >
+            <option value="" disabled>請選擇</option>
+            {(field.options || []).map(opt => (
+              <option key={opt.id} value={opt.value}>{opt.label}</option>
+            ))}
+          </Select>
         )}
 
         {field.type === 'radio' && (
@@ -277,34 +311,46 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
         )}
 
         {field.type === 'date' && (
-          <input
-            type="date"
-            value={value}
-            onChange={(e) => handleChange(field.id, e.target.value)}
-            className={`w-full px-4 py-3 bg-stone-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors ${
-              error ? 'border-red-500 focus:border-red-500' : 'border-stone-200 focus:border-primary'
-            }`}
-          />
+          <div className="space-y-1">
+            <Input
+              type="date"
+              value={value}
+              min={field.label.includes('期望日期') ? getMinDate() : undefined}
+              onChange={(e) => handleChange(field.id, e.target.value)}
+              error={!!error}
+            />
+            {field.label.includes('期望日期') && (
+              <p className="text-[10px] text-stone-400">* 為確保媒合品質，請選擇 4 天後的日期</p>
+            )}
+          </div>
         )}
 
         {field.type === 'file' && (
           <div>
-            <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
-              error ? 'border-red-500 bg-red-50' : 'border-stone-300 bg-stone-50 hover:bg-stone-100 hover:border-primary'
-            }`}>
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 text-stone-400 mb-2" />
-                <p className="text-sm text-stone-500">
-                  {value ? (value as File).name : '點擊或拖曳檔案至此上傳'}
-                </p>
-              </div>
-              <input
-                type="file"
-                className="hidden"
-                onChange={(e) => handleFileChange(field.id, e)}
-                accept="image/*"
+            {field.multiple ? (
+              <FormMultiImageUploader 
+                value={value || []}
+                onChange={(urls) => handleChange(field.id, urls)}
+                placeholder={field.placeholder || '點擊或拖曳照片至此上傳'}
               />
-            </label>
+            ) : (
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                error ? 'border-red-500 bg-red-50' : 'border-stone-300 bg-stone-50 hover:bg-stone-100 hover:border-primary'
+              }`}>
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 text-stone-400 mb-2" />
+                  <p className="text-sm text-stone-500">
+                    {value instanceof File ? value.name : (typeof value === 'string' && value ? '已上傳檔案' : '點擊或拖曳檔案至此上傳')}
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileChange(field.id, e)}
+                  accept="image/*"
+                />
+              </label>
+            )}
           </div>
         )}
 
@@ -340,23 +386,16 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
         <form onSubmit={handleSubmit}>
           {form.fields.map(renderField)}
           
-          <button
+          <Button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-70 flex items-center justify-center gap-2 mt-8"
+            isLoading={isSubmitting}
+            className="w-full py-6 text-lg mt-8"
           >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                處理中...
-              </>
-            ) : (
-              '送出表單'
-            )}
-          </button>
+            {isSubmitting ? '處理中...' : '送出表單'}
+          </Button>
+          <p className="mt-4 text-center tracking-wider text-sm text-stone-500 font-medium">
+            將有專人立即為您服務
+          </p>
         </form>
       )}
     </section>

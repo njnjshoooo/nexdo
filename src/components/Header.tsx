@@ -90,7 +90,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
+          <Link 
+            to="/" 
+            className="flex-shrink-0 flex items-center gap-2 cursor-pointer" 
+            onClick={() => {
+              window.scrollTo(0, 0);
+              setIsServicesOpen(false);
+            }}
+          >
             {isDarkHeader && settings.whiteLogo ? (
               <img src={settings.whiteLogo} alt="Logo" className="object-contain" style={{ height: settings.logoHeight ? `${settings.logoHeight}px` : '48px' }} />
             ) : settings.logo ? (
@@ -129,6 +136,7 @@ export default function Header() {
                   <Link
                     to={item.url}
                     target={item.openInNewWindow ? '_blank' : undefined}
+                    onClick={() => setIsServicesOpen(false)}
                     className={`flex items-center gap-1 font-medium text-sm lg:text-base transition-colors ${
                       isDarkHeader ? 'text-white hover:text-white/80' : 'text-stone-600 hover:text-primary'
                     }`}
@@ -153,6 +161,7 @@ export default function Header() {
                   if (e.key === 'Enter' && searchQuery.trim()) {
                     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
                     setSearchQuery('');
+                    setIsServicesOpen(false);
                   }
                 }}
               />
@@ -160,6 +169,7 @@ export default function Header() {
             </div>
             <Link 
               to="/cart"
+              onClick={() => setIsServicesOpen(false)}
               className={`relative transition-colors ${isDarkHeader ? 'text-white hover:text-white/80' : 'text-stone-600 hover:text-primary'}`}
             >
               <ShoppingCart size={20} />
@@ -372,7 +382,7 @@ export default function Header() {
                     className="px-4 pt-2 pb-6 space-y-1"
                   >
                     {navItems.map((item) => (
-                      <div key={item.id}>
+                      <div key={`nav-item-${item.id}`}>
                         {item.children && item.children.length > 0 ? (
                           <button
                             type="button"
@@ -504,7 +514,7 @@ export default function Header() {
                     {/* Submenu Content */}
                     <div className="flex-1 overflow-y-auto max-h-[70vh] px-4 py-6 space-y-8">
                       {navItems.find(i => i.id === activeSubMenu)?.children?.map((cat) => (
-                        <div key={cat.id} className="space-y-4">
+                        <div key={`nav-child-${cat.id}`} className="space-y-4">
                           <div className="flex items-center gap-3">
                             <div className="w-1 h-6 bg-primary rounded-full" />
                             {cat.url && cat.url !== '#' ? (
@@ -530,7 +540,7 @@ export default function Header() {
                             {cat.children && cat.children.length > 0 ? (
                               cat.children.map(sub => (
                                 <Link
-                                  key={sub.id}
+                                  key={`nav-subchild-${sub.id}`}
                                   to={sub.url}
                                   target={sub.openInNewWindow ? '_blank' : undefined}
                                   className="block py-3 px-4 text-stone-600 hover:text-primary hover:bg-stone-50 rounded-lg transition-colors font-medium active:bg-stone-100"
