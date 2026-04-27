@@ -1,4 +1,5 @@
 import localforage from 'localforage';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface MediaItem {
   id: string;
@@ -7,7 +8,10 @@ export interface MediaItem {
   type: string;
   createdAt: string;
   source?: 'admin' | 'vendor' | 'customer';
+  storagePath?: string;  // Supabase Storage 路徑，用於刪除時同步移除檔案
 }
+
+const SUPABASE_MEDIA_BUCKET = 'media';
 
 const STORAGE_KEY = 'admin_media_library';
 
@@ -618,45 +622,75 @@ class MediaService {
     this.initialized = this.load();
   }
 
+  /** Supabase DB 的 snake_case row → 前端 camelCase MediaItem */
+  private mapRow(row: any): MediaItem {
+    return {
+      id: row.id,
+      url: row.url,
+      name: row.name,
+      type: row.type,
+      createdAt: row.created_at,
+      source: row.source,
+      storagePath: row.storage_path ?? undefined,
+    };
+  }
+
   private async load() {
+    // 先讀 localforage 快取（即時可用）
     try {
-      const stored = await localforage.getItem<MediaItem[]>(STORAGE_KEY);
-      if (stored) {
-        this.media = stored;
-        // Merge missing default items
-        let hasNew = false;
-        DEFAULT_MEDIA.forEach(defItem => {
-          if (!this.media.find(item => item.url === defItem.url)) {
-            this.media.push(defItem);
-            hasNew = true;
-          }
-        });
-        if (hasNew) {
-          await this.save();
-        }
-      } else {
-        // Try to migrate from localStorage
-        const oldStored = localStorage.getItem(STORAGE_KEY);
-        if (oldStored) {
-          this.media = JSON.parse(oldStored);
-          await this.save();
-        } else {
-          this.media = [...DEFAULT_MEDIA];
-          await this.save();
-        }
+      const cached = await localforage.getItem<MediaItem[]>(STORAGE_KEY);
+      if (cached && cached.length > 0) {
+        this.media = cached;
       }
     } catch (e) {
-      console.error('Failed to load media library', e);
-      this.media = [...DEFAULT_MEDIA];
+      console.warn('[mediaService] localforage load failed', e);
+    }
+
+    // 背景從 Supabase 拉最新
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase
+          .from('media')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        const remote = (data ?? []).map(this.mapRow);
+
+        // 合併：Supabase 資料 + 預設圖（如果 DB 裡沒有的話）
+        const merged = [...remote];
+        DEFAULT_MEDIA.forEach(def => {
+          if (!merged.find(m => m.url === def.url || m.id === def.id)) {
+            merged.push(def);
+          }
+        });
+        this.media = merged;
+        await this.saveCache();
+        return;
+      } catch (e) {
+        console.warn('[mediaService] Supabase load failed, falling back to cache/defaults', e);
+      }
+    }
+
+    // Fallback：無 Supabase 或失敗 → 用 cache / localStorage 舊資料 / 預設
+    if (this.media.length === 0) {
+      const oldStored = localStorage.getItem(STORAGE_KEY);
+      if (oldStored) {
+        try { this.media = JSON.parse(oldStored); }
+        catch { this.media = [...DEFAULT_MEDIA]; }
+      } else {
+        this.media = [...DEFAULT_MEDIA];
+      }
+      await this.saveCache();
     }
   }
 
-  private async save() {
+  /** 更新 localforage 快取（不會 throw） */
+  private async saveCache() {
     try {
       await localforage.setItem(STORAGE_KEY, this.media);
     } catch (e) {
-      console.error('Failed to save media library', e);
-      alert('儲存空間不足，無法儲存更多圖片');
+      // 快取失敗不影響主流程
+      console.warn('[mediaService] saveCache failed', e);
     }
   }
 
@@ -665,8 +699,95 @@ class MediaService {
     return [...this.media].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
+  /** 從 Supabase 重新同步（公開，UI 可呼叫） */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase
+        .from('media')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      const remote = (data ?? []).map(this.mapRow);
+      const merged = [...remote];
+      DEFAULT_MEDIA.forEach(def => {
+        if (!merged.find(m => m.url === def.url || m.id === def.id)) {
+          merged.push(def);
+        }
+      });
+      this.media = merged;
+      await this.saveCache();
+    } catch (e) {
+      console.error('[mediaService] refresh failed', e);
+    }
+  }
+
+  /**
+   * 上傳檔案：
+   *   - 若 Supabase 已設定：上傳到 Storage bucket，metadata 存 media 表
+   *   - 否則：fallback 到 base64 存 localforage（原行為）
+   */
   async upload(file: File, source: 'admin' | 'vendor' | 'customer' = 'admin'): Promise<MediaItem> {
     await this.initialized;
+
+    // 基本大小限制（Supabase bucket 上限為 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error(`檔案「${file.name}」超過 10MB 上限`);
+    }
+
+    if (isSupabaseConfigured) {
+      // Supabase Storage upload
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storagePath = `uploads/${Date.now()}-${safeName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(SUPABASE_MEDIA_BUCKET)
+        .upload(storagePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        });
+      if (uploadError) {
+        throw new Error(`上傳失敗：${uploadError.message}`);
+      }
+
+      const { data: urlData } = supabase.storage
+        .from(SUPABASE_MEDIA_BUCKET)
+        .getPublicUrl(storagePath);
+
+      const id = Date.now().toString();
+      const newItem: MediaItem = {
+        id,
+        url: urlData.publicUrl,
+        name: file.name,
+        type: file.type,
+        createdAt: new Date().toISOString(),
+        source,
+        storagePath,
+      };
+
+      // 寫入 media metadata 表
+      const { error: insertError } = await supabase.from('media').insert({
+        id,
+        url: newItem.url,
+        name: newItem.name,
+        type: newItem.type,
+        storage_path: storagePath,
+        source,
+        created_at: newItem.createdAt,
+      });
+      if (insertError) {
+        // Rollback: 移除剛上傳的 storage 檔案
+        await supabase.storage.from(SUPABASE_MEDIA_BUCKET).remove([storagePath]).catch(() => {});
+        throw new Error(`儲存媒體資訊失敗：${insertError.message}`);
+      }
+
+      this.media.unshift(newItem);
+      await this.saveCache();
+      return newItem;
+    }
+
+    // Fallback：base64 + localforage（無 Supabase 時）
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -680,7 +801,14 @@ class MediaService {
           source
         };
         this.media.unshift(newItem);
-        await this.save();
+        try {
+          await localforage.setItem(STORAGE_KEY, this.media);
+        } catch (err) {
+          // 回滾記憶體狀態
+          this.media = this.media.filter(m => m.id !== newItem.id);
+          reject(new Error('儲存空間不足，無法儲存更多圖片'));
+          return;
+        }
         resolve(newItem);
       };
       reader.onerror = (error) => reject(error);
@@ -690,8 +818,24 @@ class MediaService {
 
   async delete(id: string) {
     await this.initialized;
+    const target = this.media.find(m => m.id === id);
+
+    if (isSupabaseConfigured && target) {
+      // 刪 storage 檔案（若有上傳過）
+      if (target.storagePath) {
+        await supabase.storage.from(SUPABASE_MEDIA_BUCKET)
+          .remove([target.storagePath])
+          .catch(err => console.warn('[mediaService] Storage remove failed', err));
+      }
+      // 刪 DB row
+      const { error } = await supabase.from('media').delete().eq('id', id);
+      if (error) {
+        throw new Error(`刪除媒體失敗：${error.message}`);
+      }
+    }
+
     this.media = this.media.filter(item => item.id !== id);
-    await this.save();
+    await this.saveCache();
   }
 }
 

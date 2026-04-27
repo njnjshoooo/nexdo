@@ -1,6 +1,8 @@
 import { Vendor } from '../types/vendor';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'vendors';
+const TABLE_NAME = 'vendors';
 
 const defaultVendors: Vendor[] = [
   {
@@ -57,33 +59,116 @@ const defaultVendors: Vendor[] = [
   }
 ];
 
+function mapRow(row: any): Vendor {
+  return {
+    id: row.id,
+    name: row.name,
+    taxId: row.tax_id ?? '',
+    type: row.type ?? '',
+    contactName: row.contact_name ?? '',
+    jobTitle: row.job_title ?? '',
+    phone: row.phone ?? '',
+    extension: row.extension ?? '',
+    address: row.address ?? '',
+    account: row.account,
+    password: '', // Password is hashed in DB; never returned to UI
+    status: row.status,
+    certifications: Array.isArray(row.certifications) ? row.certifications : [],
+    commissionRate: row.commission_rate ? Math.round(row.commission_rate * 100) : 0,
+    settlementCycle: row.settlement_cycle ?? 'monthly',
+    bankInfo: row.bank_info ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  } as Vendor;
+}
+
+let cachedVendors: Vendor[] = [];
+let initialized = false;
+
+async function ensureLoaded(): Promise<void> {
+  if (initialized) return;
+  initialized = true;
+
+  if (isSupabaseConfigured) {
+    try {
+      const { data, error } = await supabase.from(TABLE_NAME).select('*').order('created_at');
+      if (!error && data) {
+        cachedVendors = data.map(mapRow);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedVendors)); } catch {}
+        return;
+      }
+    } catch (e) {
+      console.warn('[vendorService] load from Supabase failed', e);
+    }
+  }
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try { cachedVendors = JSON.parse(stored); return; } catch {}
+  }
+  cachedVendors = [...defaultVendors];
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedVendors)); } catch {}
+}
+
+// Kick off initial load
+ensureLoaded();
+
 export const vendorService = {
   getAll: (): Vendor[] => {
-    try {
+    if (cachedVendors.length === 0) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        try { cachedVendors = JSON.parse(stored); } catch { cachedVendors = [...defaultVendors]; }
+      } else {
+        cachedVendors = [...defaultVendors];
       }
-      // Initialize if not exists
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultVendors));
-      return defaultVendors;
-    } catch (error) {
-      console.error('Failed to load vendors:', error);
-      return defaultVendors;
     }
+    // Background refresh
+    if (isSupabaseConfigured) {
+      supabase.from(TABLE_NAME).select('*').order('created_at').then(({ data, error }) => {
+        if (!error && data) {
+          cachedVendors = data.map(mapRow);
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedVendors)); } catch {}
+          window.dispatchEvent(new Event('vendors_refreshed'));
+        }
+      });
+    }
+    return [...cachedVendors];
   },
 
   getById: (id: string): Vendor | null => {
-    const all = vendorService.getAll();
-    return all.find(v => v.id === id) || null;
+    return vendorService.getAll().find(v => v.id === id) || null;
   },
 
   saveAll: (vendors: Vendor[]): void => {
+    cachedVendors = vendors;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(vendors));
       window.dispatchEvent(new Event('storage'));
     } catch (error) {
-      console.error('Failed to save vendors:', error);
+      console.error('Failed to save vendors locally:', error);
     }
-  }
+  },
+
+  /** Verify vendor login via Supabase RPC (bcrypt) with localStorage fallback */
+  login: async (account: string, password: string): Promise<Vendor | null> => {
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.rpc('verify_vendor_password', {
+          p_account: account,
+          p_password: password,
+        });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return mapRow(data[0]);
+        }
+        if (error) console.warn('[vendorService] verify_vendor_password failed', error);
+      } catch (e) {
+        console.warn('[vendorService] login RPC error, falling back', e);
+      }
+    }
+    // Fallback：本地比對明碼（不安全，只在無 Supabase 時才用）
+    const all = vendorService.getAll();
+    const found = all.find(v => v.account === account && v.password === password && v.status === 'active');
+    return found || null;
+  },
 };

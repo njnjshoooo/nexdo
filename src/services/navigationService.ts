@@ -1,6 +1,11 @@
 import { NavigationSettings, NavItem } from '../types/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { HEADER_ITEMS } from '../data/header';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+
+const STORAGE_KEY = 'admin_navigation';
+const TABLE_NAME = 'navigation';
+const SINGLETON_ID = 1;
 
 const DEFAULT_NAVIGATION: NavigationSettings = {
   items: HEADER_ITEMS
@@ -10,26 +15,65 @@ class NavigationService {
   private settings: NavigationSettings;
 
   constructor() {
-    const stored = localStorage.getItem('admin_navigation');
+    this.settings = DEFAULT_NAVIGATION;
+    this.loadCache();
+    if (isSupabaseConfigured) {
+      this.refresh().catch((err) => console.warn('[navigationService] initial refresh failed', err));
+    }
+  }
+
+  private mapRow(row: any): NavigationSettings {
+    return { items: Array.isArray(row?.items) ? row.items : [] };
+  }
+
+  private loadCache() {
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         if (parsed && Array.isArray(parsed.items)) {
           this.settings = parsed;
-        } else {
-          this.settings = DEFAULT_NAVIGATION;
+          return;
         }
       } catch (e) {
-        this.settings = DEFAULT_NAVIGATION;
+        // fall through
       }
+    }
+    if (isSupabaseConfigured) {
+      // Don't seed defaults when Supabase is configured; wait for refresh()
+      this.settings = { items: [] };
     } else {
       this.settings = DEFAULT_NAVIGATION;
-      this.save();
+      this.saveCache();
     }
   }
 
-  private save() {
-    localStorage.setItem('admin_navigation', JSON.stringify(this.settings));
+  private saveCache() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.settings));
+    } catch (e) {
+      console.warn('[navigationService] saveCache failed', e);
+    }
+  }
+
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .eq('id', SINGLETON_ID)
+      .maybeSingle();
+    if (error) {
+      console.warn('[navigationService] refresh failed', error);
+      return;
+    }
+    if (data) {
+      this.settings = this.mapRow(data);
+      this.saveCache();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('navigation_refreshed'));
+      }
+    }
   }
 
   getSettings(): NavigationSettings {
@@ -57,9 +101,29 @@ class NavigationService {
     return { items: resolveItems(this.settings.items) };
   }
 
-  updateSettings(settings: NavigationSettings) {
+  /**
+   * Update navigation settings. Updates local cache synchronously,
+   * then upserts to Supabase in the background.
+   */
+  updateSettings(settings: NavigationSettings): void {
     this.settings = settings;
-    this.save();
+    this.saveCache();
+
+    if (isSupabaseConfigured) {
+      supabase
+        .from(TABLE_NAME)
+        .upsert({
+          id: SINGLETON_ID,
+          items: settings.items,
+          updated_at: new Date().toISOString(),
+        })
+        .then(({ error }) => {
+          if (error) {
+            console.error('[navigationService] updateSettings failed in Supabase', error);
+            throw new Error(`更新失敗：${error.message}`);
+          }
+        });
+    }
   }
 
   syncSubItemToNavigation(slug: string, parentSlug: string, pageTitle: string, pageUrl: string) {
@@ -100,7 +164,10 @@ class NavigationService {
     };
 
     if (parentSlug) addItemToParent(this.settings.items);
-    if (hasChanges) this.save();
+    if (hasChanges) {
+      // Persist via the standard updateSettings path so Supabase gets updated too
+      this.updateSettings({ items: this.settings.items });
+    }
   }
 }
 

@@ -1,10 +1,12 @@
 import { Product } from '../types/admin';
 import { initialProducts } from '../data/products';
 import localforage from 'localforage';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'haolingju_products';
+const TABLE_NAME = 'products';
 
-// Configure localforage
+// Configure localforage (kept for fallback)
 localforage.config({
   name: 'haolingju',
   storeName: 'products'
@@ -15,145 +17,109 @@ class ProductService {
   private initialized: Promise<void>;
 
   constructor() {
-    this.initialized = this.loadFromStorage();
+    this.initialized = this.init();
   }
 
-  private async loadFromStorage() {
+  private mapRow(row: any): Product {
+    return {
+      id: row.id,
+      name: row.name,
+      category: row.category ?? undefined,
+      description: row.description ?? '',
+      image: row.image ?? undefined,
+      images: Array.isArray(row.images) ? row.images : [],
+      checklist: Array.isArray(row.checklist) ? row.checklist : [],
+      orderMode: row.order_mode,
+      orderCode: row.order_code ?? undefined,
+      requireDate: !!row.require_date,
+      requireTime: !!row.require_time,
+      requireNotes: !!row.require_notes,
+      variants: Array.isArray(row.variants) ? row.variants : [],
+      fixedConfig: row.fixed_config ?? { price: 0, unit: '次', buttonText: '立即下單' },
+      quoteConfig: row.quote_config ?? undefined,
+      internalFormConfig: row.internal_form_config ?? undefined,
+      externalLinkConfig: row.external_link_config ?? undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  private toRow(p: Partial<Product>): any {
+    const row: any = {};
+    if (p.id !== undefined) row.id = p.id;
+    if (p.name !== undefined) row.name = p.name;
+    if (p.category !== undefined) row.category = p.category;
+    if (p.description !== undefined) row.description = p.description;
+    if (p.image !== undefined) row.image = p.image;
+    if (p.images !== undefined) row.images = p.images;
+    if (p.checklist !== undefined) row.checklist = p.checklist;
+    if (p.orderMode !== undefined) row.order_mode = p.orderMode;
+    if (p.orderCode !== undefined) row.order_code = p.orderCode;
+    if (p.requireDate !== undefined) row.require_date = p.requireDate;
+    if (p.requireTime !== undefined) row.require_time = p.requireTime;
+    if (p.requireNotes !== undefined) row.require_notes = p.requireNotes;
+    if (p.variants !== undefined) row.variants = p.variants;
+    if (p.fixedConfig !== undefined) row.fixed_config = p.fixedConfig;
+    if (p.quoteConfig !== undefined) row.quote_config = p.quoteConfig;
+    if (p.internalFormConfig !== undefined) row.internal_form_config = p.internalFormConfig;
+    if (p.externalLinkConfig !== undefined) row.external_link_config = p.externalLinkConfig;
+    return row;
+  }
+
+  private async init() {
+    // 1. 先讀本地快取（即時可用）
+    await this.loadCache();
+    // 2. 背景從 Supabase 拉最新
+    if (isSupabaseConfigured) {
+      this.refresh().catch(err => console.warn('[productService] initial refresh failed', err));
+    }
+  }
+
+  private async loadCache() {
     try {
       const stored = await localforage.getItem<Product[]>(STORAGE_KEY);
-      if (stored) {
+      if (stored && stored.length > 0) {
         this.products = stored;
-      } else {
-        // Migration from localStorage
-        const oldStored = localStorage.getItem(STORAGE_KEY);
-        if (oldStored) {
-          this.products = JSON.parse(oldStored);
-          await localforage.setItem(STORAGE_KEY, this.products);
-          localStorage.removeItem(STORAGE_KEY);
-        } else {
-          this.products = [...initialProducts];
-          await localforage.setItem(STORAGE_KEY, this.products);
-        }
+        return;
       }
-      
-      // Migration: Add default categories and orderCodes if missing
-      let changed = false;
-      const categoryMap: Record<string, string> = {
-        'safety-assessment': '居住安全',
-        'old-house-diagnosis': '居住安全',
-        'bathroom-renovation': '居住安全',
-        'home-reorganization': '收納清潔',
-        'organization-planning': '收納清潔',
-        'regular-cleaning': '收納清潔',
-        'home-clearance': '收納清潔',
-        'health-fitness': '樂齡健康',
-        'short-term-care': '樂齡健康',
-        'home-dentist': '樂齡健康',
-        'medical-companion': '樂齡健康',
-        'nutrition-consulting': '樂齡健康',
-        'elderly-housing-exchange': '租房搬家',
-        'rental-management': '租房搬家',
-        'safe-moving': '租房搬家',
-        'real-estate': '租房搬家',
-        'decor-design': '居家裝潢',
-        'light-renovation': '居家裝潢',
-        'rental-customization': '居家裝潢',
-      };
-
-      const orderCodeMap: Record<string, string> = {
-        'bathroom-renovation': 'BRR',
-        'decor-design': 'DCD',
-        'elderly-housing-exchange': 'EHE',
-        'home-reorganization': 'HRZ',
-        'old-house-diagnosis': 'OHD',
-        'organization-planning': 'OZP',
-        'real-estate': 'RET',
-        'rental-management': 'RMM',
-        'safe-moving': 'SFM',
-        'safety-assessment': 'SAM',
-        'short-term-care': 'STC',
-        'light-renovation': 'LRV',
-        'home-dentist': 'HDT',
-        'medical-companion': 'MDC',
-        'regular-cleaning': 'RGC',
-        'home-clearance': 'HCR',
-        'nutrition-consulting': 'NTC',
-        'rental-customization': 'RCZ',
-        'health-fitness': 'HTF',
-        'assistive-devices': 'ASD',
-        'accessible-transport': 'ACT'
-      };
-
-      this.products = this.products.map(p => {
-        let updated = { ...p };
-        if (!p.category && categoryMap[p.id]) {
-          changed = true;
-          updated.category = categoryMap[p.id];
-        }
-        if (!p.orderCode && orderCodeMap[p.id]) {
-          changed = true;
-          updated.orderCode = orderCodeMap[p.id];
-        }
-        // Migrate QUOTE to EXTERNAL_LINK and ensure new configs exist
-        if (updated.orderMode === 'QUOTE' as any) {
-          changed = true;
-          updated.orderMode = 'EXTERNAL_LINK';
-          if (updated.quoteConfig) {
-            updated.externalLinkConfig = {
-              priceText: updated.quoteConfig.priceText,
-              buttonText: updated.quoteConfig.buttonText,
-              url: updated.quoteConfig.link || ''
-            };
-          }
-        }
-
-        // Force update home-reorganization to use INTERNAL_FORM and set deposit
-        if (updated.id === 'home-reorganization') {
-          if (updated.orderMode !== 'INTERNAL_FORM' || !updated.internalFormConfig?.enableDeposit) {
-            changed = true;
-            updated.orderMode = 'INTERNAL_FORM';
-            updated.internalFormConfig = {
-              priceText: '依需求報價',
-              buttonText: '立即填寫表單',
-              formId: 'home-organize-booking-form',
-              enableDeposit: true,
-              depositRatio: 30,
-              balanceRatio: 70
-            };
-          }
-        }
-
-        // Ensure new configs exist for all products
-        if (!updated.internalFormConfig) {
-          changed = true;
-          updated.internalFormConfig = { priceText: '依需求報價', buttonText: '填寫表單', formId: '' };
-        }
-        if (!updated.externalLinkConfig) {
-          changed = true;
-          updated.externalLinkConfig = { priceText: '依需求報價', buttonText: 'LINE諮詢報價', url: '' };
-        }
-        if (!updated.fixedConfig) {
-          changed = true;
-          updated.fixedConfig = { price: 0, unit: '次', buttonText: '立即下單' };
-        }
-
-        return updated;
-      });
-
-      if (changed) {
-        await this.saveToStorage();
+      // localStorage migration
+      const oldStored = localStorage.getItem(STORAGE_KEY);
+      if (oldStored) {
+        this.products = JSON.parse(oldStored);
+        localStorage.removeItem(STORAGE_KEY);
+        await localforage.setItem(STORAGE_KEY, this.products);
+        return;
       }
+      // 無 cache：用 initialProducts 作預設
+      this.products = [...initialProducts];
     } catch (e) {
-      console.error('Failed to load products', e);
+      console.error('[productService] loadCache failed', e);
       this.products = [...initialProducts];
     }
   }
 
-  private async saveToStorage() {
+  /** 從 Supabase 拉最新並更新快取 */
+  async refresh(): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .select('*')
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      this.products = (data ?? []).map(this.mapRow);
+      await this.saveCache();
+      window.dispatchEvent(new CustomEvent('products_refreshed'));
+    } catch (e) {
+      console.warn('[productService] refresh failed', e);
+    }
+  }
+
+  private async saveCache() {
     try {
       await localforage.setItem(STORAGE_KEY, this.products);
     } catch (e) {
-      console.error('Failed to save products', e);
+      console.warn('[productService] saveCache failed', e);
     }
   }
 
@@ -169,6 +135,7 @@ class ProductService {
 
   async create(data: Partial<Product>): Promise<Product> {
     await this.initialized;
+    const now = new Date().toISOString();
     const newProduct: Product = {
       id: data.id || `product-${Date.now()}`,
       name: data.name || '新產品',
@@ -179,12 +146,29 @@ class ProductService {
       fixedConfig: data.fixedConfig || { price: 0, unit: '次', buttonText: '立即下單' },
       externalLinkConfig: data.externalLinkConfig || { priceText: '依需求報價', buttonText: 'LINE諮詢報價', url: '' },
       internalFormConfig: data.internalFormConfig || { priceText: '依需求報價', buttonText: '填寫表單', formId: '' },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      createdAt: now,
+      updatedAt: now,
+      ...data, // overrides
+      // ensure required timestamps stay
+    } as Product;
+    newProduct.createdAt = now;
+    newProduct.updatedAt = now;
 
+    // Optimistic local update
     this.products.push(newProduct);
-    await this.saveToStorage();
+    await this.saveCache();
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).insert(this.toRow(newProduct));
+      if (error) {
+        console.error('[productService] create failed in Supabase', error);
+        // Rollback
+        this.products = this.products.filter(p => p.id !== newProduct.id);
+        await this.saveCache();
+        throw new Error(`新增產品失敗：${error.message}`);
+      }
+    }
+
     return newProduct;
   }
 
@@ -193,26 +177,53 @@ class ProductService {
     const index = this.products.findIndex(p => p.id === id);
     if (index === -1) return undefined;
 
-    this.products[index] = {
+    const updatedAt = new Date().toISOString();
+    const merged: Product = {
       ...this.products[index],
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt,
     };
+    const previous = this.products[index];
+    this.products[index] = merged;
+    await this.saveCache();
 
-    await this.saveToStorage();
-    return this.products[index];
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME)
+        .update(this.toRow({ ...updates, updatedAt }))
+        .eq('id', id);
+      if (error) {
+        console.error('[productService] update failed in Supabase', error);
+        // Rollback
+        this.products[index] = previous;
+        await this.saveCache();
+        throw new Error(`更新產品失敗：${error.message}`);
+      }
+    }
+
+    return merged;
   }
 
   async delete(id: string): Promise<boolean> {
     await this.initialized;
     const initialLength = this.products.length;
+    const removed = this.products.find(p => p.id === id);
     this.products = this.products.filter(p => p.id !== id);
-    
-    if (this.products.length !== initialLength) {
-      await this.saveToStorage();
-      return true;
+
+    if (this.products.length === initialLength) return false;
+    await this.saveCache();
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id);
+      if (error) {
+        console.error('[productService] delete failed in Supabase', error);
+        // Rollback
+        if (removed) this.products.push(removed);
+        await this.saveCache();
+        throw new Error(`刪除產品失敗：${error.message}`);
+      }
     }
-    return false;
+
+    return true;
   }
 }
 
