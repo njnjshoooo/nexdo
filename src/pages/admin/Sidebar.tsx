@@ -41,7 +41,8 @@ export default function Sidebar() {
 
   const hasPermission = (permission: string) => {
     if (!user) return false;
-    if (user.id === '1') return true; // Super admin
+    if (user.role === 'admin') return true; // Admin role grants all permissions
+    if (user.id === '1') return true; // Legacy super admin
     if (permissions.includes('all')) return true;
     return permissions.includes(permission);
   };
