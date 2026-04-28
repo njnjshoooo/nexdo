@@ -24,19 +24,33 @@ export default function PageList() {
 
   useEffect(() => {
     setPages(pageService.getAll());
+    // 進入頁面時主動從 Supabase 拉最新資料
+    pageService.refresh().catch(err => console.warn('refresh failed', err));
+    // 監聽 refresh 完成事件，自動更新列表
+    const handleRefresh = () => setPages(pageService.getAll());
+    window.addEventListener('pages_refreshed', handleRefresh);
+    return () => window.removeEventListener('pages_refreshed', handleRefresh);
   }, []);
 
-  const filteredPages = useMemo(() => {
-    return pages.filter(page => {
-      const matchesSearch = 
-        page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        page.slug.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesFilter = 
-        filterTemplate === 'ALL' || page.template === filterTemplate;
+  const handleTogglePublish = async (page: Page) => {
+    pageService.update(page.id, { ...page, isPublished: !page.isPublished });
+    setPages(pageService.getAll());
+  };
 
-      return matchesSearch && matchesFilter;
-    });
+  const filteredPages = useMemo(() => {
+    return pages
+      .filter(page => {
+        const matchesSearch =
+          (page.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (page.slug || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesFilter =
+          filterTemplate === 'ALL' || page.template === filterTemplate;
+
+        return matchesSearch && matchesFilter;
+      })
+      // 最新更新的頁面排最前面，方便剛建立/編輯後找回來
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }, [pages, searchTerm, filterTemplate]);
 
   const totalPages = Math.ceil(filteredPages.length / itemsPerPage);
@@ -131,15 +145,23 @@ export default function PageList() {
                 </AdminTable.Td>
                 <AdminTable.Td className="whitespace-nowrap">
                   {page.isPublished ? (
-                    <span className="flex items-center gap-1.5 text-green-600 text-sm font-medium">
+                    <button
+                      onClick={() => handleTogglePublish(page)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 transition-colors"
+                      title="點擊改為草稿"
+                    >
                       <CheckCircle size={14} />
                       已發布
-                    </span>
+                    </button>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-stone-400 text-sm font-medium">
+                    <button
+                      onClick={() => handleTogglePublish(page)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-stone-50 text-stone-600 hover:bg-primary hover:text-white border border-stone-200 hover:border-primary transition-colors"
+                      title="點擊立即發布"
+                    >
                       <XCircle size={14} />
-                      草稿
-                    </span>
+                      點此發布
+                    </button>
                   )}
                 </AdminTable.Td>
                 <AdminTable.Td className="whitespace-nowrap text-sm text-stone-500">

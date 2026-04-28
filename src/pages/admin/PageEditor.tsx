@@ -168,13 +168,33 @@ export default function PageEditor() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setValue('isPublished', !isPublished)}
-            className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
-          >
-            {isPublished ? '切換為草稿' : '發布頁面'}
-          </button>
+          {isPublished ? (
+            <button
+              type="button"
+              onClick={() => {
+                setValue('isPublished', false);
+                // 立即觸發 submit 儲存到 DB
+                setTimeout(() => handleSubmit(onSubmit)(), 0);
+              }}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+              title="將此頁面下架成草稿並立即儲存"
+            >
+              下架（轉為草稿）
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setValue('isPublished', true);
+                // 立即觸發 submit 儲存到 DB
+                setTimeout(() => handleSubmit(onSubmit)(), 0);
+              }}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-primary text-white hover:bg-primary-light shadow-sm"
+              title="立即發布此頁面到前台"
+            >
+              📢 發布頁面
+            </button>
+          )}
           <SaveButton status={saveStatus} />
         </div>
       </div>
