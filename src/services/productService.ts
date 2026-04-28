@@ -154,20 +154,18 @@ class ProductService {
     newProduct.createdAt = now;
     newProduct.updatedAt = now;
 
-    // Optimistic local update
-    this.products.push(newProduct);
-    await this.saveCache();
-
+    // Supabase first
     if (isSupabaseConfigured) {
       const { error } = await supabase.from(TABLE_NAME).insert(this.toRow(newProduct));
       if (error) {
         console.error('[productService] create failed in Supabase', error);
-        // Rollback
-        this.products = this.products.filter(p => p.id !== newProduct.id);
-        await this.saveCache();
         throw new Error(`新增產品失敗：${error.message}`);
       }
     }
+
+    // 更新 in-memory + 背景寫 cache（非阻塞）
+    this.products.push(newProduct);
+    this.saveCache().catch(err => console.warn('[productService] saveCache failed', err));
 
     return newProduct;
   }
@@ -183,54 +181,47 @@ class ProductService {
       ...updates,
       updatedAt,
     };
-    const previous = this.products[index];
-    this.products[index] = merged;
-    await this.saveCache();
 
+    // Supabase 是 source of truth：先寫雲端，成功後才更新本地
     if (isSupabaseConfigured) {
-      // .select() 強制 Supabase 回傳更新後的 row，這樣可以驗證真的有改到
-      // (RLS 阻擋的情況下會回傳 0 rows 但沒有 error)
       const { data, error } = await supabase.from(TABLE_NAME)
         .update(this.toRow({ ...updates, updatedAt }))
         .eq('id', id)
         .select();
       if (error) {
         console.error('[productService] update failed in Supabase', error);
-        this.products[index] = previous;
-        await this.saveCache();
         throw new Error(`更新產品失敗：${error.message}`);
       }
       if (!data || data.length === 0) {
-        // RLS 阻擋導致 0 rows 被更新
         console.error('[productService] update affected 0 rows (RLS blocked?)', { id });
-        this.products[index] = previous;
-        await this.saveCache();
         throw new Error('更新失敗：權限不足或產品不存在（請確認您是 admin 並已登入）');
       }
     }
+
+    // 更新 in-memory + 背景寫 cache（非阻塞，使用者不用等 IndexedDB 寫入）
+    this.products[index] = merged;
+    this.saveCache().catch(err => console.warn('[productService] saveCache failed', err));
 
     return merged;
   }
 
   async delete(id: string): Promise<boolean> {
     await this.initialized;
-    const initialLength = this.products.length;
-    const removed = this.products.find(p => p.id === id);
-    this.products = this.products.filter(p => p.id !== id);
+    const exists = this.products.some(p => p.id === id);
+    if (!exists) return false;
 
-    if (this.products.length === initialLength) return false;
-    await this.saveCache();
-
+    // Supabase first
     if (isSupabaseConfigured) {
       const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id);
       if (error) {
         console.error('[productService] delete failed in Supabase', error);
-        // Rollback
-        if (removed) this.products.push(removed);
-        await this.saveCache();
         throw new Error(`刪除產品失敗：${error.message}`);
       }
     }
+
+    // 更新 in-memory + 背景寫 cache（非阻塞）
+    this.products = this.products.filter(p => p.id !== id);
+    this.saveCache().catch(err => console.warn('[productService] saveCache failed', err));
 
     return true;
   }
