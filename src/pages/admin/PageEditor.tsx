@@ -99,6 +99,19 @@ export default function PageEditor() {
     }
   }, [urlSlug, isNew, reset, navigate]);
 
+  // 監聽 pageService 的儲存錯誤事件（Supabase 背景寫入失敗）
+  useEffect(() => {
+    const handler = (e: any) => {
+      const detail = e.detail || {};
+      const opLabel = detail.op === 'create' ? '建立' : detail.op === 'update' ? '更新' : '儲存';
+      const titleLabel = detail.title ? `「${detail.title}」` : '';
+      alert(`頁面${opLabel}${titleLabel}失敗：\n${detail.message || '未知錯誤'}\n\n請確認您仍以 admin 身分登入，或重新整理後再試。`);
+      setSaveStatus('idle');
+    };
+    window.addEventListener('pages_save_error', handler);
+    return () => window.removeEventListener('pages_save_error', handler);
+  }, []);
+
   // 檢查你的 pageService.update 是否有包含 slug
   const onSubmit = async (data: Page) => {
     setSaveStatus('saving');
@@ -120,6 +133,7 @@ export default function PageEditor() {
     } catch (error) {
       setSaveStatus('idle');
       console.error("儲存失敗:", error);
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
