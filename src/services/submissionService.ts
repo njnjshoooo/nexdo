@@ -6,9 +6,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 const STORAGE_KEY = 'haolingju_submissions';
 const TABLE_NAME = 'submissions';
 
-localforage.config({
+// 用 createInstance 避免與其他 service 共享預設 localforage 實例導致 storeName 互相覆蓋
+const store = localforage.createInstance({
   name: 'haolingju',
-  storeName: 'submissions'
+  storeName: 'submissions',
 });
 
 function mapRow(row: any): FormSubmission {
@@ -41,13 +42,13 @@ function toRow(s: Partial<FormSubmission>): any {
 
 async function loadCache(): Promise<FormSubmission[]> {
   try {
-    const stored = await localforage.getItem<FormSubmission[]>(STORAGE_KEY);
+    const stored = await store.getItem<FormSubmission[]>(STORAGE_KEY);
     if (stored) return stored;
     const oldStored = localStorage.getItem(STORAGE_KEY);
     if (oldStored) {
       try {
         const parsed = JSON.parse(oldStored);
-        await localforage.setItem(STORAGE_KEY, parsed);
+        await store.setItem(STORAGE_KEY, parsed);
         localStorage.removeItem(STORAGE_KEY);
         return parsed;
       } catch {}
@@ -60,7 +61,7 @@ async function loadCache(): Promise<FormSubmission[]> {
 }
 
 async function saveCache(items: FormSubmission[]) {
-  try { await localforage.setItem(STORAGE_KEY, items); }
+  try { await store.setItem(STORAGE_KEY, items); }
   catch (e) { console.warn('[submissionService] saveCache failed', e); }
 }
 

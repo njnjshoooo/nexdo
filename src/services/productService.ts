@@ -6,10 +6,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 const STORAGE_KEY = 'haolingju_products';
 const TABLE_NAME = 'products';
 
-// Configure localforage (kept for fallback)
-localforage.config({
+// 用 createInstance 避免與其他 service 共享預設 localforage 實例導致 storeName 互相覆蓋
+const store = localforage.createInstance({
   name: 'haolingju',
-  storeName: 'products'
+  storeName: 'products',
 });
 
 class ProductService {
@@ -77,7 +77,7 @@ class ProductService {
 
   private async loadCache() {
     try {
-      const stored = await localforage.getItem<Product[]>(STORAGE_KEY);
+      const stored = await store.getItem<Product[]>(STORAGE_KEY);
       if (stored && stored.length > 0) {
         this.products = stored;
         return;
@@ -87,7 +87,7 @@ class ProductService {
       if (oldStored) {
         this.products = JSON.parse(oldStored);
         localStorage.removeItem(STORAGE_KEY);
-        await localforage.setItem(STORAGE_KEY, this.products);
+        await store.setItem(STORAGE_KEY, this.products);
         return;
       }
       // 無 cache：用 initialProducts 作預設
@@ -117,7 +117,7 @@ class ProductService {
 
   private async saveCache() {
     try {
-      await localforage.setItem(STORAGE_KEY, this.products);
+      await store.setItem(STORAGE_KEY, this.products);
     } catch (e) {
       console.warn('[productService] saveCache failed', e);
     }

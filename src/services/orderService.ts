@@ -6,9 +6,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 const STORAGE_KEY = 'haolingju_orders';
 const TABLE_NAME = 'orders';
 
-localforage.config({
+// 用 createInstance 避免與其他 service 共享預設 localforage 實例導致 storeName 互相覆蓋
+const store = localforage.createInstance({
   name: 'haolingju',
-  storeName: 'orders'
+  storeName: 'orders',
 });
 
 function mapRow(row: any): Order {
@@ -85,13 +86,13 @@ class OrderService {
 
   private async loadCache(): Promise<Order[]> {
     try {
-      const stored = await localforage.getItem<Order[]>(STORAGE_KEY);
+      const stored = await store.getItem<Order[]>(STORAGE_KEY);
       if (stored) return stored;
       const oldStored = localStorage.getItem('orders');
       if (oldStored) {
         try {
           const parsed = JSON.parse(oldStored);
-          await localforage.setItem(STORAGE_KEY, parsed);
+          await store.setItem(STORAGE_KEY, parsed);
           localStorage.removeItem('orders');
           return parsed;
         } catch {}
@@ -105,7 +106,7 @@ class OrderService {
 
   private async saveCache(orders: Order[]) {
     try {
-      await localforage.setItem(STORAGE_KEY, orders);
+      await store.setItem(STORAGE_KEY, orders);
       window.dispatchEvent(new Event('orders_updated'));
       this.channel.postMessage('updated');
     } catch (e) {

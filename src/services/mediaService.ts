@@ -15,6 +15,12 @@ const SUPABASE_MEDIA_BUCKET = 'media';
 
 const STORAGE_KEY = 'admin_media_library';
 
+// 用 createInstance 避免與其他 service 共享預設 localforage 實例
+const store = localforage.createInstance({
+  name: 'haolingju',
+  storeName: 'media',
+});
+
 // Pre-populate with some default images if empty
 const DEFAULT_MEDIA: MediaItem[] = [
   {
@@ -638,7 +644,7 @@ class MediaService {
   private async load() {
     // 先讀 localforage 快取（即時可用）
     try {
-      const cached = await localforage.getItem<MediaItem[]>(STORAGE_KEY);
+      const cached = await store.getItem<MediaItem[]>(STORAGE_KEY);
       if (cached && cached.length > 0) {
         this.media = cached;
       }
@@ -687,7 +693,7 @@ class MediaService {
   /** 更新 localforage 快取（不會 throw） */
   private async saveCache() {
     try {
-      await localforage.setItem(STORAGE_KEY, this.media);
+      await store.setItem(STORAGE_KEY, this.media);
     } catch (e) {
       // 快取失敗不影響主流程
       console.warn('[mediaService] saveCache failed', e);
@@ -802,7 +808,7 @@ class MediaService {
         };
         this.media.unshift(newItem);
         try {
-          await localforage.setItem(STORAGE_KEY, this.media);
+          await store.setItem(STORAGE_KEY, this.media);
         } catch (err) {
           // 回滾記憶體狀態
           this.media = this.media.filter(m => m.id !== newItem.id);
