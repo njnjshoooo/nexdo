@@ -253,6 +253,33 @@ export interface Product {
   updatedAt: string;
 }
 
+export type ServiceIntroBlockType = 'GRID' | 'FEATURE' | 'COMPARISON';
+
+export interface ServiceIntroSection {
+  id: string;
+  type: ServiceIntroBlockType;
+  enabled: boolean;
+  grid?: {
+    title: string;
+    showCarousel: boolean;
+    items: { id: string; title: string; image: string; }[];
+  };
+  feature?: {
+    title: string;
+    showCarousel: boolean;
+    images: string[];
+    content: string;
+    layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM';
+  };
+  comparison?: {
+    title: string;
+    beforeImage: string;
+    afterImage: string;
+    beforeLabel: string;
+    afterLabel: string;
+  };
+}
+
 export interface SubItemContent {
   productId?: string; // New field for linked product
   mainTitle?: string; // Adding main title
@@ -265,19 +292,23 @@ export interface SubItemContent {
   button: ButtonConfig;
   linkedProductId?: string;
   serviceIntro?: {
-    blockA: {
+    sections?: ServiceIntroSection[];
+    // Legacy blocks for backward compatibility
+    blockA?: {
       enabled: boolean;
       title: string;
       items: { id: string; title: string; image: string; }[];
+      showCarousel?: boolean;
     };
-    blockB: {
+    blockB?: {
       enabled: boolean;
       title: string;
       images: string[];
       content: string;
       layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM';
+      showCarousel?: boolean;
     };
-    blockC: {
+    blockC?: {
       enabled: boolean;
       title: string;
       beforeImage: string;
@@ -489,6 +520,7 @@ export const DEFAULT_SUB_ITEM_TEMPLATE: SubItemContent = {
     blockA: {
       enabled: false,
       title: '服務項目',
+      showCarousel: true,
       items: [
         { id: '1', title: '項目 1', image: '' },
         { id: '2', title: '項目 2', image: '' },
@@ -499,6 +531,7 @@ export const DEFAULT_SUB_ITEM_TEMPLATE: SubItemContent = {
     blockB: {
       enabled: false,
       title: '服務介紹',
+      showCarousel: true,
       images: [],
       content: '服務內容說明...',
       layout: 'LEFT'

@@ -3,7 +3,7 @@ import { useFieldArray, Control, UseFormRegister, Controller } from 'react-hook-
 import { Link } from 'react-router-dom';
 import ImageUploader from '../../../components/admin/ImageUploader';
 import ButtonEditor from '../../../components/admin/ButtonEditor';
-import { Plus, Trash2, Package, Users, CheckCircle2, List, Briefcase, Link as LinkIcon, Settings, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Package, Users, CheckCircle2, List, Briefcase, Link as LinkIcon, Settings, AlertCircle } from 'lucide-react';
 import { pageService } from '../../../services/pageService';
 import { productService } from '../../../services/productService';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,11 +17,6 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
   const { fields: introItems, append: appendIntroItem, remove: removeIntroItem } = useFieldArray({ 
     control, 
     name: "content.subItem.serviceIntro.blockA.items" 
-  });
-
-  const { fields: introSections, append: appendSection, remove: removeSection, move: moveSection } = useFieldArray({ 
-    control, 
-    name: "content.subItem.serviceIntro.sections" 
   });
 
   const allPages = pageService.getAll() || [];
@@ -45,54 +40,11 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
   const cardClass = "bg-white p-6 rounded-2xl shadow-sm border border-stone-200 relative";
   const innerCardClass = "bg-stone-50 p-4 rounded-xl border border-stone-200 relative";
   const primaryBtn = "bg-[#8B5E34] hover:bg-black text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all";
-  const secondaryBtn = "bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all text-xs";
+  const secondaryBtn = "bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all";
 
   const pageId = watch('id');
   const productId = watch('content.subItem.productId');
   const selectedProduct = useMemo(() => allProducts.find(p => p.id === productId), [allProducts, productId]);
-
-  const addGridSection = () => {
-    appendSection({
-      id: uuidv4(),
-      type: 'GRID',
-      enabled: true,
-      grid: {
-        title: '服務項目',
-        showCarousel: true,
-        items: [{ id: uuidv4(), title: '項目名稱', image: '' }]
-      }
-    });
-  };
-
-  const addFeatureSection = () => {
-    appendSection({
-      id: uuidv4(),
-      type: 'FEATURE',
-      enabled: true,
-      feature: {
-        title: '特色介紹標題',
-        showCarousel: true,
-        images: [''],
-        content: '特色介紹內容...',
-        layout: 'LEFT'
-      }
-    });
-  };
-
-  const addComparisonSection = () => {
-    appendSection({
-      id: uuidv4(),
-      type: 'COMPARISON',
-      enabled: true,
-      comparison: {
-        title: '施作案例對比',
-        beforeImage: '',
-        afterImage: '',
-        beforeLabel: 'Before',
-        afterLabel: 'After'
-      }
-    });
-  };
 
   if (activeTab === 'sub_product') {
     return (
@@ -343,6 +295,20 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
   }
 
   if (activeTab === 'sub_intro') {
+    const isBlockAEnabled = watch('content.subItem.serviceIntro.blockA.enabled');
+    const isBlockBEnabled = watch('content.subItem.serviceIntro.blockB.enabled');
+    const blockBImages = watch('content.subItem.serviceIntro.blockB.images') || [];
+    
+    const handleAddBlockBImage = () => {
+      setValue('content.subItem.serviceIntro.blockB.images', [...blockBImages, '']);
+    };
+
+    const handleRemoveBlockBImage = (index: number) => {
+      const newImages = [...blockBImages];
+      newImages.splice(index, 1);
+      setValue('content.subItem.serviceIntro.blockB.images', newImages);
+    };
+
     return (
       <div className="space-y-10">
         {/* Main Title Editor */}
@@ -356,240 +322,210 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
           </div>
         </div>
 
-        {/* Dynamic Sections Editor */}
+        {/* Block A Editor */}
         <div className="space-y-6">
           <div className="flex justify-between items-center bg-stone-50 p-4 rounded-2xl border border-stone-200">
             <div>
-              <h2 className="text-lg font-bold text-stone-900">服務介紹動態區塊</h2>
-              <p className="text-xs text-stone-500 mt-1">您可以自由新增多個不同類型的介紹區塊</p>
+              <h2 className="text-lg font-bold text-stone-900">區塊 A：圖文列表 (輪播)</h2>
+              <p className="text-xs text-stone-500 mt-1">超過 3 個項目時自動轉為輪播模式</p>
             </div>
-            <div className="flex gap-2">
-              <button type="button" onClick={addGridSection} className={secondaryBtn}><Plus size={14}/> 加圖文列表</button>
-              <button type="button" onClick={addFeatureSection} className={secondaryBtn}><Plus size={14}/> 加大圖介紹</button>
-              <button type="button" onClick={addComparisonSection} className={secondaryBtn}><Plus size={14}/> 加 B/A 對比</button>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-stone-500">啟用</span>
+              <button 
+                type="button"
+                onClick={() => setValue('content.subItem.serviceIntro.blockA.enabled', !isBlockAEnabled)} 
+                className={`w-11 h-6 rounded-full p-1 transition-colors ${isBlockAEnabled ? 'bg-[#8B5E34]' : 'bg-stone-300'}`}
+              >
+                <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${isBlockAEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
             </div>
           </div>
 
-          <div className="space-y-4">
-            {introSections.map((field, index) => {
-              const type = watch(`content.subItem.serviceIntro.sections.${index}.type`);
-              const isEnabled = watch(`content.subItem.serviceIntro.sections.${index}.enabled`);
+          {isBlockAEnabled && (
+            <div className={cardClass + " space-y-6"}>
+              <div>
+                <label className={labelClass}>區塊標題</label>
+                <input {...register('content.subItem.serviceIntro.blockA.title')} placeholder="例如：服務項目" className={inputClass} />
+              </div>
 
-              return (
-                <div key={field.id} className={cardClass}>
-                  {/* Section Header */}
-                  <div className="flex justify-between items-center mb-6 pb-4 border-b border-stone-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center font-bold text-stone-500 text-xs">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <span className="text-xs font-black text-primary uppercase tracking-widest">
-                          {type === 'GRID' ? '圖文列表' : type === 'FEATURE' ? '大圖介紹' : 'B/A 對比'}
-                        </span>
-                        <h3 className="font-bold text-stone-900 text-sm">
-                          {watch(`content.subItem.serviceIntro.sections.${index}.${type.toLowerCase()}.title`) || '未命名區塊'}
-                        </h3>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        type="button" 
-                        onClick={() => moveSection(index, index - 1)} 
-                        disabled={index === 0}
-                        className="p-1.5 text-stone-400 hover:text-primary disabled:opacity-30"
-                      >
-                        <ChevronLeft className="rotate-90" size={18}/>
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => moveSection(index, index + 1)} 
-                        disabled={index === introSections.length - 1}
-                        className="p-1.5 text-stone-400 hover:text-primary disabled:opacity-30"
-                      >
-                        <ChevronRight className="rotate-90" size={18}/>
-                      </button>
-                      <div className="mx-2 w-px h-4 bg-stone-200" />
-                      <button 
-                        type="button"
-                        onClick={() => setValue(`content.subItem.serviceIntro.sections.${index}.enabled`, !isEnabled)} 
-                        className={`w-10 h-5 rounded-full p-0.5 transition-colors ${isEnabled ? 'bg-primary' : 'bg-stone-300'}`}
-                      >
-                        <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${isEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => removeSection(index)} 
-                        className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={18}/>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Section Content */}
-                  <div className="space-y-6">
-                    {/* Common Title */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className={labelClass}>區塊標題</label>
-                        <input {...register(`content.subItem.serviceIntro.sections.${index}.${type.toLowerCase()}.title`)} className={inputClass} />
-                      </div>
-                      {(type === 'GRID' || type === 'FEATURE') && (
-                        <div>
-                          <label className={labelClass}>啟用輪播模式</label>
-                          <div className="flex items-center gap-2 mt-2">
-                            <input 
-                              type="checkbox" 
-                              {...register(`content.subItem.serviceIntro.sections.${index}.${type.toLowerCase()}.showCarousel`)} 
-                              className="w-4 h-4 text-primary border-stone-300 rounded focus:ring-primary"
-                            />
-                            <span className="text-xs text-stone-500 font-medium">勾選後當超過圖片時自動輪播</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Type specific fields */}
-                    {type === 'GRID' && (
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <label className={labelClass}>子項目列表</label>
-                          <button 
-                            type="button" 
-                            onClick={() => {
-                              const items = watch(`content.subItem.serviceIntro.sections.${index}.grid.items`) || [];
-                              setValue(`content.subItem.serviceIntro.sections.${index}.grid.items`, [...items, { id: uuidv4(), title: '', image: '' }]);
-                            }}
-                            className="text-primary text-xs font-bold hover:underline"
-                          >
-                            + 新增子項目
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {(watch(`content.subItem.serviceIntro.sections.${index}.grid.items`) || []).map((_: any, itemIdx: number) => (
-                            <div key={itemIdx} className={innerCardClass}>
-                              <button 
-                                type="button" 
-                                onClick={() => {
-                                  const items = [...watch(`content.subItem.serviceIntro.sections.${index}.grid.items`)];
-                                  items.splice(itemIdx, 1);
-                                  setValue(`content.subItem.serviceIntro.sections.${index}.grid.items`, items);
-                                }}
-                                className="absolute top-2 right-2 p-1 text-stone-400 hover:text-red-500"
-                              >
-                                <Trash2 size={14}/>
-                              </button>
-                              <div className="space-y-3">
-                                <Controller 
-                                  control={control} 
-                                  name={`content.subItem.serviceIntro.sections.${index}.grid.items.${itemIdx}.image`} 
-                                  render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
-                                />
-                                <input {...register(`content.subItem.serviceIntro.sections.${index}.grid.items.${itemIdx}.title`)} placeholder="服務名稱" className={inputClass} />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {type === 'FEATURE' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <label className={labelClass}>內容文字 (留空則圖片滿版)</label>
-                            <textarea {...register(`content.subItem.serviceIntro.sections.${index}.feature.content`)} rows={4} className={inputClass} />
-                          </div>
-                          <div>
-                            <label className={labelClass}>排版佈局</label>
-                            <select {...register(`content.subItem.serviceIntro.sections.${index}.feature.layout`)} className={inputClass}>
-                              <option value="LEFT">左圖右文</option>
-                              <option value="RIGHT">右圖左文</option>
-                              <option value="TOP">上圖下文</option>
-                              <option value="BOTTOM">下圖上文</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <label className={labelClass}>展示圖片</label>
-                            <button 
-                              type="button" 
-                              onClick={() => {
-                                const imgs = watch(`content.subItem.serviceIntro.sections.${index}.feature.images`) || [];
-                                setValue(`content.subItem.serviceIntro.sections.${index}.feature.images`, [...imgs, '']);
-                              }}
-                              className="text-primary text-xs font-bold hover:underline"
-                            >
-                              + 新增圖片
-                            </button>
-                          </div>
-                          <div className="space-y-3">
-                            {(watch(`content.subItem.serviceIntro.sections.${index}.feature.images`) || []).map((_: any, imgIdx: number) => (
-                              <div key={imgIdx} className="relative group">
-                                <Controller 
-                                  control={control} 
-                                  name={`content.subItem.serviceIntro.sections.${index}.feature.images.${imgIdx}`} 
-                                  render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
-                                />
-                                <button 
-                                  type="button" 
-                                  onClick={() => {
-                                    const imgs = [...watch(`content.subItem.serviceIntro.sections.${index}.feature.images`)];
-                                    imgs.splice(imgIdx, 1);
-                                    setValue(`content.subItem.serviceIntro.sections.${index}.feature.images`, imgs);
-                                  }}
-                                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={12}/>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {type === 'COMPARISON' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className={innerCardClass}>
-                          <label className={labelClass}>Before 圖片與文字</label>
-                          <input {...register(`content.subItem.serviceIntro.sections.${index}.comparison.beforeLabel`)} className={inputClass + " mb-2"} placeholder="標籤 (例如：改善前)" />
-                          <Controller 
-                            control={control} 
-                            name={`content.subItem.serviceIntro.sections.${index}.comparison.beforeImage`} 
-                            render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
-                          />
-                        </div>
-                        <div className={innerCardClass}>
-                          <label className={labelClass}>After 圖片與文字</label>
-                          <input {...register(`content.subItem.serviceIntro.sections.${index}.comparison.afterLabel`)} className={inputClass + " mb-2"} placeholder="標籤 (例如：改善後)" />
-                          <Controller 
-                            control={control} 
-                            name={`content.subItem.serviceIntro.sections.${index}.comparison.afterImage`} 
-                            render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-stone-900">項目列表</h3>
+                  <button 
+                    type="button" 
+                    onClick={() => appendIntroItem({ id: uuidv4(), title: '', image: '' })} 
+                    className={secondaryBtn}
+                  >
+                    <Plus size={16}/> 新增項目
+                  </button>
                 </div>
-              );
-            })}
-
-            {introSections.length === 0 && (
-              <div className="p-12 text-center bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200">
-                <List className="mx-auto h-12 w-12 text-stone-300 mb-4" />
-                <h3 className="text-lg font-bold text-stone-900 mb-1">尚未建立介紹區塊</h3>
-                <p className="text-sm text-stone-500 mb-6">點擊上方按鈕，開始建立您的動態服務清單、特色介紹或對比照。</p>
-                <div className="flex justify-center gap-3">
-                  <button type="button" onClick={addGridSection} className={primaryBtn}>建立圖文列表</button>
-                  <button type="button" onClick={addFeatureSection} className={primaryBtn}>建立大圖介紹</button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {introItems.map((field, index) => (
+                    <div key={field.id} className={innerCardClass}>
+                      <button 
+                        type="button" 
+                        onClick={() => removeIntroItem(index)} 
+                        className="absolute top-2 right-2 p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={16}/>
+                      </button>
+                      <div className="space-y-4">
+                        <div>
+                          <label className={labelClass}>項目名稱</label>
+                          <input {...register(`content.subItem.serviceIntro.blockA.items.${index}.title`)} placeholder="輸入項目名稱" className={inputClass} />
+                        </div>
+                        <div>
+                          <label className={labelClass}>項目圖片</label>
+                          <Controller 
+                            control={control} 
+                            name={`content.subItem.serviceIntro.blockA.items.${index}.image`} 
+                            render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
+            </div>
+          )}
+        </div>
+
+        {/* Block B Editor */}
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div>
+              <h2 className="text-lg font-bold text-stone-900">區塊 B：大圖說明</h2>
+              <p className="text-xs text-stone-500 mt-1">左圖右文或上圖下文的大型展示區塊，多張照片時自動輪播</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-stone-500">啟用</span>
+              <button 
+                type="button"
+                onClick={() => setValue('content.subItem.serviceIntro.blockB.enabled', !isBlockBEnabled)} 
+                className={`w-11 h-6 rounded-full p-1 transition-colors ${isBlockBEnabled ? 'bg-[#8B5E34]' : 'bg-stone-300'}`}
+              >
+                <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${isBlockBEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
           </div>
+
+          {isBlockBEnabled && (
+            <div className={cardClass + " space-y-6"}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className={labelClass}>標題</label>
+                    <input {...register('content.subItem.serviceIntro.blockB.title')} placeholder="輸入標題" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>內容說明</label>
+                    <textarea {...register('content.subItem.serviceIntro.blockB.content')} placeholder="輸入內容說明..." rows={5} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>排版方向</label>
+                    <select {...register('content.subItem.serviceIntro.blockB.layout')} className={inputClass}>
+                      <option value="LEFT">左圖右文</option>
+                      <option value="RIGHT">右圖左文</option>
+                      <option value="TOP">上圖下文</option>
+                      <option value="BOTTOM">下圖上文</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <label className={labelClass}>展示圖片</label>
+                    <button type="button" onClick={handleAddBlockBImage} className="text-[#8B5E34] hover:text-black text-xs font-bold flex items-center gap-1">
+                      <Plus size={14} /> 新增圖片
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    {blockBImages.map((img: string, index: number) => (
+                      <div key={index} className="relative group">
+                        <Controller 
+                          control={control} 
+                          name={`content.subItem.serviceIntro.blockB.images.${index}`} 
+                          render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => handleRemoveBlockBImage(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    ))}
+                    {blockBImages.length === 0 && (
+                      <div className="border-2 border-dashed border-stone-200 rounded-xl p-8 text-center">
+                        <p className="text-sm text-stone-400">尚未新增圖片</p>
+                        <button type="button" onClick={handleAddBlockBImage} className="mt-2 text-[#8B5E34] text-xs font-bold">點此新增</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Block C Editor */}
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div>
+              <h2 className="text-lg font-bold text-stone-900">區塊 C：B/A 照對比</h2>
+              <p className="text-xs text-stone-500 mt-1">可拖曳滑桿查看施作前後的對比效果</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-stone-500">啟用</span>
+              <button 
+                type="button"
+                onClick={() => setValue('content.subItem.serviceIntro.blockC.enabled', !watch('content.subItem.serviceIntro.blockC.enabled'))} 
+                className={`w-11 h-6 rounded-full p-1 transition-colors ${watch('content.subItem.serviceIntro.blockC.enabled') ? 'bg-[#8B5E34]' : 'bg-stone-300'}`}
+              >
+                <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${watch('content.subItem.serviceIntro.blockC.enabled') ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
+          </div>
+
+          {watch('content.subItem.serviceIntro.blockC.enabled') && (
+            <div className={cardClass + " space-y-6"}>
+              <div>
+                <label className={labelClass}>區塊標題</label>
+                <input {...register('content.subItem.serviceIntro.blockC.title')} placeholder="例如：施作前後對比" className={inputClass} />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <div>
+                    <label className={labelClass}>Before 標籤文字</label>
+                    <input {...register('content.subItem.serviceIntro.blockC.beforeLabel')} placeholder="例如：Before" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Before 圖片</label>
+                    <Controller 
+                      control={control} 
+                      name="content.subItem.serviceIntro.blockC.beforeImage" 
+                      render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className={labelClass}>After 標籤文字</label>
+                    <input {...register('content.subItem.serviceIntro.blockC.afterLabel')} placeholder="例如：After" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>After 圖片</label>
+                    <Controller 
+                      control={control} 
+                      name="content.subItem.serviceIntro.blockC.afterImage" 
+                      render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} 
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

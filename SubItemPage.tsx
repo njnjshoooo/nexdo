@@ -4,7 +4,7 @@ import { pageService } from '../services/pageService';
 import { formService } from '../services/formService';
 import { productService } from '../services/productService';
 import { Page, Product } from '../types/admin';
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Check, ChevronDown, Package } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Check, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import DynamicForm from '../components/form/DynamicForm';
@@ -190,7 +190,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                 {/* Product Gallery / Main Image */}
                 <div className="mb-4 md:mb-6">
                   {productData?.images && productData.images.length > 0 ? (
-                    <ProductGallery images={[productData.image, ...productData.images].filter((img): img is string => !!img)} />
+                    <ProductGallery images={[productData.image || '', ...productData.images].filter(Boolean)} />
                   ) : productData?.image ? (
                     <div className="rounded-2xl overflow-hidden aspect-[16/9] md:aspect-video">
                       <img 
@@ -468,223 +468,95 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             )}
 
             {/* Service Introduction Module */}
-            {(subItem.serviceIntro?.sections || subItem.serviceIntro?.blockA?.enabled || subItem.serviceIntro?.blockB?.enabled || subItem.serviceIntro?.blockC?.enabled) && (
+            {(subItem.serviceIntro?.blockA?.enabled || subItem.serviceIntro?.blockB?.enabled || subItem.serviceIntro?.blockC?.enabled) && (
               <div className="space-y-16 md:space-y-20">
-                {/* Dynamic Sections */}
-                {subItem.serviceIntro?.sections?.map((section, sectionIdx) => (
-                  <div key={section.id || sectionIdx}>
-                    {section.type === 'GRID' && section.enabled && section.grid && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {section.grid.title}
-                          </h2>
-                        </div>
-                        {section.grid.showCarousel !== false ? (
-                          <IntroCarousel items={section.grid.items} />
-                        ) : (
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                            {section.grid.items.map((item, index) => (
-                              <motion.div 
-                                key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-md transition-shadow"
-                              >
-                                <div className="aspect-square overflow-hidden">
-                                  <img 
-                                    src={item.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                                    alt={item.title} 
-                                    className="w-full h-full object-cover"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                                <div className="p-4 text-center">
-                                  <h3 className="font-bold text-stone-900 text-sm md:text-base">{item.title}</h3>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        )}
-                      </section>
-                    )}
-
-                    {section.type === 'FEATURE' && section.enabled && section.feature && (
-                      <section>
-                        <div className={`flex flex-col ${
-                          section.feature.layout === 'LEFT' ? 'md:flex-row' : 
-                          section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse' : 
-                          section.feature.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
-                        } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
-                          <div className={`${
-                            (section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT') && section.feature.content ? 'md:w-1/2' : 'w-full'
-                          } aspect-video md:aspect-auto`}>
-                            {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
-                              section.feature.showCarousel !== false ? (
-                                <ProductGallery images={section.feature.images.filter((img): img is string => !!img)} autoplay={true} />
-                              ) : (
-                                <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
-                                  {section.feature.images.filter(Boolean).map((img, idx) => (
-                                    <img 
-                                      key={idx}
-                                      src={img || undefined} 
-                                      alt={`${section.feature.title}-${idx}`} 
-                                      className="w-full h-full object-cover aspect-video"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ))}
-                                </div>
-                              )
-                            ) : (
+                {/* Block A: Grid or Carousel */}
+                {subItem.serviceIntro?.blockA?.enabled && (
+                  <section>
+                    <div className="mb-8 pl-4 border-l-4 border-primary">
+                      <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
+                        {subItem.serviceIntro.blockA.title}
+                      </h2>
+                    </div>
+                    {subItem.serviceIntro.blockA.items.length > 3 ? (
+                      <IntroCarousel items={subItem.serviceIntro.blockA.items} />
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                        {subItem.serviceIntro.blockA.items.map((item, index) => (
+                          <motion.div 
+                            key={item.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-md transition-shadow"
+                          >
+                            <div className="aspect-square overflow-hidden">
                               <img 
-                                src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop' 
-                                alt={section.feature.title} 
+                                src={item.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
+                                alt={item.title} 
                                 className="w-full h-full object-cover"
                                 referrerPolicy="no-referrer"
                               />
-                            )}
-                          </div>
-                          {section.feature.content && (
-                            <div className={`${
-                              section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                            } flex flex-col justify-center p-6 md:p-10`}>
-                              <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">{section.feature.title}</h3>
-                              <div className="text-stone-600 leading-relaxed whitespace-pre-wrap">{section.feature.content}</div>
                             </div>
-                          )}
-                        </div>
-                      </section>
+                            <div className="p-4 text-center">
+                              <h3 className="font-bold text-stone-900 text-sm md:text-base">{item.title}</h3>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
                     )}
+                  </section>
+                )}
 
-                    {section.type === 'COMPARISON' && section.enabled && section.comparison && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {section.comparison.title}
-                          </h2>
-                        </div>
-                        <div className="bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-stone-100">
-                          <BeforeAfterSlider 
-                            beforeImage={section.comparison.beforeImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                            afterImage={section.comparison.afterImage || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=2070&auto=format&fit=crop'} 
-                            beforeLabel={section.comparison.beforeLabel}
-                            afterLabel={section.comparison.afterLabel}
-                          />
-                        </div>
-                      </section>
-                    )}
-                  </div>
-                ))}
-
-                {/* Legacy Fallback Blocks */}
-                {!subItem.serviceIntro?.sections && (
-                  <>
-                    {/* Block A: Grid or Carousel */}
-                    {subItem.serviceIntro?.blockA?.enabled && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {subItem.serviceIntro.blockA.title}
-                          </h2>
-                        </div>
-                        {subItem.serviceIntro.blockA.showCarousel !== false ? (
-                          <IntroCarousel items={subItem.serviceIntro.blockA.items} />
+                {/* Block B: Large Image */}
+                {subItem.serviceIntro?.blockB?.enabled && (
+                  <section>
+                    <div className={`flex flex-col ${
+                      subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row' : 
+                      subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse' : 
+                      subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
+                    } gap-8 bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-stone-100`}>
+                      <div className={`${
+                        subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
+                      } aspect-video md:aspect-auto rounded-2xl overflow-hidden`}>
+                        {subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images.length > 1 ? (
+                          <ProductGallery images={subItem.serviceIntro.blockB.images} autoplay={true} />
                         ) : (
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                            {subItem.serviceIntro.blockA.items.map((item, index) => (
-                              <motion.div 
-                                key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-md transition-shadow"
-                              >
-                                <div className="aspect-square overflow-hidden">
-                                  <img 
-                                    src={item.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                                    alt={item.title} 
-                                    className="w-full h-full object-cover"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                                <div className="p-4 text-center">
-                                  <h3 className="font-bold text-stone-900 text-sm md:text-base">{item.title}</h3>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        )}
-                      </section>
-                    )}
-
-                    {/* Block B: Large Image */}
-                    {subItem.serviceIntro?.blockB?.enabled && (
-                      <section>
-                        <div className={`flex flex-col ${
-                          subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row' : 
-                          subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse' : 
-                          subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
-                        } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
-                          <div className={`${
-                            (subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT') && subItem.serviceIntro.blockB.content ? 'md:w-1/2' : 'w-full'
-                          } aspect-video md:aspect-auto`}>
-                            {subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images.filter(Boolean).length > 0 ? (
-                              subItem.serviceIntro.blockB.showCarousel !== false ? (
-                                <ProductGallery images={subItem.serviceIntro.blockB.images.filter((img): img is string => !!img)} autoplay={true} />
-                              ) : (
-                                <div className={`grid ${subItem.serviceIntro.blockB.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
-                                  {subItem.serviceIntro.blockB.images.filter(Boolean).map((img, idx) => (
-                                    <img 
-                                      key={idx}
-                                      src={img || undefined} 
-                                      alt={`${subItem.serviceIntro.blockB.title}-${idx}`} 
-                                      className="w-full h-full object-cover aspect-video"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ))}
-                                </div>
-                              )
-                            ) : (
-                              <img 
-                                src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop' 
-                                alt={subItem.serviceIntro.blockB.title} 
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            )}
-                          </div>
-                          {subItem.serviceIntro.blockB.content && (
-                            <div className={`${
-                              subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                            } flex flex-col justify-center p-6 md:p-10`}>
-                              <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">{subItem.serviceIntro.blockB.title}</h3>
-                              <div className="text-stone-600 leading-relaxed whitespace-pre-wrap">{subItem.serviceIntro.blockB.content}</div>
-                            </div>
-                          )}
-                        </div>
-                      </section>
-                    )}
-
-                    {/* Block C: Before/After Slider */}
-                    {subItem.serviceIntro?.blockC?.enabled && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {subItem.serviceIntro.blockC.title}
-                          </h2>
-                        </div>
-                        <div className="bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-stone-100">
-                          <BeforeAfterSlider 
-                            beforeImage={subItem.serviceIntro.blockC.beforeImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                            afterImage={subItem.serviceIntro.blockC.afterImage || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=2070&auto=format&fit=crop'} 
-                            beforeLabel={subItem.serviceIntro.blockC.beforeLabel}
-                            afterLabel={subItem.serviceIntro.blockC.afterLabel}
+                          <img 
+                            src={(subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images[0]) || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
+                            alt={subItem.serviceIntro.blockB.title} 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
                           />
-                        </div>
-                      </section>
-                    )}
-                  </>
+                        )}
+                      </div>
+                      <div className={`${
+                        subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
+                      } flex flex-col justify-center`}>
+                        <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">{subItem.serviceIntro.blockB.title}</h3>
+                        <div className="text-stone-600 leading-relaxed whitespace-pre-wrap">{subItem.serviceIntro.blockB.content}</div>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* Block C: Before/After Slider */}
+                {subItem.serviceIntro?.blockC?.enabled && (
+                  <section>
+                    <div className="mb-8 pl-4 border-l-4 border-primary">
+                      <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
+                        {subItem.serviceIntro.blockC.title}
+                      </h2>
+                    </div>
+                    <div className="bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-stone-100">
+                      <BeforeAfterSlider 
+                        beforeImage={subItem.serviceIntro.blockC.beforeImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
+                        afterImage={subItem.serviceIntro.blockC.afterImage || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=2070&auto=format&fit=crop'} 
+                        beforeLabel={subItem.serviceIntro.blockC.beforeLabel}
+                        afterLabel={subItem.serviceIntro.blockC.afterLabel}
+                      />
+                    </div>
+                  </section>
                 )}
               </div>
             )}
@@ -732,18 +604,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                         className="flex-[0_0_83.333333%] min-w-0 md:flex-none group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-stone-100"
                       >
                         <div className="relative aspect-[4/3] overflow-hidden">
-                          {item.image ? (
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                              referrerPolicy="no-referrer"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-stone-100 flex items-center justify-center">
-                              <Package className="text-stone-300 w-12 h-12" />
-                            </div>
-                          )}
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                            referrerPolicy="no-referrer"
+                          />
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-stone-800 shadow-sm">
                             {item.tag}
                           </div>
@@ -977,7 +843,7 @@ function ProductGallery({ images, autoplay = false }: { images: string[], autopl
     <div className="relative group">
       <div className="overflow-hidden rounded-2xl aspect-[16/9] md:aspect-video" ref={emblaRef}>
         <div className="flex">
-          {images.filter(Boolean).map((src, index) => (
+          {images.map((src, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0 relative h-full">
               <img 
                 src={src} 
@@ -1179,16 +1045,12 @@ function BeforeAfterSlider({ beforeImage, afterImage, beforeLabel, afterLabel }:
     >
       {/* After Image (Background) */}
       <div className="absolute inset-0">
-        {afterImage ? (
-          <img 
-            src={afterImage} 
-            alt="After" 
-            className="w-full h-full object-cover pointer-events-none"
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <div className="w-full h-full bg-stone-200" />
-        )}
+        <img 
+          src={afterImage} 
+          alt="After" 
+          className="w-full h-full object-cover pointer-events-none"
+          referrerPolicy="no-referrer"
+        />
         <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold pointer-events-none">
           {afterLabel || 'After'}
         </div>
@@ -1199,16 +1061,12 @@ function BeforeAfterSlider({ beforeImage, afterImage, beforeLabel, afterLabel }:
         className="absolute inset-0 border-r-2 border-white pointer-events-none"
         style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
       >
-        {beforeImage ? (
-          <img 
-            src={beforeImage} 
-            alt="Before" 
-            className="w-full h-full object-cover pointer-events-none"
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <div className="w-full h-full bg-stone-300" />
-        )}
+        <img 
+          src={beforeImage} 
+          alt="Before" 
+          className="w-full h-full object-cover pointer-events-none"
+          referrerPolicy="no-referrer"
+        />
         <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold pointer-events-none">
           {beforeLabel || 'Before'}
         </div>
