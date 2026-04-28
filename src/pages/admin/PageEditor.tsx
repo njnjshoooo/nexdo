@@ -114,16 +114,27 @@ export default function PageEditor() {
 
   // 檢查你的 pageService.update 是否有包含 slug
   const onSubmit = async (data: Page) => {
+    // 防呆：必填欄位驗證
+    const title = (data.title || '').trim();
+    if (!title) {
+      alert('請先填寫頁面標題');
+      return;
+    }
+    if (!data.template) {
+      alert('請先選擇頁面模板');
+      return;
+    }
+
     setSaveStatus('saving');
     try {
       if (isNew) {
         // 💡 修正：新增頁面時呼叫 create
-        const newPage = pageService.create(data.title, data.template);
+        const newPage = pageService.create(title, data.template);
         // 更新新頁面的內容
-        pageService.update(newPage.id, { ...data, id: newPage.id });
+        pageService.update(newPage.id, { ...data, title, id: newPage.id });
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
       } else {
-        pageService.update(data.id, data);
+        pageService.update(data.id, { ...data, title });
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }
