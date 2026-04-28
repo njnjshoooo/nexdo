@@ -392,7 +392,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
             {/* Sticky CTA Area at Bottom */}
             <div className="p-5 md:p-6 pt-4 border-t border-stone-100 bg-white shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] shrink-0 relative z-20">
-              {subItem.button?.isVisible && (
+              {/* CTA 顯示條件：有連動產品時必顯示，或者頁面自己有設 isVisible=true */}
+              {(productData || subItem.button?.isVisible) && (
                 <button
                   onClick={() => {
                     // Prioritize subItem.button if it's set to something specific
