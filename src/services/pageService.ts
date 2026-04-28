@@ -34,9 +34,11 @@ class PageService {
 
   private toRow(page: Partial<Page>): any {
     const row: any = {};
-    if (page.id !== undefined) row.id = page.id;
-    if (page.slug !== undefined) row.slug = page.slug;
-    if (page.title !== undefined) row.title = page.title;
+    if (page.id !== undefined && page.id !== '') row.id = page.id;
+    // slug 不接受空字串（會違反 schema unique 索引語意，導致前台無法用 URL 訪問）
+    if (page.slug !== undefined && page.slug !== '') row.slug = page.slug;
+    // title 不接受空字串（schema 是 NOT NULL）
+    if (page.title !== undefined && page.title !== '') row.title = page.title;
     if (page.template !== undefined) row.template = page.template;
     if (page.parentId !== undefined) row.parent_id = page.parentId ?? null;
     if (page.content !== undefined) row.content = page.content;
