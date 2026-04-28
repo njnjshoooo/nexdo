@@ -1180,7 +1180,7 @@ function BeforeAfterSlider({ beforeImage, afterImage, beforeLabel, afterLabel }:
   return (
     <div 
       ref={containerRef}
-      className="relative w-full aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden cursor-ew-resize select-none"
+      className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden cursor-ew-resize select-none"
       onPointerDown={(e) => {
         setIsDragging(true);
         handleMove(e.clientX);
