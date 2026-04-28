@@ -38,15 +38,27 @@ export default function MediaLibraryModal({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setUploading(true);
+      const inputEl = e.target;
       try {
-        const uploadPromises = Array.from(e.target.files).map(file => mediaService.upload(file, 'admin'));
-        await Promise.all(uploadPromises);
+        const files = Array.from(e.target.files);
+        // Promise.allSettled 讓單檔失敗不會中斷其他並把錯誤訊息聚合給使用者
+        const results = await Promise.allSettled(
+          files.map(file => mediaService.upload(file, 'admin'))
+        );
+        const failed = results.filter(r => r.status === 'rejected') as PromiseRejectedResult[];
+        if (failed.length > 0) {
+          const msg = failed
+            .map(f => f.reason instanceof Error ? f.reason.message : String(f.reason))
+            .join('\n');
+          alert(`部分上傳失敗 (${failed.length}/${files.length})：\n${msg}`);
+        }
         await loadMedia();
       } catch (error) {
         console.error('Upload failed', error);
-        alert('上傳失敗');
+        alert(`上傳失敗：${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setUploading(false);
+        inputEl.value = ''; // 讓使用者可以再次選同檔
       }
     }
   };
