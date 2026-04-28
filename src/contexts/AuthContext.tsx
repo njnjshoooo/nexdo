@@ -45,16 +45,17 @@ async function loadProfile(authUserId: string, fallbackEmail: string): Promise<U
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // 初始值同步從 localStorage 讀取，避免 ProtectedRoute 在第一次 render 因為 user=null 而誤判未登入
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
-    // 先讀本地快取（即時可用）
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try { setUser(JSON.parse(storedUser)); } catch {}
-    }
-
-    // 然後同步 Supabase auth state
     if (!isSupabaseConfigured) return;
 
     let cancelled = false;
