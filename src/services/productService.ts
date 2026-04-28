@@ -188,15 +188,24 @@ class ProductService {
     await this.saveCache();
 
     if (isSupabaseConfigured) {
-      const { error } = await supabase.from(TABLE_NAME)
+      // .select() 強制 Supabase 回傳更新後的 row，這樣可以驗證真的有改到
+      // (RLS 阻擋的情況下會回傳 0 rows 但沒有 error)
+      const { data, error } = await supabase.from(TABLE_NAME)
         .update(this.toRow({ ...updates, updatedAt }))
-        .eq('id', id);
+        .eq('id', id)
+        .select();
       if (error) {
         console.error('[productService] update failed in Supabase', error);
-        // Rollback
         this.products[index] = previous;
         await this.saveCache();
         throw new Error(`更新產品失敗：${error.message}`);
+      }
+      if (!data || data.length === 0) {
+        // RLS 阻擋導致 0 rows 被更新
+        console.error('[productService] update affected 0 rows (RLS blocked?)', { id });
+        this.products[index] = previous;
+        await this.saveCache();
+        throw new Error('更新失敗：權限不足或產品不存在（請確認您是 admin 並已登入）');
       }
     }
 

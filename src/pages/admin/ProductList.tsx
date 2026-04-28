@@ -113,31 +113,31 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
     setDepositError('');
     setSaveStatus('saving');
 
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    if (newId !== originalId) {
-      // ID 已變更：先 create 新產品，再 delete 舊的（避免中途失敗造成資料遺失）
-      const { id: _omit, ...rest } = editedProduct;
-      try {
+    try {
+      if (newId !== originalId) {
+        // ID 已變更：先 create 新產品，再 delete 舊的（避免中途失敗造成資料遺失）
+        const { id: _omit, ...rest } = editedProduct;
         await productService.create({ ...rest, id: newId });
         await productService.delete(originalId);
-      } catch (err) {
-        setIdError(`儲存失敗：${err instanceof Error ? err.message : String(err)}`);
-        setSaveStatus('idle');
-        setActiveTab('basic');
-        return;
+      } else {
+        const result = await productService.update(editedProduct.id, editedProduct);
+        if (!result) {
+          throw new Error(`找不到 ID 為「${editedProduct.id}」的產品`);
+        }
       }
-    } else {
-      await productService.update(editedProduct.id, editedProduct);
+    } catch (err) {
+      setIdError(`儲存失敗：${err instanceof Error ? err.message : String(err)}`);
+      setSaveStatus('idle');
+      setActiveTab('basic');
+      return;
     }
 
     setSaveStatus('saved');
-
+    // 短暫顯示「已儲存」狀態 (300ms) 後關閉視窗
     setTimeout(() => {
       onSave();
       onClose();
-    }, 500);
+    }, 300);
   };
 
   const updateProductField = (field: string, value: any) => {
