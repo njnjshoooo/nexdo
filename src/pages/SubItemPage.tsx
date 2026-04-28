@@ -72,9 +72,32 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   const [productData, setProductData] = useState<Product | null>(null);
 
   useEffect(() => {
-    if (subItem.productId) {
-      productService.getById(subItem.productId).then(setProductData);
+    if (!subItem.productId) {
+      setProductData(null);
+      return;
     }
+    let cancelled = false;
+    const fetchProduct = async () => {
+      // 第一次：先從本地快取取（可能 null）
+      const cached = await productService.getById(subItem.productId!);
+      if (!cancelled && cached) setProductData(cached);
+      // 第二次：強制從 Supabase 拉最新（避免快取沒有剛建立的產品）
+      await productService.refresh();
+      const fresh = await productService.getById(subItem.productId!);
+      if (!cancelled) setProductData(fresh ?? null);
+    };
+    fetchProduct();
+    // 監聽 productService 的 refresh 完成事件，自動重抓對應產品
+    const handleRefresh = async () => {
+      if (cancelled) return;
+      const fresh = await productService.getById(subItem.productId!);
+      if (!cancelled) setProductData(fresh ?? null);
+    };
+    window.addEventListener('products_refreshed', handleRefresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('products_refreshed', handleRefresh);
+    };
   }, [subItem.productId]);
 
   const orderMode = productData?.orderMode;
