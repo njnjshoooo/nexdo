@@ -734,15 +734,13 @@ class MediaService {
    *   - 否則：fallback 到 base64 存 localforage（原行為）
    */
   async upload(file: File, source: 'admin' | 'vendor' | 'customer' = 'admin'): Promise<MediaItem> {
-    await this.initialized;
-
     // 基本大小限制（Supabase bucket 上限為 10MB）
     if (file.size > 10 * 1024 * 1024) {
       throw new Error(`檔案「${file.name}」超過 10MB 上限`);
     }
 
     if (isSupabaseConfigured) {
-      // Supabase Storage upload
+      // Supabase Storage upload (不需要等 this.initialized — 上傳跟初始 cache 載入無關)
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const storagePath = `uploads/${Date.now()}-${safeName}`;
 
@@ -784,12 +782,13 @@ class MediaService {
       });
       if (insertError) {
         // Rollback: 移除剛上傳的 storage 檔案
-        await supabase.storage.from(SUPABASE_MEDIA_BUCKET).remove([storagePath]).catch(() => {});
+        supabase.storage.from(SUPABASE_MEDIA_BUCKET).remove([storagePath]).catch(() => {});
         throw new Error(`儲存媒體資訊失敗：${insertError.message}`);
       }
 
+      // 更新 in-memory + 背景寫 cache（非阻塞，不影響使用者等待時間）
       this.media.unshift(newItem);
-      await this.saveCache();
+      this.saveCache().catch(err => console.warn('[mediaService] saveCache failed', err));
       return newItem;
     }
 
