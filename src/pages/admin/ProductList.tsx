@@ -30,11 +30,14 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [newCategory, setNewCategory] = useState('');
   const [orderCodeError, setOrderCodeError] = useState('');
+  const [idError, setIdError] = useState('');
   const [depositError, setDepositError] = useState('');
   const [forms, setForms] = useState<Form[]>([]);
   const [activeTab, setActiveTab] = useState<'basic' | 'order'>('basic');
   const [isEditingOrderCode, setIsEditingOrderCode] = useState(false);
   const [tempOrderCode, setTempOrderCode] = useState(product.orderCode || '');
+  // 紀錄打開 modal 時的原始 ID，用於判斷是否變更
+  const [originalId] = useState(product.id);
   
   useEffect(() => {
     setForms(formService.getAll());
@@ -60,6 +63,28 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
   };
 
   const handleSave = async () => {
+    // 驗證 ID
+    const newId = (editedProduct.id || '').trim();
+    if (!newId) {
+      setIdError('產品 ID 為必填欄位');
+      setActiveTab('basic');
+      return;
+    }
+    if (!/^[a-z0-9-]+$/i.test(newId)) {
+      setIdError('產品 ID 僅能包含英文字母、數字與連字號 (-)');
+      setActiveTab('basic');
+      return;
+    }
+    // 若 ID 有變更，檢查不可重複
+    if (newId !== originalId) {
+      const all = await productService.getAll();
+      if (all.some(p => p.id === newId)) {
+        setIdError(`此 ID「${newId}」已被其他產品使用`);
+        setActiveTab('basic');
+        return;
+      }
+    }
+
     // Validate orderCode if not editing
     if (isEditingOrderCode) {
       setOrderCodeError('請先確認修改訂單代碼');
@@ -83,16 +108,32 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
       }
     }
 
+    setIdError('');
     setOrderCodeError('');
     setDepositError('');
     setSaveStatus('saving');
-    
+
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 800));
-    
-    await productService.update(editedProduct.id, editedProduct);
+
+    if (newId !== originalId) {
+      // ID 已變更：先 create 新產品，再 delete 舊的（避免中途失敗造成資料遺失）
+      const { id: _omit, ...rest } = editedProduct;
+      try {
+        await productService.create({ ...rest, id: newId });
+        await productService.delete(originalId);
+      } catch (err) {
+        setIdError(`儲存失敗：${err instanceof Error ? err.message : String(err)}`);
+        setSaveStatus('idle');
+        setActiveTab('basic');
+        return;
+      }
+    } else {
+      await productService.update(editedProduct.id, editedProduct);
+    }
+
     setSaveStatus('saved');
-    
+
     setTimeout(() => {
       onSave();
       onClose();
@@ -184,12 +225,29 @@ function ProductEditModal({ product, onClose, onSave }: ProductEditModalProps) {
         className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
-          <div>
-            <h2 className="text-2xl font-bold text-stone-900">編輯產品核心資訊</h2>
-            <p className="text-stone-500 text-sm mt-1">ID: {product.id}</p>
+        <div className="p-8 border-b border-stone-100 flex justify-between items-start bg-stone-50/50 gap-6">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-bold text-stone-900 mb-2">編輯產品核心資訊</h2>
+            <div className="flex items-center gap-2">
+              <label className="text-stone-500 text-sm font-medium shrink-0">產品 ID：</label>
+              <input
+                type="text"
+                value={editedProduct.id}
+                onChange={(e) => {
+                  updateProductField('id', e.target.value);
+                  if (idError) setIdError('');
+                }}
+                placeholder="例如：safety-assessment"
+                className={`flex-1 max-w-md px-3 py-1.5 bg-white border rounded-lg text-sm font-mono focus:ring-2 outline-none transition-all ${idError ? 'border-red-400 focus:ring-red-200' : 'border-stone-200 focus:ring-primary/20 focus:border-primary'}`}
+              />
+            </div>
+            {idError && <p className="text-red-500 text-xs mt-1.5 ml-1">{idError}</p>}
+            {!idError && editedProduct.id !== originalId && (
+              <p className="text-amber-600 text-xs mt-1.5 ml-1">⚠️ 變更 ID 會建立新產品並刪除舊的，請確認沒有訂單依賴此 ID</p>
+            )}
+            <p className="text-stone-400 text-xs mt-1 ml-1">僅能包含英文字母、數字、連字號 (-)。前台網址會用到此 ID。</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-stone-200 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-stone-200 rounded-full transition-colors shrink-0">
             <X size={24} className="text-stone-400" />
           </button>
         </div>
