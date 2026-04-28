@@ -21,6 +21,51 @@ const store = localforage.createInstance({
   storeName: 'media',
 });
 
+/**
+ * 上傳前自動壓縮圖片：
+ *   - 等比例縮到最寬 1920px（保留高解析度但不浪費空間）
+ *   - 重新編碼為 JPEG quality 0.85（肉眼幾乎無差異）
+ *   - PNG 透明圖、SVG、PDF、GIF 等不壓縮，原檔上傳
+ *   - 小於 300 KB 的圖片不壓縮（已經夠小）
+ *
+ * 一張 4MB 的手機照片通常能壓縮到 200~400KB，上傳速度提升 10-20 倍。
+ */
+async function compressImageIfNeeded(file: File): Promise<File> {
+  const compressibleTypes = ['image/jpeg', 'image/jpg', 'image/webp'];
+  if (!compressibleTypes.includes(file.type)) return file;
+  if (file.size < 300 * 1024) return file;
+
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = URL.createObjectURL(file);
+    });
+    const MAX_WIDTH = 1920;
+    const scale = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(img.src);
+    const blob = await new Promise<Blob | null>(resolve => {
+      canvas.toBlob(resolve, 'image/jpeg', 0.85);
+    });
+    if (!blob || blob.size >= file.size) return file;
+    const compressedName = file.name.replace(/\.(jpe?g|webp)$/i, '.jpg');
+    console.log(`[mediaService] compressed ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(blob.size/1024).toFixed(0)}KB`);
+    return new File([blob], compressedName, { type: 'image/jpeg', lastModified: Date.now() });
+  } catch (e) {
+    console.warn('[mediaService] compress failed, using original', e);
+    return file;
+  }
+}
+
 // Pre-populate with some default images if empty
 const DEFAULT_MEDIA: MediaItem[] = [
   {
@@ -738,6 +783,9 @@ class MediaService {
     if (file.size > 10 * 1024 * 1024) {
       throw new Error(`檔案「${file.name}」超過 10MB 上限`);
     }
+
+    // 上傳前自動壓縮（jpeg/webp 大於 300KB 才會壓）
+    file = await compressImageIfNeeded(file);
 
     if (isSupabaseConfigured) {
       // Supabase Storage upload (不需要等 this.initialized — 上傳跟初始 cache 載入無關)
