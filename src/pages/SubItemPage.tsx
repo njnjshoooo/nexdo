@@ -513,8 +513,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     {section.type === 'FEATURE' && section.enabled && section.feature && (
                       <section>
                         <div className={`flex flex-col ${
-                          section.feature.layout === 'LEFT' ? 'md:flex-row' : 
-                          section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse' : 
+                          section.feature.layout === 'LEFT' ? 'md:flex-row' :
+                          section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse' :
                           section.feature.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
                         } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
                           <div className={`${
@@ -522,14 +522,18 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                           } aspect-video md:aspect-auto`}>
                             {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
                               section.feature.showCarousel !== false ? (
-                                <ProductGallery images={section.feature.images.filter((img): img is string => !!img)} autoplay={true} />
+                                <ProductGallery
+                                  images={section.feature.images.filter((img): img is string => !!img)}
+                                  autoplay={true}
+                                  fill={section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT'}
+                                />
                               ) : (
                                 <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
                                   {section.feature.images.filter(Boolean).map((img, idx) => (
-                                    <img 
+                                    <img
                                       key={idx}
-                                      src={img || undefined} 
-                                      alt={`${section.feature.title}-${idx}`} 
+                                      src={img || undefined}
+                                      alt={`${section.feature.title}-${idx}`}
                                       className="w-full h-full object-cover aspect-video"
                                       referrerPolicy="no-referrer"
                                     />
@@ -537,9 +541,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                 </div>
                               )
                             ) : (
-                              <img 
-                                src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop' 
-                                alt={section.feature.title} 
+                              <img
+                                src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'
+                                alt={section.feature.title}
                                 className="w-full h-full object-cover"
                                 referrerPolicy="no-referrer"
                               />
@@ -631,7 +635,11 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                           } aspect-video md:aspect-auto`}>
                             {subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images.filter(Boolean).length > 0 ? (
                               subItem.serviceIntro.blockB.showCarousel !== false ? (
-                                <ProductGallery images={subItem.serviceIntro.blockB.images.filter((img): img is string => !!img)} autoplay={true} />
+                                <ProductGallery
+                                  images={subItem.serviceIntro.blockB.images.filter((img): img is string => !!img)}
+                                  autoplay={true}
+                                  fill={subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT'}
+                                />
                               ) : (
                                 <div className={`grid ${subItem.serviceIntro.blockB.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
                                   {subItem.serviceIntro.blockB.images.filter(Boolean).map((img, idx) => (
@@ -949,7 +957,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   );
 }
 
-function ProductGallery({ images, autoplay = false }: { images: string[], autoplay?: boolean }) {
+function ProductGallery({ images, autoplay = false, fill = false }: { images: string[], autoplay?: boolean, fill?: boolean }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -973,9 +981,10 @@ function ProductGallery({ images, autoplay = false }: { images: string[], autopl
     };
   }, [emblaApi, autoplay, images.length]);
 
+  // fill=true 時讓畫廊填滿父容器（用於 FEATURE 左右佈局，避免文字較長時圖片下方留白）
   return (
-    <div className="relative group">
-      <div className="overflow-hidden rounded-2xl aspect-[16/9] md:aspect-video" ref={emblaRef}>
+    <div className={`relative group ${fill ? 'h-full' : ''}`}>
+      <div className={`overflow-hidden rounded-2xl ${fill ? 'h-full' : 'aspect-[16/9] md:aspect-video'}`} ref={emblaRef}>
         <div className="flex">
           {images.filter(Boolean).map((src, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0 relative h-full">
