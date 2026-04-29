@@ -33,8 +33,12 @@ export default function PageList() {
   }, []);
 
   const handleTogglePublish = async (page: Page) => {
-    pageService.update(page.id, { ...page, isPublished: !page.isPublished });
-    setPages(pageService.getAll());
+    try {
+      await pageService.update(page.id, { ...page, isPublished: !page.isPublished });
+      setPages(pageService.getAll());
+    } catch (error) {
+      alert(`切換狀態失敗：${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   const filteredPages = useMemo(() => {

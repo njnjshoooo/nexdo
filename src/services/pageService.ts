@@ -210,9 +210,15 @@ class PageService {
     return newPage;
   }
 
-  update(id: string, data: Partial<Page>): void {
+  /**
+   * 更新頁面。改成 async 並回傳 Promise，這樣 PageEditor 可以等
+   * Supabase 真的寫完才導頁，避免 navigate 中斷請求造成資料遺失。
+   */
+  async update(id: string, data: Partial<Page>): Promise<void> {
     const index = this.pages.findIndex(p => p.id === id || p.slug === id);
-    if (index === -1) return;
+    if (index === -1) {
+      throw new Error(`找不到頁面 (id: ${id})`);
+    }
 
     const currentPage = this.pages[index];
     const updatedData = { ...data };
@@ -229,42 +235,31 @@ class PageService {
     this.pages[index] = newPage;
     this.saveCache();
 
-    // Background write to Supabase — 用 upsert 確保即便先前 create 失敗，
-    // update 仍能把整筆資料補進 DB
+    // Foreground write to Supabase — await 確保寫完才回傳
     if (isSupabaseConfigured) {
       const idChanged = updatedData.id !== undefined && updatedData.id !== oldId;
-      const dispatchErr = (op: string, message: string) => {
-        window.dispatchEvent(new CustomEvent('pages_save_error', {
-          detail: { op, message, pageId: newPage.id, title: newPage.title }
-        }));
-      };
 
       if (idChanged) {
         // PK 變更：先刪舊的，再 upsert 新 row
-        (async () => {
-          const { error: delErr } = await supabase.from(TABLE_NAME).delete().eq('id', oldId);
-          if (delErr) {
-            console.error('[pageService] update (delete-old) failed', delErr);
-            dispatchErr('update', delErr.message);
-            return;
-          }
-          const { error: insErr } = await supabase.from(TABLE_NAME).upsert(this.toRow(newPage), { onConflict: 'id' });
-          if (insErr) {
-            console.error('[pageService] update (insert-new) failed', insErr);
-            dispatchErr('update', insErr.message);
-          }
-        })();
+        const { error: delErr } = await supabase.from(TABLE_NAME).delete().eq('id', oldId);
+        if (delErr) {
+          console.error('[pageService] update (delete-old) failed', delErr);
+          throw new Error(`更新失敗：${delErr.message}`);
+        }
+        const { error: insErr } = await supabase.from(TABLE_NAME).upsert(this.toRow(newPage), { onConflict: 'id' });
+        if (insErr) {
+          console.error('[pageService] update (insert-new) failed', insErr);
+          throw new Error(`更新失敗：${insErr.message}`);
+        }
       } else {
         // 用 upsert 而非 update + eq，這樣 row 不存在時會自動 insert
-        supabase
+        const { error } = await supabase
           .from(TABLE_NAME)
-          .upsert(this.toRow(newPage), { onConflict: 'id' })
-          .then(({ error }) => {
-            if (error) {
-              console.error('[pageService] update failed in Supabase', error);
-              dispatchErr('update', error.message);
-            }
-          });
+          .upsert(this.toRow(newPage), { onConflict: 'id' });
+        if (error) {
+          console.error('[pageService] update failed in Supabase', error);
+          throw new Error(`更新失敗：${error.message}`);
+        }
       }
     }
   }

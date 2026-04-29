@@ -128,23 +128,24 @@ export default function PageEditor() {
     setSaveStatus('saving');
     try {
       if (isNew) {
-        // 💡 修正：新增頁面時呼叫 create
+        // 新增頁面：先建立空殼，再 await update 把完整內容寫進 Supabase
         const newPage = pageService.create(title, data.template);
-        // 更新新頁面的內容
-        pageService.update(newPage.id, { ...data, title, id: newPage.id });
+        await pageService.update(newPage.id, { ...data, title, id: newPage.id });
+        setSaveStatus('saved');
+        // 確認 Supabase 真的寫完才導頁，避免 navigate 中斷請求造成資料遺失
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
       } else {
-        pageService.update(data.id, { ...data, title });
+        await pageService.update(data.id, { ...data, title });
+        setSaveStatus('saved');
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }
       }
-      setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
       setSaveStatus('idle');
       console.error("儲存失敗:", error);
-      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}\n\n請確認您仍以 admin 身分登入，或檢查網路連線。`);
     }
   };
 
