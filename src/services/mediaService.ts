@@ -30,18 +30,40 @@ const store = localforage.createInstance({
  *
  * 一張 4MB 的手機照片通常能壓縮到 200~400KB，上傳速度提升 10-20 倍。
  */
-async function compressImageIfNeeded(file: File): Promise<File> {
-  const compressibleTypes = ['image/jpeg', 'image/jpg', 'image/webp'];
-  if (!compressibleTypes.includes(file.type)) return file;
-  if (file.size < 300 * 1024) return file;
+/** 帶逾時的 Promise 包裝（避免 Image() onload 永遠不觸發卡死） */
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} 逾時 ${ms}ms`)), ms)
+    )
+  ]);
+}
 
+async function compressImageIfNeeded(file: File): Promise<File> {
+  const compressibleTypes = ['image/jpeg', 'image/jpg', 'image/webp', 'image/png'];
+  if (!compressibleTypes.includes(file.type)) {
+    console.log(`[mediaService] skip compress (type=${file.type}, size=${(file.size/1024).toFixed(0)}KB)`);
+    return file;
+  }
+  if (file.size < 300 * 1024) {
+    console.log(`[mediaService] skip compress (size<300KB, ${(file.size/1024).toFixed(0)}KB)`);
+    return file;
+  }
+
+  const t0 = performance.now();
   try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = reject;
-      i.src = URL.createObjectURL(file);
-    });
+    const objUrl = URL.createObjectURL(file);
+    const img = await withTimeout(
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = () => reject(new Error('圖片載入失敗（可能格式不支援，例如 HEIC）'));
+        i.src = objUrl;
+      }),
+      8000,
+      '圖片載入'
+    );
     const MAX_WIDTH = 1920;
     const scale = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
     const w = Math.round(img.width * scale);
@@ -50,15 +72,20 @@ async function compressImageIfNeeded(file: File): Promise<File> {
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return file;
+    if (!ctx) { URL.revokeObjectURL(objUrl); return file; }
     ctx.drawImage(img, 0, 0, w, h);
-    URL.revokeObjectURL(img.src);
-    const blob = await new Promise<Blob | null>(resolve => {
-      canvas.toBlob(resolve, 'image/jpeg', 0.85);
-    });
-    if (!blob || blob.size >= file.size) return file;
-    const compressedName = file.name.replace(/\.(jpe?g|webp)$/i, '.jpg');
-    console.log(`[mediaService] compressed ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(blob.size/1024).toFixed(0)}KB`);
+    URL.revokeObjectURL(objUrl);
+    const blob = await withTimeout(
+      new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85)),
+      5000,
+      '壓縮編碼'
+    );
+    if (!blob || blob.size >= file.size) {
+      console.log(`[mediaService] compress no benefit, using original`);
+      return file;
+    }
+    const compressedName = file.name.replace(/\.(jpe?g|webp|png)$/i, '.jpg');
+    console.log(`[mediaService] compressed ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(blob.size/1024).toFixed(0)}KB (${Math.round(performance.now()-t0)}ms)`);
     return new File([blob], compressedName, { type: 'image/jpeg', lastModified: Date.now() });
   } catch (e) {
     console.warn('[mediaService] compress failed, using original', e);
@@ -793,8 +820,10 @@ class MediaService {
     if (file.size > 10 * 1024 * 1024) {
       throw new Error(`檔案「${file.name}」超過 10MB 上限`);
     }
+    console.log(`[mediaService] upload start: ${file.name} (${(file.size/1024).toFixed(0)}KB, ${file.type})`);
+    const tStart = performance.now();
 
-    // 上傳前自動壓縮（jpeg/webp 大於 300KB 才會壓）
+    // 上傳前自動壓縮（jpeg/webp/png 大於 300KB 才會壓）
     file = await compressImageIfNeeded(file);
 
     if (isSupabaseConfigured) {
@@ -802,13 +831,18 @@ class MediaService {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const storagePath = `uploads/${Date.now()}-${safeName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from(SUPABASE_MEDIA_BUCKET)
-        .upload(storagePath, file, {
+      // 加 30 秒逾時，避免網路有問題時永遠卡在「上傳中」
+      const tUpload = performance.now();
+      const { error: uploadError } = await withTimeout(
+        supabase.storage.from(SUPABASE_MEDIA_BUCKET).upload(storagePath, file, {
           cacheControl: '3600',
           upsert: false,
           contentType: file.type,
-        });
+        }),
+        30000,
+        'Storage 上傳'
+      );
+      console.log(`[mediaService] storage upload: ${Math.round(performance.now() - tUpload)}ms`);
       if (uploadError) {
         throw new Error(`上傳失敗：${uploadError.message}`);
       }
