@@ -125,28 +125,39 @@ export default function PageEditor() {
       return;
     }
 
-    setSaveStatus('saving');
-    try {
-      if (isNew) {
-        // 新增頁面：先建立空殼，再 await update 把完整內容寫進 Supabase
+    if (isNew) {
+      // 新增頁面：必須等 await 才能拿到 newPage.slug 跳轉
+      setSaveStatus('saving');
+      try {
         const newPage = pageService.create(title, data.template);
         await pageService.update(newPage.id, { ...data, title, id: newPage.id });
         setSaveStatus('saved');
-        // 確認 Supabase 真的寫完才導頁，避免 navigate 中斷請求造成資料遺失
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
-      } else {
-        await pageService.update(data.id, { ...data, title });
-        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      } catch (error) {
+        setSaveStatus('idle');
+        alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+      }
+      return;
+    }
+
+    // 編輯模式：樂觀 UI — 立刻顯示「已儲存」，背景 await Supabase
+    // 這讓使用者不會卡在「儲存中」轉圈圈，而是立刻能繼續編輯
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 2000);
+
+    pageService.update(data.id, { ...data, title })
+      .then(() => {
+        // 若 slug 改變才 navigate
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }
-      }
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    } catch (error) {
-      setSaveStatus('idle');
-      console.error("儲存失敗:", error);
-      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}\n\n請確認您仍以 admin 身分登入，或檢查網路連線。`);
-    }
+      })
+      .catch((error) => {
+        // 失敗時跳警告
+        setSaveStatus('idle');
+        alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}\n\n您剛才的變更可能沒寫入。請重整後再試一次。`);
+      });
   };
 
   if (loading) return <div className="p-20 text-center">載入中...</div>;
