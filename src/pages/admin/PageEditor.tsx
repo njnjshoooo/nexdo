@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Page, DEFAULT_MAJOR_ITEM_TEMPLATE, DEFAULT_HOME_TEMPLATE, DEFAULT_SUB_ITEM_TEMPLATE, DEFAULT_GENERAL_TEMPLATE } from '../../types/admin';
@@ -23,6 +23,21 @@ export default function PageEditor() {
   console.log('PageEditor rendered, urlSlug:', urlSlug, 'pathname:', window.location.pathname, 'isNew:', isNew);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  // 追蹤未完成的儲存請求，避免使用者中途離開導致資料遺失
+  const pendingSaves = useRef(0);
+
+  // 儲存中時阻擋瀏覽器關閉/離開
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (pendingSaves.current > 0) {
+        e.preventDefault();
+        e.returnValue = '尚有未完成的儲存，現在離開可能會遺失資料。';
+        return e.returnValue;
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
   const [activeTab, setActiveTab] = useState<string>('');
   const [forms, setForms] = useState<Form[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -125,39 +140,28 @@ export default function PageEditor() {
       return;
     }
 
-    if (isNew) {
-      // 新增頁面：必須等 await 才能拿到 newPage.slug 跳轉
-      setSaveStatus('saving');
-      try {
+    setSaveStatus('saving');
+    pendingSaves.current += 1;
+    try {
+      if (isNew) {
         const newPage = pageService.create(title, data.template);
         await pageService.update(newPage.id, { ...data, title, id: newPage.id });
         setSaveStatus('saved');
         navigate(`/admin/pages/${newPage.slug}`, { replace: true });
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      } catch (error) {
-        setSaveStatus('idle');
-        alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
-      }
-      return;
-    }
-
-    // 編輯模式：樂觀 UI — 立刻顯示「已儲存」，背景 await Supabase
-    // 這讓使用者不會卡在「儲存中」轉圈圈，而是立刻能繼續編輯
-    setSaveStatus('saved');
-    setTimeout(() => setSaveStatus('idle'), 2000);
-
-    pageService.update(data.id, { ...data, title })
-      .then(() => {
-        // 若 slug 改變才 navigate
+      } else {
+        await pageService.update(data.id, { ...data, title });
+        setSaveStatus('saved');
         if (urlSlug !== data.slug) {
           navigate(`/admin/pages/${data.slug}`, { replace: true });
         }
-      })
-      .catch((error) => {
-        // 失敗時跳警告
-        setSaveStatus('idle');
-        alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}\n\n您剛才的變更可能沒寫入。請重整後再試一次。`);
-      });
+      }
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch (error) {
+      setSaveStatus('idle');
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      pendingSaves.current -= 1;
+    }
   };
 
   if (loading) return <div className="p-20 text-center">載入中...</div>;
