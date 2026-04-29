@@ -6,17 +6,31 @@ export default function Footer() {
   const [data, setData] = useState(footerData);
 
   useEffect(() => {
+    // 先讀 localStorage 即時 render
     const saved = localStorage.getItem('siteSettings');
     if (saved) {
-      const parsed = JSON.parse(saved).footer;
-      if (parsed.menuGroups && parsed.menuGroups.length < footerData.menuGroups.length) {
-        parsed.menuGroups = [
-          ...parsed.menuGroups,
-          ...footerData.menuGroups.slice(parsed.menuGroups.length)
-        ];
-      }
-      setData(parsed);
+      try {
+        const parsed = JSON.parse(saved).footer;
+        if (parsed?.menuGroups && parsed.menuGroups.length < footerData.menuGroups.length) {
+          parsed.menuGroups = [
+            ...parsed.menuGroups,
+            ...footerData.menuGroups.slice(parsed.menuGroups.length)
+          ];
+        }
+        if (parsed) setData(parsed);
+      } catch {}
     }
+    // 再從 Supabase 拉最新
+    import('../services/siteSettingsService').then(({ siteSettingsService }) => {
+      siteSettingsService.load().then((remote: any) => {
+        if (!remote?.footer) return;
+        const f = remote.footer;
+        if (f.menuGroups && f.menuGroups.length < footerData.menuGroups.length) {
+          f.menuGroups = [...f.menuGroups, ...footerData.menuGroups.slice(f.menuGroups.length)];
+        }
+        setData(f);
+      }).catch(() => {});
+    });
   }, []);
 
   return (

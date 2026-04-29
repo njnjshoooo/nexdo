@@ -3,6 +3,7 @@ import { headerData } from '../../data/settings/headerData';
 import { footerData } from '../../data/settings/footerData';
 import ImageUploader from '../../components/admin/ImageUploader';
 import { allInitialPages } from '../../data/pages';
+import { siteSettingsService } from '../../services/siteSettingsService';
 
 import SaveButton from '../../components/admin/SaveButton';
 
@@ -10,28 +11,46 @@ export default function SystemSettings() {
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('siteSettings');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      // Ensure the new "關於我們" group is present if it was added to footerData but not in saved settings
-      if (parsed.footer && parsed.footer.menuGroups && parsed.footer.menuGroups.length < footerData.menuGroups.length) {
-        parsed.footer.menuGroups = [
-          ...parsed.footer.menuGroups,
-          ...footerData.menuGroups.slice(parsed.footer.menuGroups.length)
-        ];
-      }
-      return parsed;
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.footer && parsed.footer.menuGroups && parsed.footer.menuGroups.length < footerData.menuGroups.length) {
+          parsed.footer.menuGroups = [
+            ...parsed.footer.menuGroups,
+            ...footerData.menuGroups.slice(parsed.footer.menuGroups.length)
+          ];
+        }
+        return parsed;
+      } catch {}
     }
     return { header: headerData, footer: footerData };
   });
 
+  // 進入頁面時主動從 Supabase 拉最新設定，覆蓋本地快取
+  useEffect(() => {
+    siteSettingsService.load().then((remote: any) => {
+      if (!remote) return;
+      if (remote.footer?.menuGroups && remote.footer.menuGroups.length < footerData.menuGroups.length) {
+        remote.footer.menuGroups = [
+          ...remote.footer.menuGroups,
+          ...footerData.menuGroups.slice(remote.footer.menuGroups.length)
+        ];
+      }
+      setSettings(remote);
+    }).catch(err => console.warn('[SystemSettings] load failed', err));
+  }, []);
+
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  const saveSettings = () => {
+  const saveSettings = async () => {
     setSaveStatus('saving');
-    localStorage.setItem('siteSettings', JSON.stringify(settings));
-    setTimeout(() => {
+    try {
+      await siteSettingsService.save(settings);
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
-    }, 500);
+    } catch (error) {
+      setSaveStatus('idle');
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   const pageOptions = [

@@ -28,10 +28,17 @@ export default function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // 先用 localStorage 即時 render
     const saved = localStorage.getItem('siteSettings');
     if (saved) {
-      setSettings(JSON.parse(saved).header);
+      try { setSettings(JSON.parse(saved).header); } catch {}
     }
+    // 再從 Supabase 拉最新
+    import('../services/siteSettingsService').then(({ siteSettingsService }) => {
+      siteSettingsService.load().then((remote: any) => {
+        if (remote?.header) setSettings(remote.header);
+      }).catch(() => {});
+    });
   }, []);
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
