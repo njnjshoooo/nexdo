@@ -89,28 +89,26 @@ export default function PageEditor() {
 
     if (urlSlug) {
       setLoading(true);
-      // 載入前先強制抓 Supabase 最新資料，避免讀到舊快取覆蓋使用者已存的內容
-      pageService.refresh().finally(() => {
-        const allPages = pageService.getAll();
-        const page = allPages.find(p => p.slug === urlSlug);
+      // 💡 關鍵：從 service 撈出所有頁面，用 slug 去比對
+      const allPages = pageService.getAll();
+      const page = allPages.find(p => p.slug === urlSlug);
 
-        if (page) {
-          reset(page); // 這裡會把 template 設進去，模板才會顯示
+      if (page) {
+        reset(page); // 這裡會把 template 設進去，模板才會顯示
 
-          // 根據 template 預設 activeTab
-          if (page.template === 'HOME') setActiveTab('home_hero');
-          else if (page.template === 'MAJOR_ITEM') setActiveTab('hero');
-          else if (page.template === 'SUB_ITEM') setActiveTab('sub_product');
-          else if (page.template === 'GENERAL') setActiveTab('general_blocks');
-          else if (page.template === 'BLOG') setActiveTab('blog_hero');
+        // 根據 template 預設 activeTab
+        if (page.template === 'HOME') setActiveTab('home_hero');
+        else if (page.template === 'MAJOR_ITEM') setActiveTab('hero');
+        else if (page.template === 'SUB_ITEM') setActiveTab('sub_product');
+        else if (page.template === 'GENERAL') setActiveTab('general_blocks');
+        else if (page.template === 'BLOG') setActiveTab('blog_hero');
 
-          setLoading(false);
-        } else {
-          // 找不到 slug 就滾回列表
-          console.error("找不到該 Slug 的頁面:", urlSlug);
-          navigate('/admin/pages');
-        }
-      });
+        setLoading(false);
+      } else {
+        // 找不到 slug 就滾回列表
+        console.error("找不到該 Slug 的頁面:", urlSlug);
+        navigate('/admin/pages');
+      }
     } else {
       console.log('PageEditor: urlSlug is undefined/null and not new');
       // 如果沒有 slug，可能是還沒載入，先不設 loading false
