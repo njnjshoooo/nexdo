@@ -44,9 +44,14 @@ export default function SystemSettings() {
   const saveSettings = async () => {
     setSaveStatus('saving');
     try {
-      await siteSettingsService.save(settings);
+      const result = await siteSettingsService.save(settings);
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
+      // 若 Supabase 寫入失敗（如 table 不存在），溫和提示但不阻擋
+      if (result?.warning) {
+        console.warn(result.warning);
+        // 不彈 alert 讓使用者一直被打擾，只在 console 提示
+      }
     } catch (error) {
       setSaveStatus('idle');
       alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
