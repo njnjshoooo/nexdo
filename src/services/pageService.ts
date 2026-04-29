@@ -264,29 +264,21 @@ class PageService {
     }
   }
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const target = this.pages.find(p => p.id === id || p.slug === id);
     if (!target) return false;
 
-    const initialLength = this.pages.length;
-    this.pages = this.pages.filter(p => p.id !== id && p.slug !== id);
-    if (this.pages.length === initialLength) return false;
-
-    this.saveCache();
-
+    // Supabase first 確保真的刪掉，避免 fire-and-forget 在使用者離開時被取消
     if (isSupabaseConfigured) {
-      supabase
-        .from(TABLE_NAME)
-        .delete()
-        .eq('id', target.id)
-        .then(({ error }) => {
-          if (error) {
-            console.error('[pageService] delete failed in Supabase', error);
-            throw new Error(`刪除失敗：${error.message}`);
-          }
-        });
+      const { error } = await supabase.from(TABLE_NAME).delete().eq('id', target.id);
+      if (error) {
+        console.error('[pageService] delete failed in Supabase', error);
+        throw new Error(`刪除失敗：${error.message}`);
+      }
     }
 
+    this.pages = this.pages.filter(p => p.id !== id && p.slug !== id);
+    this.saveCache();
     return true;
   }
 }

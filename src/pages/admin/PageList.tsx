@@ -72,9 +72,13 @@ export default function PageList() {
     setDeleteModal({ isOpen: true, id });
   };
 
-  const confirmDelete = () => {
-    if (deleteModal.id && pageService.delete(deleteModal.id)) {
-      setPages(pageService.getAll());
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      const ok = await pageService.delete(deleteModal.id);
+      if (ok) setPages(pageService.getAll());
+    } catch (error) {
+      alert(`刪除失敗：${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
