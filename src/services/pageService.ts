@@ -246,19 +246,30 @@ class PageService {
           console.error('[pageService] update (delete-old) failed', delErr);
           throw new Error(`更新失敗：${delErr.message}`);
         }
-        const { error: insErr } = await supabase.from(TABLE_NAME).upsert(this.toRow(newPage), { onConflict: 'id' });
+        const { data: insData, error: insErr } = await supabase
+          .from(TABLE_NAME)
+          .upsert(this.toRow(newPage), { onConflict: 'id' })
+          .select();
         if (insErr) {
           console.error('[pageService] update (insert-new) failed', insErr);
           throw new Error(`更新失敗：${insErr.message}`);
         }
+        if (!insData || insData.length === 0) {
+          throw new Error('儲存失敗：Supabase 回傳 0 筆寫入。可能是登入過期或權限不足，請重新整理後重新登入再試。');
+        }
       } else {
         // 用 upsert 而非 update + eq，這樣 row 不存在時會自動 insert
-        const { error } = await supabase
+        // .select() 強制回傳實際寫入的 row，用 0 筆判斷 RLS silent-fail
+        const { data, error } = await supabase
           .from(TABLE_NAME)
-          .upsert(this.toRow(newPage), { onConflict: 'id' });
+          .upsert(this.toRow(newPage), { onConflict: 'id' })
+          .select();
         if (error) {
           console.error('[pageService] update failed in Supabase', error);
           throw new Error(`更新失敗：${error.message}`);
+        }
+        if (!data || data.length === 0) {
+          throw new Error('儲存失敗：Supabase 回傳 0 筆寫入。可能是登入過期或權限不足，請重新整理後重新登入再試。');
         }
       }
     }
