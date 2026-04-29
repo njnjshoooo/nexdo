@@ -189,14 +189,19 @@ export default function NavigationEditor() {
 
   const handleSave = async () => {
     setSaveStatus('saving');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    navigationService.updateSettings({ items });
-    setToast('導覽列設定已儲存');
-    setSaveStatus('saved');
-    setTimeout(() => {
-      setToast(null);
+    try {
+      // 真正等 Supabase 寫入完成（解決「加新項目時舊的消失」問題）
+      await navigationService.updateSettings({ items });
+      setToast('導覽列設定已儲存');
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setToast(null);
+        setSaveStatus('idle');
+      }, 2000);
+    } catch (error) {
       setSaveStatus('idle');
-    }, 2000);
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   return (

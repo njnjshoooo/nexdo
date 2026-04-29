@@ -105,24 +105,26 @@ class NavigationService {
    * Update navigation settings. Updates local cache synchronously,
    * then upserts to Supabase in the background.
    */
-  updateSettings(settings: NavigationSettings): void {
+  /**
+   * Update navigation settings. await Supabase 確保導覽變更不會被
+   * 接下來的 refresh 蓋掉（修復「加新項目時舊的會消失」問題）。
+   */
+  async updateSettings(settings: NavigationSettings): Promise<void> {
     this.settings = settings;
     this.saveCache();
 
     if (isSupabaseConfigured) {
-      supabase
+      const { error } = await supabase
         .from(TABLE_NAME)
         .upsert({
           id: SINGLETON_ID,
           items: settings.items,
           updated_at: new Date().toISOString(),
-        })
-        .then(({ error }) => {
-          if (error) {
-            console.error('[navigationService] updateSettings failed in Supabase', error);
-            throw new Error(`更新失敗：${error.message}`);
-          }
         });
+      if (error) {
+        console.error('[navigationService] updateSettings failed in Supabase', error);
+        throw new Error(`更新失敗：${error.message}`);
+      }
     }
   }
 

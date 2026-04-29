@@ -54,9 +54,13 @@ export default function MediaLibrary() {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await mediaService.delete(id);
-    if (selectedItem?.id === id) setSelectedItem(null);
-    await loadMedia();
+    try {
+      await mediaService.delete(id);
+      if (selectedItem?.id === id) setSelectedItem(null);
+      await loadMedia();
+    } catch (error) {
+      alert(`刪除失敗：${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   const filteredMedia = media.filter(item => 

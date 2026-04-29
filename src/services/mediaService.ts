@@ -707,9 +707,14 @@ class MediaService {
         if (error) throw error;
         const remote = (data ?? []).map(this.mapRow);
 
-        // 合併：Supabase 資料 + 預設圖（如果 DB 裡沒有的話）
+        // 合併：Supabase 資料 + 預設圖（如果 DB 裡沒有且未被使用者刪除的話）
+        const deletedDefaults: string[] = (() => {
+          try { return JSON.parse(localStorage.getItem('media_deleted_defaults') || '[]'); }
+          catch { return []; }
+        })();
         const merged = [...remote];
         DEFAULT_MEDIA.forEach(def => {
+          if (deletedDefaults.includes(def.id)) return; // 使用者已刪除過，不再加回
           if (!merged.find(m => m.url === def.url || m.id === def.id)) {
             merged.push(def);
           }
@@ -760,8 +765,13 @@ class MediaService {
         .order('created_at', { ascending: false });
       if (error) throw error;
       const remote = (data ?? []).map(this.mapRow);
+      const deletedDefaults: string[] = (() => {
+        try { return JSON.parse(localStorage.getItem('media_deleted_defaults') || '[]'); }
+        catch { return []; }
+      })();
       const merged = [...remote];
       DEFAULT_MEDIA.forEach(def => {
+        if (deletedDefaults.includes(def.id)) return;
         if (!merged.find(m => m.url === def.url || m.id === def.id)) {
           merged.push(def);
         }
@@ -873,12 +883,15 @@ class MediaService {
     await this.initialized;
     const target = this.media.find(m => m.id === id);
 
-    if (isSupabaseConfigured && target) {
+    if (isSupabaseConfigured) {
       // 刪 storage 檔案（若有上傳過）
-      if (target.storagePath) {
-        await supabase.storage.from(SUPABASE_MEDIA_BUCKET)
-          .remove([target.storagePath])
-          .catch(err => console.warn('[mediaService] Storage remove failed', err));
+      if (target?.storagePath) {
+        const { error: storageErr } = await supabase.storage.from(SUPABASE_MEDIA_BUCKET)
+          .remove([target.storagePath]);
+        if (storageErr) {
+          console.warn('[mediaService] Storage remove failed', storageErr);
+          // 繼續刪 DB row，即使 storage 刪不掉（可能檔已不存在）
+        }
       }
       // 刪 DB row
       const { error } = await supabase.from('media').delete().eq('id', id);
@@ -887,8 +900,19 @@ class MediaService {
       }
     }
 
+    // 記住被刪除的預設媒體 id，refresh 時不再合併回去
+    if (id.startsWith('default-')) {
+      try {
+        const deleted: string[] = JSON.parse(localStorage.getItem('media_deleted_defaults') || '[]');
+        if (!deleted.includes(id)) {
+          deleted.push(id);
+          localStorage.setItem('media_deleted_defaults', JSON.stringify(deleted));
+        }
+      } catch {}
+    }
+
     this.media = this.media.filter(item => item.id !== id);
-    await this.saveCache();
+    this.saveCache().catch(err => console.warn('[mediaService] saveCache failed', err));
   }
 }
 
