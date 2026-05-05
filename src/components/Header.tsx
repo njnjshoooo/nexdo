@@ -306,50 +306,35 @@ export default function Header() {
             exit={{ opacity: 0, height: 0 }}
             className="hidden md:block bg-[#4A5D3B] text-white overflow-hidden border-t border-white/10"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <div className="flex gap-12">
-                {/* Left Image */}
-                <div className="w-1/4">
-                  <div className="rounded-2xl overflow-hidden aspect-[3/4]">
-                    <img 
-                      src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop" 
-                      alt="Happy seniors" 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-
-                {/* Right Grid */}
-                <div className="w-3/4 grid grid-cols-3 lg:grid-cols-6 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+              <div className="max-w-5xl mx-auto flex justify-center">
+                {/* 服務項目採置中分佈，限制總最大寬度，讓左右留白的視覺更平衡 */}
+                <div className="w-full grid grid-cols-3 gap-y-10 md:grid-cols-6 gap-x-6 xl:gap-x-10 text-left">
                   {serviceCategories.map((category) => {
-                    const subtitle = category.subtitle || '服務項目';
-                    
                     return (
                       <div key={category.id} className="space-y-4">
-                        <div>
-                          <p className="text-xs text-white mb-1 opacity-80">{subtitle}</p>
+                        <div className="flex flex-col items-start">
                           {category.url && category.url !== '#' ? (
                             <Link 
                               to={category.url} 
                               target={category.openInNewWindow ? '_blank' : undefined}
-                              className="text-xl font-bold text-white hover:underline"
+                              className="text-lg font-bold text-white hover:text-white/80 transition-colors"
                               onClick={() => setIsServicesOpen(false)}
                             >
                               {category.label}
                             </Link>
                           ) : (
-                            <h3 className="text-xl font-bold text-white">{category.label}</h3>
+                            <h3 className="text-lg font-bold text-white">{category.label}</h3>
                           )}
                         </div>
                         {category.children && category.children.length > 0 && (
-                          <ul className="space-y-3">
+                          <ul className="space-y-3 flex flex-col items-start">
                             {category.children.map((item) => (
                               <li key={item.id}>
                                 <Link 
                                   to={item.url} 
                                   target={item.openInNewWindow ? '_blank' : undefined}
-                                  className="text-sm text-white hover:underline transition-colors block truncate"
+                                  className="text-sm font-medium text-white/80 hover:text-white transition-colors block"
                                   onClick={() => setIsServicesOpen(false)}
                                 >
                                   {item.label}
