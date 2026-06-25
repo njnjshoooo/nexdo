@@ -11,6 +11,7 @@ import {
   Link as LinkIcon, Heading2, Bold, Italic, Minus, Quote, List,
   MessageSquare
 } from 'lucide-react';
+import AdminMarkdownEditor from '../../components/admin/AdminMarkdownEditor';
 import SaveButton from '../../components/admin/SaveButton';
 import ImageUploader from '../../components/admin/ImageUploader';
 import AdminPageHeader from '../../components/admin/ui/AdminPageHeader';
@@ -26,7 +27,7 @@ export default function ArticleEditor() {
   const [availableForms, setAvailableForms] = useState<Form[]>([]);
   const [newCategory, setNewCategory] = useState('');
 
-  const { register, handleSubmit, setValue, watch, reset } = useForm<Article>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<Article>({
     defaultValues: {
       id: '',
       title: '',
@@ -43,30 +44,6 @@ export default function ArticleEditor() {
     }
   });
 
-  const contentRef = useRef<HTMLTextAreaElement | null>(null);
-  const { ref: contentFormRef, ...contentRegister } = register('content');
-
-  const insertMarkdown = (prefix: string, suffix: string = '') => {
-    const textarea = contentRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = watch('content') || '';
-    const before = text.substring(0, start);
-    const selection = text.substring(start, end);
-    const after = text.substring(end);
-
-    const newText = before + prefix + selection + suffix + after;
-    setValue('content', newText);
-
-    // Restore focus and selection
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + prefix.length + selection.length + suffix.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  };
 
   const isPublished = watch('isPublished');
   const showForm = watch('showForm');
@@ -145,8 +122,15 @@ export default function ArticleEditor() {
           <>
             <button
               type="button"
-              onClick={() => setValue('isPublished', !isPublished)}
-              className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+              onClick={() => {
+                setValue('isPublished', !isPublished);
+                setTimeout(() => handleSubmit(onSubmit)(), 0);
+              }}
+              className={`px-4 py-2 rounded-xl text-sm font-bold border transition-colors ${
+                isPublished 
+                  ? 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50' 
+                  : 'bg-primary text-white border-primary hover:bg-primary-light shadow-sm'
+              }`}
             >
               {isPublished ? '切換為草稿' : '發布文章'}
             </button>
@@ -158,82 +142,21 @@ export default function ArticleEditor() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 space-y-6">
           <div>
-            <label className="block text-sm font-bold text-stone-700 mb-2">文章標題</label>
-            <input {...register('title', { required: true })} className="w-full border border-stone-200 p-3 rounded-xl text-lg font-bold outline-none focus:border-primary" placeholder="輸入文章標題..." />
+            <label className="block text-sm font-bold text-stone-700 mb-2">文章標題 <span className="text-red-500">*</span></label>
+            <input {...register('title', { required: '請輸入文章標題' })} className={`w-full border p-3 rounded-xl text-lg font-bold outline-none transition-colors ${errors.title ? 'border-red-500 bg-red-50 focus:border-red-600' : 'border-stone-200 focus:border-primary'}`} placeholder="輸入文章標題..." />
+            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-bold text-stone-700 mb-2">摘要 (Summary)</label>
             <textarea {...register('summary')} className="w-full border border-stone-200 p-3 rounded-xl h-24 outline-none focus:border-primary" placeholder="輸入文章摘要..." />
           </div>
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2">
               <label className="block text-sm font-bold text-stone-700">內容 (Markdown)</label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('## ')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="標題 (##)"
-                >
-                  <Heading2 size={14} /> 標題
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('**', '**')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="加粗 (**)"
-                >
-                  <Bold size={14} /> 加粗
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('*', '*')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="斜體 (*)"
-                >
-                  <Italic size={14} /> 斜體
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('\n---\n')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="分隔線 (---)"
-                >
-                  <Minus size={14} /> 分隔線
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('> ')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="引用 (>)"
-                >
-                  <Quote size={14} /> 引用
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('[', '](url)')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="連結 ([])"
-                >
-                  <LinkIcon size={14} /> 連結
-                </button>
-                <button
-                  type="button"
-                  onClick={() => insertMarkdown('- ')}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 hover:border-stone-300 transition-all"
-                  title="列表 (-)"
-                >
-                  <List size={14} /> 列表
-                </button>
-              </div>
             </div>
-            <textarea 
-              {...contentRegister}
-              ref={(e) => {
-                contentFormRef(e);
-                contentRef.current = e;
-              }}
-              className="w-full border border-stone-200 p-4 rounded-xl h-96 outline-none focus:border-primary font-mono text-sm leading-relaxed" 
+            <AdminMarkdownEditor 
+              {...register('content')}
+              className="w-full border border-stone-200 p-4 rounded-xl h-96 outline-none focus:border-primary font-mono text-sm leading-relaxed bg-white" 
               placeholder="使用 Markdown 語法輸入文章內容..." 
             />
           </div>
@@ -243,8 +166,9 @@ export default function ArticleEditor() {
           <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 space-y-5">
             <h3 className="font-bold text-stone-900 border-b border-stone-50 pb-3">基本設定</h3>
             <div>
-              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">網址代稱 (Slug)</label>
-              <input {...register('slug', { required: true })} className="w-full border border-stone-200 p-3 rounded-xl text-sm font-mono outline-none focus:border-primary" placeholder="例如：how-to-clean-bathroom" />
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">網址代稱 (Slug) <span className="text-red-500">*</span></label>
+              <input {...register('slug', { required: '請輸入網址代稱' })} className={`w-full border p-3 rounded-xl text-sm font-mono outline-none transition-colors ${errors.slug ? 'border-red-500 bg-red-50 focus:border-red-600' : 'border-stone-200 focus:border-primary'}`} placeholder="例如：how-to-clean-bathroom" />
+              {errors.slug && <p className="text-red-500 text-xs mt-1 ml-1">{errors.slug.message}</p>}
             </div>
             <div>
               <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">分類 (Category)</label>
