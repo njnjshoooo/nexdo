@@ -1,0 +1,321 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Page, DEFAULT_MAJOR_ITEM_TEMPLATE, DEFAULT_HOME_TEMPLATE, DEFAULT_SUB_ITEM_TEMPLATE, DEFAULT_GENERAL_TEMPLATE } from '../../types/admin';
+import { pageService } from '../../services/pageService';
+import { formService } from '../../services/formService';
+import { Form } from '../../types/form';
+import { ArrowLeft, Globe, PanelsTopLeft, X } from 'lucide-react';
+import SaveButton from '../../components/admin/SaveButton';
+import AdminPageHeader from '../../components/admin/ui/AdminPageHeader';
+
+import HomeEditor from './editors/HomeEditor';
+import MajorItemEditor from './editors/MajorItemEditor';
+import SubItemEditor from './editors/SubItemEditor';
+import GeneralEditor from './editors/GeneralEditor';
+import BlogEditor from './editors/BlogEditor';
+import { DEFAULT_BLOG_TEMPLATE } from '../../types/admin';
+
+export default function PageEditor() {
+  console.log('PageEditor rendered');
+  // 💡 這裡必須跟 App.tsx 的 :slug 對應
+  const { slug: urlSlug } = useParams<{ slug: string }>(); 
+  const isNew = urlSlug === 'new' || window.location.pathname.endsWith('/new');
+  console.log('PageEditor rendered, urlSlug:', urlSlug, 'pathname:', window.location.pathname, 'isNew:', isNew);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  // 追蹤未完成的儲存請求，避免使用者中途離開導致資料遺失
+  const pendingSaves = useRef(0);
+
+  // 儲存中時阻擋瀏覽器關閉/離開
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (pendingSaves.current > 0) {
+        e.preventDefault();
+        e.returnValue = '尚有未完成的儲存，現在離開可能會遺失資料。';
+        return e.returnValue;
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [forms, setForms] = useState<Form[]>([]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  const { register, control, handleSubmit, setValue, watch, reset } = useForm<Page>({
+    shouldUnregister: false,
+    defaultValues: {
+      id: '',
+      template: 'MAJOR_ITEM',
+      content: DEFAULT_MAJOR_ITEM_TEMPLATE,
+      isPublished: false,
+    }
+  });
+
+  const template = watch('template');
+  const isPublished = watch('isPublished');
+  const id = watch('id');
+
+  // Update activeTab and content when template changes
+  useEffect(() => {
+    if (template === 'HOME') {
+      setActiveTab('home_hero');
+      if (urlSlug === 'new') setValue('content', { ...DEFAULT_MAJOR_ITEM_TEMPLATE, home: DEFAULT_HOME_TEMPLATE });
+    } else if (template === 'MAJOR_ITEM') {
+      setActiveTab('hero');
+      if (urlSlug === 'new') setValue('content', DEFAULT_MAJOR_ITEM_TEMPLATE);
+    } else if (template === 'SUB_ITEM') {
+      setActiveTab('sub_product');
+      if (urlSlug === 'new') setValue('content', { ...DEFAULT_MAJOR_ITEM_TEMPLATE, subItem: DEFAULT_SUB_ITEM_TEMPLATE });
+    } else if (template === 'GENERAL') {
+      setActiveTab('general_blocks');
+      if (urlSlug === 'new') setValue('content', { ...DEFAULT_MAJOR_ITEM_TEMPLATE, general: DEFAULT_GENERAL_TEMPLATE });
+    } else if (template === 'BLOG') {
+      setActiveTab('blog_hero');
+      if (urlSlug === 'new') setValue('content', { ...DEFAULT_MAJOR_ITEM_TEMPLATE, blog: DEFAULT_BLOG_TEMPLATE });
+    }
+  }, [template, urlSlug, setValue]);
+
+  useEffect(() => {
+    console.log('PageEditor useEffect urlSlug:', urlSlug, 'isNew:', isNew);
+    setForms(formService.getAll());
+    
+    if (isNew) {
+      console.log('PageEditor: isNew is true, setting loading false');
+      setActiveTab('hero'); // Default for MAJOR_ITEM
+      setLoading(false);
+      return;
+    }
+
+    if (urlSlug) {
+      setLoading(true);
+      // 💡 關鍵：從 service 撈出所有頁面，用 slug 去比對
+      const allPages = pageService.getAll();
+      const page = allPages.find(p => p.slug === urlSlug);
+
+      if (page) {
+        reset(page); // 這裡會把 template 設進去，模板才會顯示
+
+        // 根據 template 預設 activeTab
+        if (page.template === 'HOME') setActiveTab('home_hero');
+        else if (page.template === 'MAJOR_ITEM') setActiveTab('hero');
+        else if (page.template === 'SUB_ITEM') setActiveTab('sub_product');
+        else if (page.template === 'GENERAL') setActiveTab('general_blocks');
+        else if (page.template === 'BLOG') setActiveTab('blog_hero');
+
+        setLoading(false);
+      } else {
+        // 找不到 slug 就滾回列表
+        console.error("找不到該 Slug 的頁面:", urlSlug);
+        navigate('/admin/pages');
+      }
+    } else {
+      console.log('PageEditor: urlSlug is undefined/null and not new');
+      // 如果沒有 slug，可能是還沒載入，先不設 loading false
+    }
+  }, [urlSlug, isNew, reset, navigate]);
+
+  // 監聽 pageService 的儲存錯誤事件（Supabase 背景寫入失敗）
+  useEffect(() => {
+    const handler = (e: any) => {
+      const detail = e.detail || {};
+      const opLabel = detail.op === 'create' ? '建立' : detail.op === 'update' ? '更新' : '儲存';
+      const titleLabel = detail.title ? `「${detail.title}」` : '';
+      alert(`頁面${opLabel}${titleLabel}失敗：\n${detail.message || '未知錯誤'}\n\n請確認您仍以 admin 身分登入，或重新整理後再試。`);
+      setSaveStatus('idle');
+    };
+    window.addEventListener('pages_save_error', handler);
+    return () => window.removeEventListener('pages_save_error', handler);
+  }, []);
+
+  // 檢查你的 pageService.update 是否有包含 slug
+  const onSubmit = async (data: Page) => {
+    // 防呆：必填欄位驗證
+    const title = (data.title || '').trim();
+    if (!title) {
+      alert('請先填寫頁面標題');
+      return;
+    }
+    if (!data.template) {
+      alert('請先選擇頁面模板');
+      return;
+    }
+
+    setSaveStatus('saving');
+    pendingSaves.current += 1;
+    try {
+      if (isNew) {
+        const newPage = pageService.create(title, data.template);
+        await pageService.update(newPage.id, { ...data, title, id: newPage.id });
+        setSaveStatus('saved');
+        navigate(`/admin/pages/${newPage.slug}`, { replace: true });
+      } else {
+        await pageService.update(data.id, { ...data, title });
+        setSaveStatus('saved');
+        if (urlSlug !== data.slug) {
+          navigate(`/admin/pages/${data.slug}`, { replace: true });
+        }
+      }
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch (error) {
+      setSaveStatus('idle');
+      alert(`儲存失敗：${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      pendingSaves.current -= 1;
+    }
+  };
+
+  if (loading) return <div className="p-20 text-center">載入中...</div>;
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-7xl mx-auto pb-20">
+      {/* 頂部動作列 */}
+      <AdminPageHeader
+        title={id ? '頁面編輯' : '新建頁面'}
+        backTo="/admin/pages"
+        statusIndicator={
+          <>
+            <span className={`w-2 h-2 rounded-full ${isPublished ? 'bg-green-500' : 'bg-stone-300'}`} />
+            <span className="text-xs text-stone-500 font-medium">{isPublished ? '已發布' : '草稿'}</span>
+          </>
+        }
+        actionButtons={
+          <>
+            {isPublished ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('isPublished', false);
+                  // 立即觸發 submit 儲存到 DB
+                  setTimeout(() => handleSubmit(onSubmit)(), 0);
+                }}
+                className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+                title="將此頁面下架成草稿並立即儲存"
+              >
+                下架（轉為草稿）
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('isPublished', true);
+                  // 立即觸發 submit 儲存到 DB
+                  setTimeout(() => handleSubmit(onSubmit)(), 0);
+                }}
+                className="px-4 py-2 rounded-xl text-sm font-bold bg-primary text-white hover:bg-primary-light shadow-sm"
+                title="立即發布此頁面到前台"
+              >
+                📢 發布頁面
+              </button>
+            )}
+            <SaveButton status={saveStatus} />
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* 左側：基本設定 (Slug 恢復) */}
+        <div className="lg:sticky lg:top-24 space-y-6 self-start">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-stone-200 space-y-5">
+            <h3 className="font-bold text-stone-900 flex items-center gap-2 border-b border-stone-50 pb-3">
+              <PanelsTopLeft size={18} className="text-stone-400" /> 基本設定
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">頁面標題</label>
+                <input {...register('title')} className="w-full border border-stone-200 bg-stone-50 p-3 rounded-xl text-sm focus:border-stone-900 focus:bg-white outline-none transition-all" placeholder="例如：居住安全" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">網址代稱 (Slug)</label>
+                <input {...register('slug')} className="w-full border border-stone-200 bg-stone-50 p-3 rounded-xl text-sm font-mono focus:border-stone-900 focus:bg-white outline-none transition-all" placeholder="home-safety" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">模板類型</label>
+                <select {...register('template')} disabled={!isNew} className={`w-full border border-stone-200 p-3 rounded-xl text-sm ${!isNew ? 'bg-stone-50 text-stone-400 cursor-not-allowed' : 'bg-white text-stone-900'}`}>
+                  <option value="HOME">首頁模板</option>
+                  <option value="MAJOR_ITEM">大項目模板</option>
+                  <option value="SUB_ITEM">子項目模板</option>
+                  <option value="GENERAL">通用模板</option>
+                  <option value="BLOG">部落格模板</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+            <div className="flex justify-between items-center p-4 bg-stone-50 border-b border-stone-200 text-stone-400">
+              <span className="font-bold text-[11px] uppercase tracking-widest">內容區塊導覽</span>
+              
+            </div>
+            <nav className="flex flex-col">
+              {template === 'HOME' && (
+                <>
+                  <TabButton active={activeTab === 'home_hero'} label="Hero 區塊" onClick={() => setActiveTab('home_hero')} />
+                  <TabButton active={activeTab === 'home_secondary'} label="服務項目" onClick={() => setActiveTab('home_secondary')} />
+                  <TabButton active={activeTab === 'home_more_services'} label="我們還提供" onClick={() => setActiveTab('home_more_services')} />
+                  <TabButton active={activeTab === 'home_consultation'} label="預約流程" onClick={() => setActiveTab('home_consultation')} />
+                  <TabButton active={activeTab === 'home_testimonials'} label="客戶心得" onClick={() => setActiveTab('home_testimonials')} />
+                  <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
+                </>
+              )}
+              {template === 'MAJOR_ITEM' && (
+                <>
+                  <TabButton active={activeTab === 'hero'} label="Hero 區塊" onClick={() => setActiveTab('hero')} />
+                  <TabButton active={activeTab === 'services'} label="服務清單" onClick={() => setActiveTab('services')} />
+                  <TabButton active={activeTab === 'cases'} label="成功案例" onClick={() => setActiveTab('cases')} />
+                  <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
+                </>
+              )}
+              {template === 'SUB_ITEM' && (
+                <>
+                  <TabButton active={activeTab === 'sub_product'} label="產品基本資訊" onClick={() => setActiveTab('sub_product')} />
+                  <TabButton active={activeTab === 'sub_intro'} label="服務介紹" onClick={() => setActiveTab('sub_intro')} />
+                  <TabButton active={activeTab === 'sub_partners'} label="專業夥伴" onClick={() => setActiveTab('sub_partners')} />
+                  <TabButton active={activeTab === 'sub_cases'} label="真實案例" onClick={() => setActiveTab('sub_cases')} />
+                  <TabButton active={activeTab === 'sub_core_services'} label="服務流程" onClick={() => setActiveTab('sub_core_services')} />
+                  <TabButton active={activeTab === 'sub_faqs'} label="常見問題" onClick={() => setActiveTab('sub_faqs')} />
+                  <TabButton active={activeTab === 'sub_related'} label="關聯服務" onClick={() => setActiveTab('sub_related')} />
+                  <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
+                </>
+              )}
+              {template === 'GENERAL' && (
+                <>
+                  <TabButton active={activeTab === 'general_blocks'} label="內容區塊" onClick={() => setActiveTab('general_blocks')} />
+                </>
+              )}
+              {template === 'BLOG' && (
+                <>
+                  <TabButton active={activeTab === 'blog_hero'} label="HERO區塊" onClick={() => setActiveTab('blog_hero')} />
+                  <TabButton active={activeTab === 'blog_category'} label="分類導覽列表" onClick={() => setActiveTab('blog_category')} />
+                  <TabButton active={activeTab === 'blog_featured'} label="主推文章" onClick={() => setActiveTab('blog_featured')} />
+                  <TabButton active={activeTab === 'blog_popular'} label="熱門文章列表" onClick={() => setActiveTab('blog_popular')} />
+                  <TabButton active={activeTab === 'blog_services'} label="推薦服務" onClick={() => setActiveTab('blog_services')} />
+                </>
+              )}
+            </nav>
+          </div>
+        </div>
+
+        {/* 右側：編輯內容 (傳遞必要參數) */}
+        <div className="lg:col-span-3">
+          {template === 'HOME' && <HomeEditor control={control} register={register} activeTab={activeTab} watch={watch} setValue={setValue} forms={forms} />}
+          {template === 'MAJOR_ITEM' && <MajorItemEditor control={control} register={register} activeTab={activeTab} watch={watch} setValue={setValue} forms={forms} />}
+          {template === 'SUB_ITEM' && <SubItemEditor control={control} register={register} activeTab={activeTab} watch={watch} setValue={setValue} forms={forms} />}
+          {template === 'GENERAL' && <GeneralEditor control={control} register={register} activeTab={activeTab} watch={watch} setValue={setValue} forms={forms} />}
+          {template === 'BLOG' && <BlogEditor control={control} register={register} activeTab={activeTab} watch={watch} setValue={setValue} />}
+        </div>
+      </div>
+
+      
+    </form>
+  );
+}
+
+function TabButton({ active, label, onClick }: any) {
+  return (
+    <button type="button" onClick={onClick} className={`px-6 py-4 text-left text-sm transition-all border-l-4 ${active ? 'border-stone-900 bg-stone-50 text-stone-900 font-bold' : 'border-transparent text-stone-500 hover:bg-stone-50'}`}>
+      {label}
+    </button>
+  );
+}
