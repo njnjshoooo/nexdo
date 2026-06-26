@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { Heading2, Bold, Italic, Minus, Quote, Link as LinkIcon, List } from 'lucide-react';
 
