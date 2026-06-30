@@ -54,10 +54,18 @@ export default function ArticleList() {
     setDeleteModal({ isOpen: true, id });
   };
 
-  const confirmDelete = () => {
-    if (deleteModal.id && articleService.delete(deleteModal.id)) {
-      setArticles(articleService.getAll());
+  const confirmDelete = async () => {
+    if (deleteModal.id) {
+      try {
+        const success = await articleService.delete(deleteModal.id);
+        if (success) {
+          setArticles(articleService.getAll());
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : String(error));
+      }
     }
+    setDeleteModal({ isOpen: false, id: null });
   };
 
   return (

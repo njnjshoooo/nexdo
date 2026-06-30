@@ -126,75 +126,74 @@ class ArticleService {
     return this.articles.find(a => a.slug?.toLowerCase() === slug.toLowerCase());
   }
 
-  create(data: Omit<Article, 'id' | 'updatedAt'>): Article {
+  async create(data: Omit<Article, 'id' | 'updatedAt'>): Promise<Article> {
     const newArticle: Article = {
       ...data,
       id: data.slug || uuidv4(),
       updatedAt: new Date().toISOString(),
     };
 
+    // Background write to Supabase
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from(TABLE_NAME)
+        .insert(this.toRow(newArticle));
+        
+      if (error) {
+        console.error('[articleService] create failed in Supabase', error);
+        throw new Error(`Supabase建立失敗：${error.message} (可能因為 RLS 權限未開放)`);
+      }
+    }
+
     // Optimistic local update
     this.articles.push(newArticle);
     this.saveCache();
 
-    // Background write to Supabase
-    if (isSupabaseConfigured) {
-      supabase
-        .from(TABLE_NAME)
-        .insert(this.toRow(newArticle))
-        .then(({ error }) => {
-          if (error) {
-            console.error('[articleService] create failed in Supabase', error);
-            throw new Error(`建立失敗：${error.message}`);
-          }
-        });
-    }
-
     return newArticle;
   }
 
-  update(id: string, data: Partial<Article>): void {
+  async update(id: string, data: Partial<Article>): Promise<void> {
     const index = this.articles.findIndex(a => a.id === id);
     if (index === -1) return;
 
     const updatedAt = new Date().toISOString();
     const updated = { ...this.articles[index], ...data, updatedAt };
-    this.articles[index] = updated;
-    this.saveCache();
 
     if (isSupabaseConfigured) {
-      supabase
+      const { error } = await supabase
         .from(TABLE_NAME)
         .update(this.toRow({ ...data, updatedAt }))
-        .eq('id', id)
-        .then(({ error }) => {
-          if (error) {
-            console.error('[articleService] update failed in Supabase', error);
-            throw new Error(`更新失敗：${error.message}`);
-          }
-        });
+        .eq('id', id);
+        
+      if (error) {
+        console.error('[articleService] update failed in Supabase', error);
+        throw new Error(`Supabase更新失敗：${error.message} (可能因為 RLS 權限未開放)`);
+      }
     }
+
+    this.articles[index] = updated;
+    this.saveCache();
   }
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const initialLength = this.articles.length;
+    
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from(TABLE_NAME)
+        .delete()
+        .eq('id', id);
+        
+      if (error) {
+        console.error('[articleService] delete failed in Supabase', error);
+        throw new Error(`Supabase刪除失敗：${error.message} (可能因為 RLS 權限未開放)`);
+      }
+    }
+
     this.articles = this.articles.filter(a => a.id !== id);
     if (this.articles.length === initialLength) return false;
 
     this.saveCache();
-
-    if (isSupabaseConfigured) {
-      supabase
-        .from(TABLE_NAME)
-        .delete()
-        .eq('id', id)
-        .then(({ error }) => {
-          if (error) {
-            console.error('[articleService] delete failed in Supabase', error);
-            throw new Error(`刪除失敗：${error.message}`);
-          }
-        });
-    }
 
     return true;
   }

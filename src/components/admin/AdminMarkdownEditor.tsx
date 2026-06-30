@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { Heading2, Bold, Italic, Minus, Quote, Link as LinkIcon, List } from 'lucide-react';
 
@@ -8,9 +7,6 @@ interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
 
 const AdminMarkdownEditor = forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   const innerRef = useRef<HTMLTextAreaElement | null>(null);
-  
-  // Expose innerRef to the forwarded ref
-  useImperativeHandle(ref, () => innerRef.current!);
 
   const insertMarkdown = (prefix: string, suffix: string = '') => {
     const textarea = innerRef.current;
@@ -23,7 +19,7 @@ const AdminMarkdownEditor = forwardRef<HTMLTextAreaElement, Props>((props, ref) 
     const selection = text.substring(start, end);
     const after = text.substring(end);
 
-    const newText = before + prefix + selection + suffix + after;
+    const net = before + prefix + selection + suffix + after;
     
     // To make React Hook Form register the change, we need to set the value natively and dispatch an event
     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;

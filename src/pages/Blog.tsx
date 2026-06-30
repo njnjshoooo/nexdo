@@ -166,7 +166,7 @@ export default function Blog() {
                         <span className="text-[#8B5E34] text-sm font-bold tracking-wider mb-2 block">{featuredPost.categoryId}</span>
                       )}
                       <CardTitle className="text-3xl mb-4 group-hover:text-[#8B5E34]">{featuredPost.title}</CardTitle>
-                      <CardDescription className="line-clamp-3 mb-6 flex-grow">{featuredPost.summary || featuredPost.content.substring(0, 150)}</CardDescription>
+                      <CardDescription className="line-clamp-3 mb-6 flex-grow">{featuredPost.summary || (featuredPost.content || '').substring(0, 150)}</CardDescription>
                       <div className="text-sm text-stone-400 font-medium mt-auto">
                         {new Date(featuredPost.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
@@ -230,7 +230,7 @@ export default function Blog() {
                         <span className="text-[#8B5E34] text-xs font-bold tracking-wider mb-2 block">{post.categoryId}</span>
                       )}
                       <CardTitle className="text-xl mb-3 group-hover:text-[#8B5E34] line-clamp-2">{post.title}</CardTitle>
-                      <CardDescription className="text-sm line-clamp-2 mb-4 flex-grow">{post.summary || post.content.substring(0, 100)}</CardDescription>
+                      <CardDescription className="text-sm line-clamp-2 mb-4 flex-grow">{post.summary || (post.content || '').substring(0, 100)}</CardDescription>
                       <div className="text-xs text-stone-400 font-medium mt-auto">
                         {new Date(post.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
