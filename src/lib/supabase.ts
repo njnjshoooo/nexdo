@@ -20,9 +20,23 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undef
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-// noop lock：跳過 Web Locks，直接執行回呼
-// 解決 "Lock 'lock:sb-xxx-auth-token' was not released within 5000ms" 警告與 query 卡住問題
-const noopLock = async <R>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => fn();
+const locks: Record<string, Promise<any>> = {};
+
+const memoryLock = async <R>(name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => {
+  const previous = locks[name] || Promise.resolve();
+  
+  let resolveCurrent: () => void;
+  const current = new Promise<void>(resolve => { resolveCurrent = resolve; });
+  
+  locks[name] = previous.then(() => current, () => current);
+  
+  try {
+    await previous.catch(() => {});
+    return await fn();
+  } finally {
+    resolveCurrent!();
+  }
+};
 
 export const supabase: SupabaseClient = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
@@ -32,7 +46,7 @@ export const supabase: SupabaseClient = createClient(
       persistSession: isSupabaseConfigured,
       autoRefreshToken: isSupabaseConfigured,
       detectSessionInUrl: false,
-      lock: noopLock,
+      lock: memoryLock,
     },
   }
 );
