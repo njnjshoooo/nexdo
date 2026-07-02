@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Briefcase, Building2, User, Phone, Mail, MapPin, FileText, ArrowLeft } from 'lucide-react';
 import { vendorService } from '../../services/vendorService';
+import { vendorApplicationService } from '../../services/vendorApplicationService';
+import { Input } from '../../components/ui/Input';
 
 export default function VendorLogin() {
   const [activeTab, setActiveTab] = useState<'join' | 'login'>('join');
@@ -25,12 +27,11 @@ export default function VendorLogin() {
     motivation: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
 
-    const vendors = vendorService.getAll();
-    const vendor = vendors.find((v: any) => v.account === account && v.password === password);
+    const vendor = await vendorService.login(account, password);
     
     if (vendor) {
       if (vendor.status !== 'active') {
@@ -46,22 +47,31 @@ export default function VendorLogin() {
     setLoginError('帳號或密碼錯誤');
   };
 
-  const handleJoinSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleJoinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    alert('加盟申請已送出！管理員將會盡快與您聯繫。');
-    setJoinForm({
-      name: '',
-      taxId: '',
-      contactName: '',
-      jobTitle: '',
-      phone: '',
-      extension: '',
-      email: '',
-      address: '',
-      motivation: ''
-    });
-    setActiveTab('login');
+    setIsSubmitting(true);
+    try {
+      await vendorApplicationService.create(joinForm);
+      alert('加盟申請已送出！管理員將會盡快與您聯繫。');
+      setJoinForm({
+        name: '',
+        taxId: '',
+        contactName: '',
+        jobTitle: '',
+        phone: '',
+        extension: '',
+        email: '',
+        address: '',
+        motivation: ''
+      });
+      setActiveTab('login');
+    } catch (error: any) {
+      alert(error.message || '申請失敗，請稍後再試。');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -233,7 +243,7 @@ export default function VendorLogin() {
                     rows={3}
                     value={joinForm.motivation}
                     onChange={e => setJoinForm({...joinForm, motivation: e.target.value})}
-                    className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+                    className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-stone-300"
                     placeholder="請簡述您希望加入好齡居的原因..."
                   />
                 </div>
@@ -241,9 +251,10 @@ export default function VendorLogin() {
 
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                disabled={isSubmitting}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
               >
-                送出申請
+                {isSubmitting ? '送出中...' : '送出申請'}
               </button>
             </form>
           )}
@@ -259,24 +270,24 @@ export default function VendorLogin() {
               
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-1">管理者帳號</label>
-                <input
+                <Input
                   type="text"
                   required
                   value={account}
                   onChange={e => setAccount(e.target.value)}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  className="placeholder:text-stone-300"
                   placeholder="請輸入帳號或信箱"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-1">密碼</label>
-                <input
+                <Input
                   type="password"
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  className="placeholder:text-stone-300"
                   placeholder="請輸入密碼"
                 />
               </div>

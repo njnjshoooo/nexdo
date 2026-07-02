@@ -96,7 +96,7 @@ function articleToRow(a) {
     slug: a.slug,
     title: a.title,
     summary: a.summary ?? '',
-    content: a.content ?? {},
+    content: a.content ?? '',
     cover_image: a.coverImage ?? null,
     category_id: a.categoryId ?? null,
     seo_keywords: a.seoKeywords ?? [],

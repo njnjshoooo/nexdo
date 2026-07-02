@@ -1,5 +1,6 @@
 import { Vendor } from '../types/vendor';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import bcrypt from 'bcryptjs';
 
 const STORAGE_KEY = 'vendors';
 const TABLE_NAME = 'vendors';
@@ -113,6 +114,39 @@ async function ensureLoaded(): Promise<void> {
 // Kick off initial load
 ensureLoaded();
 
+function toRow(v: Partial<Vendor>): any {
+  const row: any = {};
+  if (v.id !== undefined) row.id = v.id;
+  if (v.name !== undefined) row.name = v.name;
+  if (v.taxId !== undefined) row.tax_id = v.taxId;
+  if (v.type !== undefined) row.type = v.type;
+  if (v.contactName !== undefined) row.contact_name = v.contactName;
+  if (v.jobTitle !== undefined) row.job_title = v.jobTitle;
+  if (v.phone !== undefined) row.phone = v.phone;
+  if (v.extension !== undefined) row.extension = v.extension;
+  if (v.address !== undefined) row.address = v.address;
+  if (v.account !== undefined) row.account = v.account;
+  if (v.password !== undefined && v.password.trim() !== '') {
+    // If it's not already a bcrypt hash, hash it
+    if (v.password.startsWith('$2a$') || v.password.startsWith('$2b$')) {
+       row.password_hash = v.password;
+    } else {
+       row.password_hash = bcrypt.hashSync(v.password, 10);
+    }
+  }
+  if (v.status !== undefined) row.status = v.status;
+  if (v.certifications !== undefined) row.certifications = v.certifications;
+  if (v.commissionRate !== undefined) row.commission_rate = v.commissionRate / 100;
+  if (v.settlementCycle !== undefined) row.settlement_cycle = v.settlementCycle;
+  if (v.bankInfo !== undefined) row.bank_info = v.bankInfo;
+  if (v.createdAt !== undefined) row.created_at = v.createdAt;
+  if (v.updatedAt !== undefined) row.updated_at = v.updatedAt;
+  return row;
+}
+
+let lastVendorFetchTime = 0;
+let isVendorFetching = false;
+
 export const vendorService = {
   getAll: (): Vendor[] => {
     if (cachedVendors.length === 0) {
@@ -123,14 +157,19 @@ export const vendorService = {
         cachedVendors = [...defaultVendors];
       }
     }
-    // Background refresh
-    if (isSupabaseConfigured) {
+    // Background refresh with deduplication
+    if (isSupabaseConfigured && !isVendorFetching && Date.now() - lastVendorFetchTime > 5000) {
+      isVendorFetching = true;
       supabase.from(TABLE_NAME).select('*').order('created_at').then(({ data, error }) => {
+        isVendorFetching = false;
         if (!error && data) {
           cachedVendors = data.map(mapRow);
+          lastVendorFetchTime = Date.now();
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedVendors)); } catch {}
           window.dispatchEvent(new Event('vendors_refreshed'));
         }
+      }).catch(() => {
+        isVendorFetching = false;
       });
     }
     return [...cachedVendors];
@@ -150,6 +189,49 @@ export const vendorService = {
     }
   },
 
+  create: async (data: Omit<Vendor, 'createdAt' | 'updatedAt'>): Promise<Vendor> => {
+    const now = new Date().toISOString();
+    const newVendor: Vendor = {
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).insert(toRow(newVendor));
+      if (error) throw new Error(`Supabase建立失敗：${error.message}`);
+    }
+
+    cachedVendors.push(newVendor);
+    vendorService.saveAll(cachedVendors);
+    return newVendor;
+  },
+
+  update: async (id: string, data: Partial<Vendor>): Promise<void> => {
+    const index = cachedVendors.findIndex(v => v.id === id);
+    if (index === -1) return;
+
+    const updatedAt = new Date().toISOString();
+    const updated = { ...cachedVendors[index], ...data, updatedAt };
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).update(toRow({ ...data, updatedAt })).eq('id', id);
+      if (error) throw new Error(`Supabase更新失敗：${error.message}`);
+    }
+
+    cachedVendors[index] = updated;
+    vendorService.saveAll(cachedVendors);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id);
+      if (error) throw new Error(`Supabase刪除失敗：${error.message}`);
+    }
+    cachedVendors = cachedVendors.filter(v => v.id !== id);
+    vendorService.saveAll(cachedVendors);
+  },
+
   /** Verify vendor login via Supabase RPC (bcrypt) with localStorage fallback */
   login: async (account: string, password: string): Promise<Vendor | null> => {
     if (isSupabaseConfigured) {
@@ -162,10 +244,13 @@ export const vendorService = {
           return mapRow(data[0]);
         }
         if (error) console.warn('[vendorService] verify_vendor_password failed', error);
+        return null;
       } catch (e) {
-        console.warn('[vendorService] login RPC error, falling back', e);
+        console.warn('[vendorService] login RPC error', e);
+        return null;
       }
     }
+    
     // Fallback：本地比對明碼（不安全，只在無 Supabase 時才用）
     const all = vendorService.getAll();
     const found = all.find(v => v.account === account && v.password === password && v.status === 'active');

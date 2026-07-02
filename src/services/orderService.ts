@@ -114,24 +114,53 @@ class OrderService {
     }
   }
 
-  async getAll(): Promise<Order[]> {
+  private refreshPromise: Promise<Order[]> | null = null;
+  private lastFetchTime = 0;
+  private cachedOrders: Order[] = [];
+
+  async getAll(forceRefresh = false): Promise<Order[]> {
     if (isSupabaseConfigured) {
-      try {
-        const { data, error } = await supabase
-          .from(TABLE_NAME)
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          const mapped = data.map(mapRow);
-          await this.saveCache(mapped);
-          return mapped;
-        }
-        if (error) console.warn('[orderService] Supabase getAll failed', error);
-      } catch (e) {
-        console.warn('[orderService] Supabase getAll error', e);
+      if (!forceRefresh && Date.now() - this.lastFetchTime < 5000) {
+        if (this.refreshPromise) return this.refreshPromise;
+        if (this.cachedOrders.length > 0) return [...this.cachedOrders];
       }
+
+      if (this.refreshPromise) {
+        return this.refreshPromise;
+      }
+
+      this.refreshPromise = (async () => {
+        try {
+          const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!error && data) {
+            const mapped = data.map(mapRow);
+            await this.saveCache(mapped);
+            this.cachedOrders = mapped;
+            this.lastFetchTime = Date.now();
+            return mapped;
+          }
+          if (error) console.warn('[orderService] Supabase getAll failed', error);
+          const cached = await this.loadCache();
+          this.cachedOrders = cached;
+          return cached;
+        } catch (e) {
+          console.warn('[orderService] Supabase getAll error', e);
+          const cached = await this.loadCache();
+          this.cachedOrders = cached;
+          return cached;
+        } finally {
+          this.refreshPromise = null;
+        }
+      })();
+      return this.refreshPromise;
     }
-    return this.loadCache();
+    
+    const cached = await this.loadCache();
+    this.cachedOrders = cached;
+    return cached;
   }
 
   async getById(id: string): Promise<Order | undefined> {
@@ -192,6 +221,7 @@ class OrderService {
     const orders = await this.loadCache();
     orders.push(order);
     await this.saveCache(orders);
+    this.cachedOrders = orders;
   }
 
   async update(orderId: string, updates: Partial<Order>): Promise<void> {
@@ -207,6 +237,7 @@ class OrderService {
     if (index !== -1) {
       orders[index] = { ...orders[index], ...updates };
       await this.saveCache(orders);
+      this.cachedOrders = orders;
     }
   }
 
@@ -223,7 +254,9 @@ class OrderService {
       }
     }
     const orders = await this.loadCache();
-    await this.saveCache(orders.filter(o => o.id !== orderId));
+    const newOrders = orders.filter(o => o.id !== orderId);
+    await this.saveCache(newOrders);
+    this.cachedOrders = newOrders;
   }
 }
 

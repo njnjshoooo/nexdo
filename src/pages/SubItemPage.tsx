@@ -43,23 +43,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   const { subItem, showForm, formId } = currentPage.content;
   const selectedForm = formId ? formService.getById(formId) : null;
 
-  // Sticky CTA logic
-  const [showStickyCTA, setShowStickyCTA] = useState(false);
   const productInfoRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (productInfoRef.current) {
-        const rect = productInfoRef.current.getBoundingClientRect();
-        // Show sticky CTA when the bottom of product info is above the viewport
-        setShowStickyCTA(rect.bottom < 0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+  
   // Embla for Real Cases on Mobile
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
@@ -202,21 +187,25 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
   return (
     <div className="min-h-screen bg-stone-50 pt-20 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+      <div className="max-w-7xl mx-auto px-0 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-12">
           
           {/* Product Info Column (Top on Mobile, Right on Desktop) */}
-          <div className="lg:w-[35%] order-1 lg:order-2 lg:sticky lg:top-24 self-start flex flex-col max-h-[calc(100vh-6rem)] bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden" ref={productInfoRef}>
+          <div className="lg:w-[35%] order-1 lg:order-2 lg:sticky lg:top-24 self-start flex flex-col max-h-[calc(100vh-6rem)] bg-white rounded-none lg:rounded-3xl shadow-sm lg:shadow-lg border-b lg:border border-stone-200 lg:border-stone-100 overflow-hidden" ref={productInfoRef}>
             
             {/* Scrollable Content Area */}
-            <div className="p-5 md:p-8 overflow-y-auto scrollbar-hide flex-1 pb-4">
+            <div className="p-0 md:p-8 overflow-y-auto scrollbar-hide flex-1 pb-4">
               <div className="mb-2">
                 {/* Product Gallery / Main Image */}
-                <div className="mb-4 md:mb-6">
+                <div className="mb-6 md:mb-6">
                   {productData?.images && productData.images.length > 0 ? (
-                    <ProductGallery images={[productData.image, ...productData.images].filter((img): img is string => !!img)} />
+                    <ProductGallery 
+                      images={[productData.image, ...productData.images].filter((img): img is string => !!img)} 
+                      aspectClass="aspect-[2/1] md:aspect-video"
+                      roundedClass="rounded-none md:rounded-2xl"
+                    />
                   ) : productData?.image ? (
-                    <div className="rounded-2xl overflow-hidden aspect-[16/9] md:aspect-video">
+                    <div className="md:rounded-2xl overflow-hidden aspect-[2/1] md:aspect-video">
                       <img 
                         src={productData.image || undefined} 
                         alt={productData.name} 
@@ -226,41 +215,42 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     </div>
                   ) : null}
                 </div>
-                <div className="flex items-center gap-2 mb-2 md:mb-4">
-                  <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs md:text-sm font-bold">
-                    熱門服務
-                  </span>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-stone-900 mb-2 md:mb-4 leading-tight tracking-tight text-left">
-                  {productData?.name || currentPage.title}
-                </h1>
-                
-                {/* Price/Quote Display */}
-                <div className="mb-4 md:mb-6">
-                  {orderMode === 'FIXED' ? (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xs md:text-sm font-bold text-stone-400">NT$</span>
-                      <span className="text-2xl md:text-3xl font-black text-primary">
-                        {((fixedConfig?.price || 0) + (productData?.variants?.find(v => v.id === selectedVariantId)?.price || 0)).toLocaleString()}
-                      </span>
-                      <span className="text-xs md:text-sm font-bold text-stone-400">
-                        / {productData?.variants?.find(v => v.id === selectedVariantId)?.unit || fixedConfig?.unit || '次'}
-                      </span>
-                    </div>
-                  ) : orderMode === 'INTERNAL_FORM' ? (
-                    <div className="text-xl md:text-2xl font-bold text-primary">
-                      {internalFormConfig?.priceText || '依需求報價'}
-                    </div>
-                  ) : (
-                    <div className="text-xl md:text-2xl font-bold text-primary">
-                      {externalLinkConfig?.priceText || '依需求報價'}
-                    </div>
-                  )}
-                </div>
+                <div className="px-5 md:px-0">
+                  <div className="flex items-center gap-2 mb-3 md:mb-4">
+                    <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs md:text-sm font-bold">
+                      熱門服務
+                    </span>
+                  </div>
+                  <h1 className="text-2xl md:text-4xl font-extrabold text-stone-900 mb-2 md:mb-4 leading-tight tracking-tight text-left">
+                    {productData?.name || currentPage.title}
+                  </h1>
+                  
+                  {/* Price/Quote Display */}
+                  <div className="mb-4 md:mb-6">
+                    {orderMode === 'FIXED' ? (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xs md:text-sm font-bold text-stone-400">NT$</span>
+                        <span className="text-2xl md:text-3xl font-black text-primary">
+                          {((fixedConfig?.price || 0) + (productData?.variants?.find(v => v.id === selectedVariantId)?.price || 0)).toLocaleString()}
+                        </span>
+                        <span className="text-xs md:text-sm font-bold text-stone-400">
+                          / {productData?.variants?.find(v => v.id === selectedVariantId)?.unit || fixedConfig?.unit || '次'}
+                        </span>
+                      </div>
+                    ) : orderMode === 'INTERNAL_FORM' ? (
+                      <div className="text-xl md:text-2xl font-bold text-primary">
+                        {internalFormConfig?.priceText || '依需求報價'}
+                      </div>
+                    ) : (
+                      <div className="text-xl md:text-2xl font-bold text-primary">
+                        {externalLinkConfig?.priceText || '依需求報價'}
+                      </div>
+                    )}
+                  </div>
 
-                <p className="text-stone-600 text-base md:text-lg leading-relaxed mb-4 md:mb-6 line-clamp-3 md:line-clamp-none">
-                  {productData?.description}
-                </p>
+                  <p className="text-stone-600 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 line-clamp-3 md:line-clamp-none">
+                    {productData?.description}
+                  </p>
 
                 {productData?.checklist && productData.checklist.length > 0 && (
                   <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8">
@@ -411,11 +401,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     )}
                   </div>
                 )}
+                </div>
               </div>
             </div>
 
-            {/* Sticky CTA Area at Bottom */}
-            <div className="p-5 md:p-6 pt-4 border-t border-stone-100 bg-white shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] shrink-0 relative z-20">
+            {/* Sticky CTA Area at Bottom (Desktop Only) */}
+            <div className="hidden lg:block p-5 md:p-6 pt-4 border-t border-stone-100 bg-white shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] shrink-0 relative z-20">
               {/* CTA 顯示條件：有連動產品時必顯示，或者頁面自己有設 isVisible=true */}
               {(productData || subItem.button?.isVisible) && (
                 <button
@@ -481,7 +472,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
           </div>
 
           {/* Content Column (Bottom on Mobile, Left on Desktop) */}
-          <div className="flex-1 space-y-16 md:space-y-20 order-2 lg:order-1 min-w-0">
+          <div className="flex-1 space-y-16 md:space-y-20 order-2 lg:order-1 min-w-0 px-4 lg:px-0 mt-8 lg:mt-0">
 
             {/* Product/Service Main Title */}
             {(subItem.mainTitle || subItem.coreServicesSectionTitle) && (
@@ -545,6 +536,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   images={section.feature.images.filter((img): img is string => !!img)}
                                   autoplay={true}
                                   fill={false}
+                                  roundedClass="rounded-none"
                                 />
                               ) : (
                                 <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full`}>
@@ -576,13 +568,14 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                           } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
                             <div className={`${
                               (section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT') && section.feature.content ? 'md:w-1/2' : 'w-full'
-                            } aspect-video md:aspect-auto`}>
+                            } aspect-video md:aspect-auto min-h-[300px] relative`}>
                               {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
                                 section.feature.showCarousel !== false ? (
                                   <ProductGallery
                                     images={section.feature.images.filter((img): img is string => !!img)}
                                     autoplay={true}
                                     fill={section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT'}
+                                    roundedClass="rounded-none"
                                   />
                                 ) : (
                                   <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
@@ -720,7 +713,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                         } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
                           <div className={`${
                             (subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT') && subItem.serviceIntro.blockB.content ? 'md:w-1/2' : 'w-full'
-                          } aspect-video md:aspect-auto`}>
+                          } aspect-video md:aspect-auto min-h-[300px] relative`}>
                             {subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images.filter(Boolean).length > 0 ? (
                               subItem.serviceIntro.blockB.showCarousel !== false ? (
                                 <ProductGallery
@@ -988,16 +981,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
       </div>
 
       {/* Sticky CTA for Mobile */}
-      <AnimatePresence>
-        {showStickyCTA && (
-          <motion.div
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/80 backdrop-blur-md border-t border-stone-100 lg:hidden"
-          >
-            <button
-              onClick={
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-white via-white to-white/0 pt-8 lg:hidden">
+        <button
+          onClick={
                 orderMode === 'FIXED' 
                   ? handleAddToCart 
                   : () => {
@@ -1031,9 +1017,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
               {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
               {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
 
       {/* Form Section */}
       {showForm && selectedForm && (
@@ -1051,7 +1035,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   );
 }
 
-function ProductGallery({ images, autoplay = false, fill = false }: { images: string[], autoplay?: boolean, fill?: boolean }) {
+function ProductGallery({ images, autoplay = false, fill = false, aspectClass = "aspect-[4/3] sm:aspect-[16/9] md:aspect-video", roundedClass = "rounded-2xl" }: { images: string[], autoplay?: boolean, fill?: boolean, aspectClass?: string, roundedClass?: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -1077,9 +1061,9 @@ function ProductGallery({ images, autoplay = false, fill = false }: { images: st
 
   // fill=true 時讓畫廊填滿父容器（用於 FEATURE 左右佈局，避免文字較長時圖片下方留白）
   return (
-    <div className={`relative group ${fill ? 'h-full' : ''}`}>
-      <div className={`overflow-hidden rounded-2xl ${fill ? 'h-full' : 'aspect-[16/9] md:aspect-video'}`} ref={emblaRef}>
-        <div className="flex">
+    <div className={`group ${fill ? 'absolute inset-0' : 'relative'}`}>
+      <div className={`overflow-hidden ${roundedClass} ${fill ? 'h-full w-full' : aspectClass}`} ref={emblaRef}>
+        <div className={`flex ${fill ? 'h-full' : ''}`}>
           {images.filter(Boolean).map((src, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0 relative h-full">
               <img 

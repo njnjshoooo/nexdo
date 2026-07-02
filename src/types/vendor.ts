@@ -1,3 +1,18 @@
+export interface VendorApplication {
+  id: string;
+  name: string;
+  taxId: string;
+  contactName: string;
+  jobTitle: string;
+  phone: string;
+  extension?: string;
+  email: string;
+  address: string;
+  motivation?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+}
+
 export interface Vendor {
   id: string; // 廠商ID
   name: string; // 廠商名稱

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageMainTitle } from '../../components/admin/ui/AdminEditorUI';
 import { Plus, Search, Edit2, Trash2, X, Upload, Briefcase } from 'lucide-react';
 import { Vendor } from '../../types/vendor';
@@ -11,10 +12,9 @@ import { Pagination } from '../../components/ui/Pagination';
 import StatusBadge from '../../components/admin/StatusBadge';
 
 export default function VendorManagement() {
+  const navigate = useNavigate();
   const [vendors, setVendors] = useState<Vendor[]>(() => vendorService.getAll());
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [vendorToDelete, setVendorToDelete] = useState<Vendor | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,11 +43,16 @@ export default function VendorManagement() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!vendorToDelete) return;
-    saveVendors(vendors.filter(v => v.id !== vendorToDelete.id));
-    setShowDeleteConfirm(false);
-    setVendorToDelete(null);
+    try {
+      await vendorService.delete(vendorToDelete.id);
+      setVendors(vendors.filter(v => v.id !== vendorToDelete.id));
+      setShowDeleteConfirm(false);
+      setVendorToDelete(null);
+    } catch (error: any) {
+      alert(error.message || '刪除失敗');
+    }
   };
 
   const filteredVendors = vendors.filter(v => 
@@ -88,10 +93,7 @@ export default function VendorManagement() {
           <p className="text-stone-500">管理所有合作廠商資訊與狀態</p>
         </div>
         <button
-          onClick={() => {
-            setEditingVendor(null);
-            setIsModalOpen(true);
-          }}
+          onClick={() => navigate('/admin/vendors/new')}
           className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-sm"
         >
           <Plus size={20} />
@@ -140,10 +142,7 @@ export default function VendorManagement() {
                 <AdminTable.Td>{getStatusBadge(vendor.status)}</AdminTable.Td>
                 <AdminTable.Td className="text-right">
                   <AdminTable.Actions>
-                    <AdminTable.Edit onClick={() => {
-                      setEditingVendor(vendor);
-                      setIsModalOpen(true);
-                    }} />
+                    <AdminTable.Edit onClick={() => navigate(`/admin/vendors/${vendor.id}`)} />
                     <AdminTable.Delete onClick={() => handleDelete(vendor.id)} />
                   </AdminTable.Actions>
                 </AdminTable.Td>
@@ -166,22 +165,6 @@ export default function VendorManagement() {
             onPageChange={setCurrentPage} 
           />
         </div>
-      )}
-
-      {isModalOpen && (
-        <VendorModal
-          vendor={editingVendor}
-          vendors={vendors}
-          onClose={() => setIsModalOpen(false)}
-          onSave={(vendor) => {
-            if (editingVendor) {
-              saveVendors(vendors.map(v => v.id === vendor.id ? vendor : v));
-            } else {
-              saveVendors([...vendors, vendor]);
-            }
-            setIsModalOpen(false);
-          }}
-        />
       )}
 
       {/* 刪除確認 Modal */}
@@ -226,412 +209,6 @@ export default function VendorManagement() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-import SaveButton from '../../components/admin/SaveButton';
-
-function VendorModal({ 
-  vendor, 
-  vendors,
-  onClose, 
-  onSave 
-}: { 
-  vendor: Vendor | null, 
-  vendors: Vendor[],
-  onClose: () => void,
-  onSave: (vendor: Vendor) => void
-}) {
-  const [formData, setFormData] = useState<Partial<Vendor>>(
-    vendor || {
-      status: 'reviewing',
-      certifications: [],
-      commissionRate: 80,
-      settlementCycle: 'Monthly',
-      bankInfo: {
-        bankCode: '',
-        bank: '',
-        bankName: '',
-        accountName: '',
-        accountNumber: ''
-      }
-    }
-  );
-
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.name || !formData.taxId || !formData.type || !formData.id || 
-        !formData.contactName || !formData.jobTitle || !formData.phone || 
-        !formData.address || !formData.account || (!vendor && !formData.password)) {
-      alert('請填寫所有必填欄位');
-      return;
-    }
-
-    if (formData.commissionRate !== undefined && (formData.commissionRate < 0 || formData.commissionRate > 100)) {
-      alert('分潤比例必須在 0 到 100 之間');
-      return;
-    }
-
-    if (!vendor && vendors.some(v => v.id === formData.id)) {
-      alert('廠商ID已存在，請使用其他ID');
-      return;
-    }
-
-    setSaveStatus('saving');
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onSave({
-      ...formData,
-      createdAt: vendor?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    } as Vendor);
-    
-    setSaveStatus('saved');
-    setTimeout(() => {
-      onClose();
-    }, 500);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl my-8">
-        <div className="flex items-center justify-between p-6 border-b border-stone-100 sticky top-0 bg-white rounded-t-2xl z-10">
-          <h2 className="text-xl font-bold text-stone-900">
-            {vendor ? '編輯廠商資訊' : '新增廠商資訊'}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-full transition-colors">
-            <X size={24} className="text-stone-500" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto">
-            {/* 基本資訊 */}
-          <section>
-            <h3 className="text-lg font-bold text-stone-800 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-5 bg-primary rounded-full"></span>
-              基本資訊
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">廠商名稱 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name || ''}
-                  onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">統一編號 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.taxId || ''}
-                  onChange={e => setFormData({...formData, taxId: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">廠商類型 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.type || ''}
-                  onChange={e => setFormData({...formData, type: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                  placeholder="例如：裝修工程、清潔服務..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">廠商ID <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.id || ''}
-                  onChange={e => setFormData({...formData, id: e.target.value})}
-                  disabled={!!vendor} // 編輯時不可修改 ID
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="唯一值，例如：V001"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* 聯繫資訊 */}
-          <section>
-            <h3 className="text-lg font-bold text-stone-800 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-5 bg-primary rounded-full"></span>
-              聯繫資訊
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">窗口姓名 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.contactName || ''}
-                  onChange={e => setFormData({...formData, contactName: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">職稱 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.jobTitle || ''}
-                  onChange={e => setFormData({...formData, jobTitle: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">公司電話 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.phone || ''}
-                  onChange={e => setFormData({...formData, phone: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">分機</label>
-                <input
-                  type="text"
-                  value={formData.extension || ''}
-                  onChange={e => setFormData({...formData, extension: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-stone-700 mb-1">公司地址 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.address || ''}
-                  onChange={e => setFormData({...formData, address: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">帳號 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.account || ''}
-                  onChange={e => setFormData({...formData, account: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">密碼 {vendor ? '(不修改請留白)' : <span className="text-red-500">*</span>}</label>
-                <input
-                  type="password"
-                  required={!vendor}
-                  value={formData.password || ''}
-                  onChange={e => setFormData({...formData, password: e.target.value})}
-                  className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* 信賴與營運資訊 */}
-          <section>
-            <h3 className="text-lg font-bold text-stone-800 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-5 bg-primary rounded-full"></span>
-              信賴與營運資訊
-            </h3>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">合作狀態 <span className="text-red-500">*</span></label>
-                  <select
-                    value={formData.status}
-                    onChange={e => setFormData({...formData, status: e.target.value as any})}
-                    className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                  >
-                    <option value="active">合作中</option>
-                    <option value="reviewing">審核中</option>
-                    <option value="suspended">停權中</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">專業證照 / 認證 (附件)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {formData.certifications?.map((cert, index) => (
-                    <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border border-stone-200">
-                      <img src={cert || undefined} alt={`Certification ${index + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newCerts = [...(formData.certifications || [])];
-                          newCerts.splice(index, 1);
-                          setFormData({...formData, certifications: newCerts});
-                        }}
-                        className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-50"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  ))}
-                  <div className="aspect-video">
-                    <ImageUploader
-                      value=""
-                      onChange={(url) => {
-                        if (url) {
-                          setFormData({
-                            ...formData,
-                            certifications: [...(formData.certifications || []), url]
-                          });
-                        }
-                      }}
-                      placeholder="上傳證照"
-                      className="h-full"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* 財務結算設定 */}
-          <section>
-            <h3 className="text-lg font-bold text-stone-800 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-5 bg-primary rounded-full"></span>
-              財務結算設定
-            </h3>
-            <div className="bg-stone-50 p-6 rounded-xl border border-stone-200 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">分潤比例 (%) <span className="text-red-500">*</span></label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    required
-                    value={formData.commissionRate ?? ''}
-                    onChange={e => setFormData({...formData, commissionRate: Number(e.target.value)})}
-                    className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                    placeholder="例如：80"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">結算週期 <span className="text-red-500">*</span></label>
-                  <select
-                    value={formData.settlementCycle || 'Monthly'}
-                    onChange={e => setFormData({...formData, settlementCycle: e.target.value as any})}
-                    className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                  >
-                    <option value="Monthly">月結 (Monthly)</option>
-                    <option value="Bi-weekly">半月結 (Bi-weekly)</option>
-                    <option value="Weekly">週結 (Weekly)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-stone-700 mb-3 text-sm">銀行帳戶資訊</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">銀行代碼 <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.bankInfo?.bankCode || ''}
-                      onChange={e => setFormData({
-                        ...formData, 
-                        bankInfo: { ...formData.bankInfo!, bankCode: e.target.value }
-                      })}
-                      className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="例如：808"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">匯款銀行 <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.bankInfo?.bank || ''}
-                      onChange={e => setFormData({
-                        ...formData, 
-                        bankInfo: { ...formData.bankInfo!, bank: e.target.value }
-                      })}
-                      className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="例如：玉山銀行"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">分行名稱 <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.bankInfo?.bankName || ''}
-                      onChange={e => setFormData({
-                        ...formData, 
-                        bankInfo: { ...formData.bankInfo!, bankName: e.target.value }
-                      })}
-                      className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="例如：信義分行"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">戶名 <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.bankInfo?.accountName || ''}
-                      onChange={e => setFormData({
-                        ...formData, 
-                        bankInfo: { ...formData.bankInfo!, accountName: e.target.value }
-                      })}
-                      className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="例如：居家整聊室有限公司"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">帳號 <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.bankInfo?.accountNumber || ''}
-                      onChange={e => setFormData({
-                        ...formData, 
-                        bankInfo: { ...formData.bankInfo!, accountNumber: e.target.value }
-                      })}
-                      className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="例如：1234567890123"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          </div>
-
-          <div className="flex justify-end gap-3 p-6 border-t border-stone-100 sticky bottom-0 bg-white rounded-b-2xl z-10">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 text-stone-600 font-medium hover:bg-stone-100 rounded-xl transition-colors"
-            >
-              取消
-            </button>
-            <SaveButton status={saveStatus} />
-          </div>
-        </form>
-      </div>
     </div>
   );
 }

@@ -92,27 +92,48 @@ class ProductService {
     }
   }
 
-  async refresh(): Promise<void> {
+  private refreshPromise: Promise<void> | null = null;
+  private lastFetchTime = 0;
+
+  async refresh(force = false): Promise<void> {
     if (!isSupabaseConfigured) {
       this.loadCache();
       return;
     }
-    const { data, error } = await supabase.from(TABLE_NAME).select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('❌ [productService] refresh error:', error);
+
+    if (!force && Date.now() - this.lastFetchTime < 5000) {
+      if (this.refreshPromise) return this.refreshPromise;
       return;
     }
-    console.log('📦 [productService] refresh raw data:', data);
-    if (data) {
-      this.products = data.map(row => this.mapRow(row));
-      console.log('✨ [productService] mapped products:', this.products);
-      this.saveCache();
+
+    if (this.refreshPromise) {
+      return this.refreshPromise;
     }
+
+    this.refreshPromise = (async () => {
+      try {
+        const { data, error } = await supabase.from(TABLE_NAME).select('*').order('created_at', { ascending: false });
+        if (error) {
+          console.error('❌ [productService] refresh error:', error);
+          return;
+        }
+        console.log('📦 [productService] refresh raw data:', data);
+        if (data) {
+          this.products = data.map(row => this.mapRow(row));
+          console.log('✨ [productService] mapped products:', this.products);
+          this.saveCache();
+          this.lastFetchTime = Date.now();
+        }
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+    return this.refreshPromise;
   }
 
-  async getAll(): Promise<Product[]> {
+  async getAll(forceRefresh = false): Promise<Product[]> {
     if (isSupabaseConfigured) {
-      await this.refresh();
+      await this.refresh(forceRefresh);
     }
     return [...this.products];
   }
@@ -171,7 +192,7 @@ class ProductService {
       this.saveCache();
       return this.products[index];
     } else {
-      if (isSupabaseConfigured) await this.refresh();
+      if (isSupabaseConfigured) await this.refresh(true);
       const p = this.products.find(x => x.id === id);
       if (!p) throw new Error('產品不存在');
       return p;

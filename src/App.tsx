@@ -38,6 +38,8 @@ import AppointmentManagement from './pages/admin/AppointmentManagement';
 import ConsultationRecords from './pages/admin/ConsultationRecords';
 import UserManagement from './pages/admin/UserManagement';
 import VendorManagement from './pages/admin/VendorManagement';
+import VendorApplicationManagement from './pages/admin/VendorApplicationManagement';
+import VendorEditor from './pages/admin/VendorEditor';
 import FinanceManagement from './pages/admin/FinanceManagement';
 import ProductList from './pages/admin/ProductList';
 import ProductEditor from './pages/admin/ProductEditor';
@@ -89,6 +91,8 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<PermissionGuard permission="users"><UserManagement /></PermissionGuard>} />
         <Route path="vendors" element={<PermissionGuard permission="vendors"><VendorManagement /></PermissionGuard>} />
+        <Route path="vendor-applications" element={<PermissionGuard permission="vendors"><VendorApplicationManagement /></PermissionGuard>} />
+        <Route path="vendors/:id" element={<PermissionGuard permission="vendors"><VendorEditor /></PermissionGuard>} />
         <Route path="finance" element={<PermissionGuard permission="finance"><FinanceManagement /></PermissionGuard>} />
         <Route path="permissions" element={<PermissionGuard permission="permissions"><PermissionManagement /></PermissionGuard>} />
         <Route path="permissions/:id" element={<PermissionGuard permission="permissions"><PermissionEditor /></PermissionGuard>} />

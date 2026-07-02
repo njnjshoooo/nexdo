@@ -93,6 +93,7 @@ export default function Sidebar() {
       icon: ClipboardCheck,
       items: [
         { title: '合作廠商', path: '/admin/vendors', permission: 'vendors' },
+        { title: '加盟申請', path: '/admin/vendor-applications', permission: 'vendors' },
         { title: '表單工具', path: '/admin/forms', permission: 'forms' },
       ]
     },
