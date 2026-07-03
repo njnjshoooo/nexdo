@@ -271,6 +271,7 @@ export interface ServiceIntroSection {
     images: string[];
     content: string;
     layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM' | 'TEXT_ONLY' | 'IMAGE_ONLY';
+    imageFit?: 'cover' | 'contain';
   };
   comparison?: {
     title: string;
@@ -312,6 +313,7 @@ export interface SubItemContent {
       content: string;
       layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM' | 'TEXT_ONLY' | 'IMAGE_ONLY';
       showCarousel?: boolean;
+      imageFit?: 'cover' | 'contain';
     };
     blockC?: {
       enabled: boolean;

@@ -589,6 +589,13 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                         )}
                         {watch(`content.subItem.serviceIntro.sections.${index}.feature.layout`) !== 'TEXT_ONLY' && (
                           <div className="space-y-4">
+                            <div>
+                              <label className={labelClass}>圖片裁切方式</label>
+                              <select {...register(`content.subItem.serviceIntro.sections.${index}.feature.imageFit`)} className={inputClass}>
+                                <option value="cover">填滿 (Cover) - 可能會裁切邊緣</option>
+                                <option value="contain">適應 (Contain) - 保留完整圖片</option>
+                              </select>
+                            </div>
                             <div className="flex justify-between items-center">
                               <label className={labelClass}>展示圖片</label>
                               <button 

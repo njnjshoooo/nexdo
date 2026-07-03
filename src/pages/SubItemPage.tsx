@@ -537,6 +537,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   autoplay={true}
                                   fill={false}
                                   roundedClass="rounded-none"
+                                  imageFit={section.feature.imageFit || 'cover'}
                                 />
                               ) : (
                                 <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full`}>
@@ -545,7 +546,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                       key={idx}
                                       src={img || undefined}
                                       alt={`${section.feature.title}-${idx}`}
-                                      className="w-full h-auto object-contain"
+                                      className={`w-full h-auto ${section.feature.imageFit === 'cover' ? 'object-cover aspect-video' : 'object-contain'}`}
                                       referrerPolicy="no-referrer"
                                     />
                                   ))}
@@ -561,30 +562,32 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             </div>
                           </div>
                         ) : (
-                          <div className={`flex flex-col ${
-                            section.feature.layout === 'LEFT' ? 'md:flex-row' :
-                            section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse' :
-                            section.feature.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
-                          } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
+                          <div className={`flex flex-col md:items-center ${
+                            section.feature.layout === 'LEFT' ? 'md:flex-row gap-8 lg:gap-16' :
+                            section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse gap-8 lg:gap-16' :
+                            section.feature.layout === 'TOP' ? 'flex-col gap-8 lg:gap-12' : 'flex-col-reverse gap-8 lg:gap-12'
+                          }`}>
                             <div className={`${
                               (section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT') && section.feature.content ? 'md:w-1/2' : 'w-full'
-                            } aspect-video md:aspect-auto min-h-[300px] relative`}>
+                            } ${section.feature.imageFit === 'contain' ? 'h-auto' : 'aspect-video md:aspect-[4/3] min-h-[300px]'} relative rounded-2xl shadow-xl overflow-hidden bg-white`}>
                               {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
                                 section.feature.showCarousel !== false ? (
                                   <ProductGallery
                                     images={section.feature.images.filter((img): img is string => !!img)}
                                     autoplay={true}
-                                    fill={section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT'}
+                                    fill={section.feature.imageFit !== 'contain'}
+                                    aspectClass={section.feature.imageFit === 'contain' ? 'aspect-auto' : undefined}
                                     roundedClass="rounded-none"
+                                    imageFit={section.feature.imageFit || 'cover'}
                                   />
                                 ) : (
-                                  <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
+                                  <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full ${section.feature.imageFit === 'contain' ? 'h-auto' : 'h-full'}`}>
                                     {section.feature.images.filter(Boolean).map((img, idx) => (
                                       <img
                                         key={idx}
                                         src={img || undefined}
                                         alt={`${section.feature.title}-${idx}`}
-                                        className="w-full h-full object-cover aspect-video"
+                                        className={`w-full ${section.feature.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full aspect-video object-cover'}`}
                                         referrerPolicy="no-referrer"
                                       />
                                     ))}
@@ -594,7 +597,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                 <img
                                   src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'
                                   alt={section.feature.title}
-                                  className="w-full h-full object-cover"
+                                  className={`w-full ${section.feature.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full object-cover'}`}
                                   referrerPolicy="no-referrer"
                                 />
                               )}
@@ -602,9 +605,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             {section.feature.content && (
                               <div className={`${
                                 section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                              } flex flex-col justify-center p-6 md:p-10`}>
-                                <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-6">{section.feature.title}</h3>
-                                <div className="markdown-body text-stone-600 leading-relaxed text-lg">
+                              } flex flex-col justify-center py-6 md:py-10`}>
+                                <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-6 tracking-tight">{section.feature.title}</h3>
+                                <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
                                   <Markdown>{section.feature.content}</Markdown>
                                 </div>
                               </div>
@@ -706,29 +709,32 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     {/* Block B: Large Image */}
                     {subItem.serviceIntro?.blockB?.enabled && (
                       <section>
-                        <div className={`flex flex-col ${
-                          subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row' : 
-                          subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse' : 
-                          subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col' : 'flex-col-reverse'
-                        } bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden`}>
+                        <div className={`flex flex-col md:items-center ${
+                          subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row gap-8 lg:gap-16' : 
+                          subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse gap-8 lg:gap-16' : 
+                          subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col gap-8 lg:gap-12' : 'flex-col-reverse gap-8 lg:gap-12'
+                        }`}>
                           <div className={`${
                             (subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT') && subItem.serviceIntro.blockB.content ? 'md:w-1/2' : 'w-full'
-                          } aspect-video md:aspect-auto min-h-[300px] relative`}>
+                          } ${subItem.serviceIntro.blockB.imageFit === 'contain' ? 'h-auto' : 'aspect-video md:aspect-[4/3] min-h-[300px]'} relative rounded-2xl shadow-xl overflow-hidden bg-white`}>
                             {subItem.serviceIntro.blockB.images && subItem.serviceIntro.blockB.images.filter(Boolean).length > 0 ? (
                               subItem.serviceIntro.blockB.showCarousel !== false ? (
                                 <ProductGallery
                                   images={subItem.serviceIntro.blockB.images.filter((img): img is string => !!img)}
                                   autoplay={true}
-                                  fill={subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT'}
+                                  fill={subItem.serviceIntro.blockB.imageFit !== 'contain'}
+                                  aspectClass={subItem.serviceIntro.blockB.imageFit === 'contain' ? 'aspect-auto' : undefined}
+                                  roundedClass="rounded-none"
+                                  imageFit={subItem.serviceIntro.blockB.imageFit || 'cover'}
                                 />
                               ) : (
-                                <div className={`grid ${subItem.serviceIntro.blockB.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full h-full`}>
+                                <div className={`grid ${subItem.serviceIntro.blockB.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full ${subItem.serviceIntro.blockB.imageFit === 'contain' ? 'h-auto' : 'h-full'}`}>
                                   {subItem.serviceIntro.blockB.images.filter(Boolean).map((img, idx) => (
                                     <img 
                                       key={idx}
                                       src={img || undefined} 
                                       alt={`${subItem.serviceIntro.blockB.title}-${idx}`} 
-                                      className="w-full h-full object-cover aspect-video"
+                                      className={`w-full ${subItem.serviceIntro.blockB.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full aspect-video object-cover'}`}
                                       referrerPolicy="no-referrer"
                                     />
                                   ))}
@@ -738,7 +744,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                               <img 
                                 src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop' 
                                 alt={subItem.serviceIntro.blockB.title} 
-                                className="w-full h-full object-cover"
+                                className={`w-full ${subItem.serviceIntro.blockB.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full object-cover'}`}
                                 referrerPolicy="no-referrer"
                               />
                             )}
@@ -746,9 +752,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                           {subItem.serviceIntro.blockB.content && (
                             <div className={`${
                               subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                            } flex flex-col justify-center p-6 md:p-10`}>
-                              <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">{subItem.serviceIntro.blockB.title}</h3>
-                              <div className="markdown-body text-stone-600 leading-relaxed text-lg">
+                            } flex flex-col justify-center py-6 md:py-10`}>
+                              <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-6 tracking-tight">{subItem.serviceIntro.blockB.title}</h3>
+                              <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
                                 <Markdown>{subItem.serviceIntro.blockB.content}</Markdown>
                               </div>
                             </div>
@@ -857,47 +863,49 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             )}
 
             {/* Core Services Module (Service Process) */}
-            <section>
-              <div className="mb-8 pl-4 border-l-4 border-primary">
-                <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                  服務流程
-                </h2>
-              </div>
-              <div className="relative pl-2 md:pl-4">
-                {/* Continuous Vertical Line */}
-                <div className="absolute left-[35px] md:left-[43px] top-6 bottom-6 w-0.5 bg-stone-200"></div>
-
-                <div className="space-y-6 md:space-y-8">
-                  {subItem.coreServices.map((service, index) => (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      viewport={{ once: true, margin: "-50px" }}
-                      className="relative flex items-stretch gap-6 md:gap-8 group"
-                    >
-                      {/* Step Indicator */}
-                      <div className="relative z-10 shrink-0 mt-3 md:mt-2">
-                        <div className="w-[54px] h-[54px] md:w-[62px] md:h-[62px] bg-stone-50 border-4 border-white shadow-sm ring-1 ring-stone-200 group-hover:ring-[#8B5E34] rounded-full flex items-center justify-center transition-all duration-300">
-                          <span className="text-stone-400 group-hover:text-[#8B5E34] font-bold text-xl md:text-2xl transition-colors duration-300">
-                            {index + 1}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content Card */}
-                      <div className="flex-1 bg-white p-6 md:p-8 rounded-[1.5rem] shadow-sm border border-stone-100 group-hover:shadow-md group-hover:border-[#8B5E34]/20 transition-all duration-300">
-                        <h3 className="text-xl md:text-2xl font-bold text-stone-900 mb-3 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
-                        <div className="markdown-body text-stone-600 leading-relaxed text-sm md:text-base">
-                          <Markdown>{service.content}</Markdown>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+            {subItem.coreServices && subItem.coreServices.length > 0 && (
+              <section className="bg-[#FAF9F7] sm:bg-[#FAF9F7] -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10 py-12 lg:py-16 my-8 rounded-[2.5rem]">
+                <div className="mb-10 pl-4 border-l-4 border-primary">
+                  <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
+                    服務流程
+                  </h2>
                 </div>
-              </div>
-            </section>
+                <div className="relative pl-2 md:pl-4">
+                  {/* Continuous Vertical Line */}
+                  <div className="absolute left-[35px] md:left-[43px] top-6 bottom-6 w-0.5 bg-stone-200"></div>
+
+                  <div className="space-y-6 md:space-y-8">
+                    {subItem.coreServices.map((service, index) => (
+                      <motion.div 
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        className="relative flex items-stretch gap-6 md:gap-8 group"
+                      >
+                        {/* Step Indicator */}
+                        <div className="relative z-10 shrink-0 mt-3 md:mt-2">
+                          <div className="w-[54px] h-[54px] md:w-[62px] md:h-[62px] bg-white border-4 border-[#FAF9F7] shadow-sm ring-1 ring-stone-200 group-hover:ring-[#8B5E34] rounded-full flex items-center justify-center transition-all duration-300">
+                            <span className="text-stone-400 group-hover:text-[#8B5E34] font-bold text-xl md:text-2xl transition-colors duration-300">
+                              {index + 1}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Content Card */}
+                        <div className="flex-1 bg-white p-6 md:p-8 rounded-[1.5rem] shadow-sm border border-stone-100 group-hover:shadow-md group-hover:border-[#8B5E34]/20 transition-all duration-300">
+                          <h3 className="text-xl md:text-2xl font-bold text-stone-900 mb-3 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
+                          <div className="markdown-body text-stone-600 leading-relaxed text-sm md:text-base">
+                            <Markdown>{service.content}</Markdown>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
 
             {/* FAQ Module */}
             {subItem.faqs && subItem.faqs.length > 0 && (
@@ -1035,7 +1043,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   );
 }
 
-function ProductGallery({ images, autoplay = false, fill = false, aspectClass = "aspect-[4/3] sm:aspect-[16/9] md:aspect-video", roundedClass = "rounded-2xl" }: { images: string[], autoplay?: boolean, fill?: boolean, aspectClass?: string, roundedClass?: string }) {
+function ProductGallery({ images, autoplay = false, fill = false, aspectClass = "aspect-[4/3] sm:aspect-[16/9] md:aspect-video", roundedClass = "rounded-2xl", imageFit = 'cover' }: { images: string[], autoplay?: boolean, fill?: boolean, aspectClass?: string, roundedClass?: string, imageFit?: 'cover' | 'contain' }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -1069,7 +1077,7 @@ function ProductGallery({ images, autoplay = false, fill = false, aspectClass = 
               <img 
                 src={src || undefined} 
                 alt={`Product image ${index + 1}`}
-                className="w-full h-full object-cover"
+                className={`w-full ${imageFit === 'contain' ? 'h-auto object-contain' : 'h-full object-cover'}`}
                 referrerPolicy="no-referrer"
               />
             </div>
