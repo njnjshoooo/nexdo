@@ -108,7 +108,7 @@ export default function BlogPostPage() {
           <div className="flex items-center gap-6 text-white/80 text-sm font-medium">
             <div className="flex items-center gap-2">
               <Calendar size={16} />
-              {new Date(article.updatedAt).toLocaleDateString('zh-TW')}
+              {new Date(article.publishedAt || article.updatedAt).toLocaleDateString('zh-TW')}
             </div>
             {article.seoKeywords && article.seoKeywords.length > 0 && (
               <div className="flex items-center gap-2">
@@ -122,21 +122,23 @@ export default function BlogPostPage() {
 
       {/* Content Section */}
       <div className="max-w-3xl mx-auto px-6 py-24 relative z-20">
-        <div className="mb-20">
+        <div className="">
           {article.summary && (
             <div className="text-lg italic text-stone-500 leading-relaxed mb-16 pb-16 border-b border-stone-200">
               {article.summary}
             </div>
           )}
           
-          <div className="prose prose-stone prose-lg max-w-none prose-h2:text-2xl prose-h2:font-bold prose-h2:text-[#4A5D3B] prose-h2:mb-3 prose-headings:text-stone-900 prose-p:text-stone-700 prose-p:leading-relaxed prose-strong:text-stone-900 prose-blockquote:border-[#8B5E34] prose-blockquote:bg-stone-100/50 prose-blockquote:p-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic">
+          <div className="prose prose-stone prose-lg max-w-none prose-h2:text-2xl prose-h2:font-bold prose-h2:text-[#4A5D3B] prose-h2:mb-3 prose-headings:text-stone-900 prose-p:text-stone-700 prose-p:leading-relaxed prose-strong:text-stone-900 prose-blockquote:border-[#8B5E34] prose-blockquote:bg-stone-100/50 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:rounded-l-none prose-blockquote:not-italic">
             <Markdown>{article.content}</Markdown>
           </div>
         </div>
+      </div>
 
-        {/* CTA Form Section */}
-        {article.showForm && ctaForm && (
-          <section className="mt-16 mb-20 bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-stone-200">
+      {/* CTA Form Section */}
+      {article.showForm && ctaForm && (
+        <div className="max-w-3xl mx-auto px-6 mb-20 relative z-20">
+          <section className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-stone-200">
             <div className="max-w-xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-2xl font-bold text-stone-900 mb-3">對此主題感興趣嗎？</h2>
@@ -149,11 +151,13 @@ export default function BlogPostPage() {
               />
             </div>
           </section>
-        )}
+        </div>
+      )}
 
-        {/* Related Services Module */}
-        {loadedRelatedServices.length > 0 && (
-          <section className="mt-20 border-t border-stone-200 pt-16">
+      {/* Related Services Module */}
+      {loadedRelatedServices.length > 0 && (
+        <div className="max-w-6xl mx-auto px-6 pb-24 relative z-20">
+          <section className="border-t border-stone-200 pt-16">
             <h2 className="text-3xl font-bold text-stone-900 mb-8 text-center">好鄰居的貼心推薦</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {loadedRelatedServices.map(service => (
@@ -189,8 +193,8 @@ export default function BlogPostPage() {
               ))}
             </div>
           </section>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

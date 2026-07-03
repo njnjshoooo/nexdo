@@ -17,5 +17,7 @@ export interface Article {
   showForm?: boolean;
   formId?: string;
   isPublished: boolean;
+  isRecommended?: boolean;
+  publishedAt?: string;
   updatedAt: string;
 }

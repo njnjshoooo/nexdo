@@ -31,6 +31,8 @@ class ArticleService {
       showForm: row.show_form ?? undefined,
       formId: row.form_id ?? undefined,
       isPublished: !!row.is_published,
+      isRecommended: !!row.is_recommended,
+      publishedAt: row.published_at,
       updatedAt: row.updated_at,
     };
   }
@@ -49,6 +51,8 @@ class ArticleService {
     if (a.showForm !== undefined) row.show_form = a.showForm;
     if (a.formId !== undefined) row.form_id = a.formId;
     if (a.isPublished !== undefined) row.is_published = a.isPublished;
+    if (a.isRecommended !== undefined) row.is_recommended = a.isRecommended;
+    if (a.publishedAt !== undefined) row.published_at = a.publishedAt;
     if (a.updatedAt !== undefined) row.updated_at = a.updatedAt;
     return row;
   }

@@ -68,6 +68,15 @@ export default function ArticleList() {
     setDeleteModal({ isOpen: false, id: null });
   };
 
+  const handleToggleRecommended = async (id: string, currentVal: boolean) => {
+    try {
+      await articleService.update(id, { isRecommended: !currentVal });
+      setArticles(articleService.getAll());
+    } catch (error) {
+      alert(error instanceof Error ? error.message : String(error));
+    }
+  };
+
   return (
     <div>
       <div className="sticky top-0 z-20 bg-stone-50/80 backdrop-blur-md -mx-4 px-4 py-4 mb-8 sm:-mx-8 sm:px-8">
@@ -106,14 +115,15 @@ export default function ArticleList() {
           <AdminTable.Head>
             <tr>
               <AdminTable.Th>文章標題</AdminTable.Th>
+              <AdminTable.Th>推薦文章</AdminTable.Th>
               <AdminTable.Th>狀態</AdminTable.Th>
-              <AdminTable.Th>最後更新</AdminTable.Th>
+              <AdminTable.Th>發布時間</AdminTable.Th>
               <AdminTable.Th className="text-right">操作</AdminTable.Th>
             </tr>
           </AdminTable.Head>
           <AdminTable.Body>
             {paginatedArticles.length === 0 ? (
-              <AdminTable.Empty colSpan={4}>
+              <AdminTable.Empty colSpan={5}>
                 {articles.length === 0 ? '目前沒有任何文章，請點擊右上角新增。' : '找不到符合條件的文章。'}
               </AdminTable.Empty>
             ) : (
@@ -131,6 +141,20 @@ export default function ArticleList() {
                     </div>
                   </AdminTable.Td>
                   <AdminTable.Td className="whitespace-nowrap">
+                    <label className="flex items-center cursor-pointer">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={article.isRecommended || false}
+                          onChange={() => handleToggleRecommended(article.id, article.isRecommended || false)}
+                        />
+                        <div className={`block w-10 h-6 rounded-full transition-colors ${article.isRecommended ? 'bg-[#8B5E34]' : 'bg-stone-200'}`}></div>
+                        <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${article.isRecommended ? 'transform translate-x-4' : ''}`}></div>
+                      </div>
+                    </label>
+                  </AdminTable.Td>
+                  <AdminTable.Td className="whitespace-nowrap">
                     {article.isPublished ? (
                       <StatusBadge status="success" icon="check" text="已發布" />
                     ) : (
@@ -138,7 +162,7 @@ export default function ArticleList() {
                     )}
                   </AdminTable.Td>
                   <AdminTable.Td className="whitespace-nowrap text-sm text-stone-500">
-                    {new Date(article.updatedAt).toLocaleDateString('zh-TW')}
+                    {new Date(article.publishedAt || article.updatedAt).toLocaleDateString('zh-TW')}
                   </AdminTable.Td>
                   <AdminTable.Td className="whitespace-nowrap text-right">
                     <AdminTable.Actions>

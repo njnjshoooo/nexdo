@@ -22,7 +22,7 @@ export default function Blog() {
   useEffect(() => {
     const allArticles = articleService.getAll().filter(a => a.isPublished);
     // Sort by date descending
-    allArticles.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    allArticles.sort((a, b) => new Date(b.publishedAt || b.updatedAt).getTime() - new Date(a.publishedAt || a.updatedAt).getTime());
     setArticles(allArticles);
 
     // Dynamic categories from articles
@@ -60,14 +60,12 @@ export default function Blog() {
   }
 
   // Get interested posts
-  const interestedPosts = blogConfig.interestedPostIds
-    ?.map(id => articles.find(a => a.id === id))
-    .filter((a): a is Article => !!a) || [];
+  const recommendedPosts = articles.filter(a => a.isRecommended);
 
-  // If not enough interested posts, fallback to recent posts
-  const sidebarPosts = interestedPosts.length > 0 
-    ? interestedPosts.slice(0, 3)
-    : articles.filter(a => a.id !== featuredPost?.id).slice(0, 3);
+  // If no recommended posts, fallback to recent posts
+  const sidebarPosts = recommendedPosts.length > 0 
+    ? recommendedPosts
+    : articles.filter(a => a.id !== featuredPost?.id).slice(0, 4);
 
   // Pagination logic
   const indexOfLastPost = currentPage * postsPerPage;
@@ -168,7 +166,7 @@ export default function Blog() {
                       <CardTitle className="text-3xl mb-4 group-hover:text-[#8B5E34]">{featuredPost.title}</CardTitle>
                       <CardDescription className="line-clamp-3 mb-6 flex-grow">{featuredPost.summary || (featuredPost.content || '').substring(0, 150)}</CardDescription>
                       <div className="text-sm text-stone-400 font-medium mt-auto">
-                        {new Date(featuredPost.updatedAt).toLocaleDateString('zh-TW')}
+                        {new Date(featuredPost.publishedAt || featuredPost.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
                     </CardContent>
                   </Card>
@@ -182,7 +180,7 @@ export default function Blog() {
                 <h3 className="font-bold text-stone-900 mb-6 text-xl border-b border-stone-100 pb-4">
                   你可能有興趣
                 </h3>
-                <div className="space-y-6 flex-grow">
+                <div className="space-y-6 flex-grow overflow-y-auto pr-2 scrollbar-hide" style={{ maxHeight: 'calc(100% - 60px)' }}>
                   {sidebarPosts.map(post => (
                     <Link key={post.id} to={`/blog/${post.slug}`} className="flex gap-4 group">
                       <div className="w-24 h-24 bg-stone-100 rounded-xl flex-shrink-0 overflow-hidden">
@@ -198,7 +196,7 @@ export default function Blog() {
                           <span className="text-[#8B5E34] text-[10px] font-bold tracking-wider mb-1">{post.categoryId}</span>
                         )}
                         <h4 className="font-bold text-sm text-stone-900 group-hover:text-[#8B5E34] transition-colors line-clamp-2">{post.title}</h4>
-                        <p className="text-xs text-stone-400 mt-2 font-medium">{new Date(post.updatedAt).toLocaleDateString('zh-TW')}</p>
+                        <p className="text-xs text-stone-400 mt-2 font-medium">{new Date(post.publishedAt || post.updatedAt).toLocaleDateString('zh-TW')}</p>
                       </div>
                     </Link>
                   ))}
@@ -232,7 +230,7 @@ export default function Blog() {
                       <CardTitle className="text-xl mb-3 group-hover:text-[#8B5E34] line-clamp-2">{post.title}</CardTitle>
                       <CardDescription className="text-sm line-clamp-2 mb-4 flex-grow">{post.summary || (post.content || '').substring(0, 100)}</CardDescription>
                       <div className="text-xs text-stone-400 font-medium mt-auto">
-                        {new Date(post.updatedAt).toLocaleDateString('zh-TW')}
+                        {new Date(post.publishedAt || post.updatedAt).toLocaleDateString('zh-TW')}
                       </div>
                     </CardContent>
                   </Card>

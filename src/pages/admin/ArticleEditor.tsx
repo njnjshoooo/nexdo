@@ -26,6 +26,8 @@ export default function ArticleEditor() {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableForms, setAvailableForms] = useState<Form[]>([]);
   const [newCategory, setNewCategory] = useState('');
+  const [keywordStr, setKeywordStr] = useState('');
+  const [publishedAtStr, setPublishedAtStr] = useState('');
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<Article>({
     defaultValues: {
@@ -66,6 +68,8 @@ export default function ArticleEditor() {
       const article = articleService.getBySlug(urlSlug);
       if (article) {
         reset(article);
+        setKeywordStr(article.seoKeywords?.join(', ') || '');
+        setPublishedAtStr(article.publishedAt ? article.publishedAt.slice(0, 16) : (article.updatedAt ? article.updatedAt.slice(0, 16) : ''));
         setLoading(false);
       } else {
         navigate('/admin/articles');
@@ -87,6 +91,11 @@ export default function ArticleEditor() {
 
   const onSubmit = async (data: Article) => {
     setSaveStatus('saving');
+    
+    // transform data
+    data.seoKeywords = keywordStr.split(',').map(s => s.trim()).filter(Boolean);
+    data.publishedAt = publishedAtStr ? new Date(publishedAtStr).toISOString() : new Date().toISOString();
+    
     try {
       // Auto-generate slug if empty
       if (!data.slug || data.slug.trim() === '') {
@@ -210,6 +219,28 @@ export default function ArticleEditor() {
                 </button>
               </div>
             </div>
+            
+            <div>
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">發布時間</label>
+              <input 
+                type="datetime-local" 
+                value={publishedAtStr}
+                onChange={(e) => setPublishedAtStr(e.target.value)}
+                className="w-full border border-stone-200 p-3 rounded-xl text-sm outline-none focus:border-primary" 
+              />
+            </div>
+            
+            <div>
+              <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">關鍵字 (用逗號分隔)</label>
+              <input 
+                type="text" 
+                value={keywordStr}
+                onChange={(e) => setKeywordStr(e.target.value)}
+                className="w-full border border-stone-200 p-3 rounded-xl text-sm outline-none focus:border-primary" 
+                placeholder="例如：清潔,打掃,家事" 
+              />
+            </div>
+
             <div>
               <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">封面圖</label>
               <ImageUploader value={watch('coverImage')} onChange={(val) => setValue('coverImage', val)} />
