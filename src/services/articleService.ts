@@ -2,6 +2,7 @@ import { Article } from '../types/article';
 import { v4 as uuidv4 } from 'uuid';
 import { ALL_ARTICLES } from '../data/articles';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { parseContentToMarkdown } from '../lib/blockNoteToMarkdown';
 
 const STORAGE_KEY = 'articles';
 const TABLE_NAME = 'articles';
@@ -22,7 +23,7 @@ class ArticleService {
       slug: row.slug,
       title: row.title,
       summary: row.summary ?? undefined,
-      content: row.content,
+      content: parseContentToMarkdown(row.content),
       coverImage: row.cover_image ?? '',
       categoryId: row.category_id ?? '',
       seoKeywords: Array.isArray(row.seo_keywords) ? row.seo_keywords : [],
@@ -58,7 +59,10 @@ class ArticleService {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         try {
-          this.articles = JSON.parse(cached);
+          this.articles = JSON.parse(cached).map((a: Article) => ({
+            ...a,
+            content: parseContentToMarkdown(a.content)
+          }));
         } catch (e) {
           console.error('Failed to parse cached articles', e);
           this.articles = [];
@@ -71,11 +75,14 @@ class ArticleService {
 
     // localStorage-only fallback path (with static defaults)
     const storedArticles = localStorage.getItem(STORAGE_KEY);
-    this.articles = [...ALL_ARTICLES];
+    this.articles = ALL_ARTICLES.map(a => ({...a, content: parseContentToMarkdown(a.content)}));
 
     if (storedArticles) {
       try {
-        const customArticles: Article[] = JSON.parse(storedArticles);
+        const customArticles: Article[] = JSON.parse(storedArticles).map((a: Article) => ({
+          ...a,
+          content: parseContentToMarkdown(a.content)
+        }));
         customArticles.forEach(ca => {
           const index = this.articles.findIndex(a => a.id === ca.id);
           if (index !== -1) {

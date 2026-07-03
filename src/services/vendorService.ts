@@ -168,8 +168,6 @@ export const vendorService = {
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedVendors)); } catch {}
           window.dispatchEvent(new Event('vendors_refreshed'));
         }
-      }).catch(() => {
-        isVendorFetching = false;
       });
     }
     return [...cachedVendors];

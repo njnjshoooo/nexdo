@@ -118,7 +118,10 @@ export default function VendorApplicationManagement() {
                     <div className="text-sm text-stone-500">{app.email}</div>
                   </AdminTable.Td>
                   <AdminTable.Td>
-                    <StatusBadge status={app.status === 'pending' ? 'reviewing' : app.status === 'approved' ? 'active' : 'suspended'} />
+                    <StatusBadge 
+                      status={app.status === 'pending' ? 'warning' : app.status === 'approved' ? 'success' : 'error'} 
+                      text={app.status === 'pending' ? '審核中' : app.status === 'approved' ? '已核准' : '已拒絕'}
+                    />
                   </AdminTable.Td>
                   <AdminTable.Td className="text-right">
                     <div className="flex justify-end gap-2 items-center">
