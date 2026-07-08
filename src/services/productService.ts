@@ -101,9 +101,9 @@ class ProductService {
       return;
     }
 
-    if (!force && Date.now() - this.lastFetchTime < 5000) {
+    if (!force && Date.now() - this.lastFetchTime < 300000) { // Cache for 5 minutes instead of 5s for better stability
       if (this.refreshPromise) return this.refreshPromise;
-      return;
+      if (this.products.length > 0) return;
     }
 
     if (this.refreshPromise) {
@@ -117,13 +117,13 @@ class ProductService {
           console.error('❌ [productService] refresh error:', error);
           return;
         }
-        console.log('📦 [productService] refresh raw data:', data);
         if (data) {
           this.products = data.map(row => this.mapRow(row));
-          console.log('✨ [productService] mapped products:', this.products);
           this.saveCache();
           this.lastFetchTime = Date.now();
         }
+      } catch (err) {
+        console.error('❌ [productService] refresh caught error:', err);
       } finally {
         this.refreshPromise = null;
       }
@@ -138,19 +138,37 @@ class ProductService {
     return [...this.products];
   }
 
-  async getById(id: string): Promise<Product | undefined> {
+  async getById(id: string, forceRefresh = false): Promise<Product | undefined> {
     if (isSupabaseConfigured) {
-      const { data } = await supabase.from(TABLE_NAME).select('*').eq('id', id).maybeSingle();
-      if (data) {
-        const prod = this.mapRow(data);
-        const index = this.products.findIndex(p => p.id === id);
-        if (index !== -1) {
-          this.products[index] = prod;
-        } else {
-          this.products.push(prod);
+      // 確保我們至少有快取資料
+      if (this.products.length === 0 || forceRefresh) {
+        await this.refresh(forceRefresh);
+      }
+
+      // 從快取中尋找
+      let found = this.products.find(p => p.id === id);
+      if (found && !forceRefresh) {
+        return found;
+      }
+
+      // 如果快取中還是沒有，或者強制更新，才單獨發送請求
+      try {
+        const { data, error } = await supabase.from(TABLE_NAME).select('*').eq('id', id).maybeSingle();
+        if (error) {
+          console.error(`❌ [productService] getById(${id}) error:`, error);
+        } else if (data) {
+          const prod = this.mapRow(data);
+          const index = this.products.findIndex(p => p.id === id);
+          if (index !== -1) {
+            this.products[index] = prod;
+          } else {
+            this.products.push(prod);
+          }
+          this.saveCache();
+          return prod;
         }
-        this.saveCache();
-        return prod;
+      } catch (err) {
+        console.error(`❌ [productService] getById(${id}) caught error:`, err);
       }
     }
     return this.products.find(p => p.id === id);

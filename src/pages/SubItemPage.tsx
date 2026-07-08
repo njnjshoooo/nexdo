@@ -9,8 +9,24 @@ import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Markdown from 'react-markdown';
 import DynamicForm from '../components/form/DynamicForm';
+import { useForm } from '../hooks/useForm';
 import { useCart } from '../contexts/CartContext';
 import ServiceCarousel from '../components/ServiceCarousel';
+
+// Helper component to load form data using the hook
+function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, pageSlug: string, pageTitle: string, blockId: string }) {
+  const form = useForm(formId);
+  if (!form) return null;
+  return (
+    <section key={blockId} id={blockId} className="py-16 bg-[#FDF8F3]">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
+          <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function SubItemPage({ page: propPage }: { page?: Page | null }) {
   const { slug, category } = useParams<{ slug: string, category: string }>();
@@ -41,7 +57,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   }
 
   const { subItem, showForm, formId } = currentPage.content;
-  const selectedForm = formId ? formService.getById(formId) : null;
+  const selectedForm = useForm(formId);
 
   const productInfoRef = useRef<HTMLDivElement>(null);
   
@@ -64,25 +80,30 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
     }
     let cancelled = false;
     const fetchProduct = async () => {
-      // 第一次：先從本地快取取（可能 null）
-      const cached = await productService.getById(subItem.productId!);
-      if (!cancelled && cached) setProductData(cached);
-      // 第二次：強制從 Supabase 拉最新（避免快取沒有剛建立的產品）
-      await productService.refresh();
-      const fresh = await productService.getById(subItem.productId!);
-      if (!cancelled) setProductData(fresh ?? null);
+      try {
+        // Try to get from cache or fetch individually
+        const product = await productService.getById(subItem.productId!);
+        if (!cancelled) {
+          setProductData(product ?? null);
+        }
+      } catch (err) {
+        console.error('Failed to fetch product for subItem:', subItem.productId, err);
+      }
     };
+    
     fetchProduct();
-    // 監聽 productService 的 refresh 完成事件，自動重抓對應產品
+    
+    // Listen for product updates globally
     const handleRefresh = async () => {
       if (cancelled) return;
       const fresh = await productService.getById(subItem.productId!);
       if (!cancelled) setProductData(fresh ?? null);
     };
-    window.addEventListener('products_refreshed', handleRefresh);
+    window.addEventListener('products_updated', handleRefresh);
+    
     return () => {
       cancelled = true;
-      window.removeEventListener('products_refreshed', handleRefresh);
+      window.removeEventListener('products_updated', handleRefresh);
     };
   }, [subItem.productId]);
 
@@ -739,17 +760,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       
                                 case 'FORM':
                                   if (!section.form?.formId) return null;
-                                  const form = formService.getById(section.form.formId);
-                                  if (!form) return null;
-                                  return (
-                                    <section key={section.id} id={section.id} className="py-16 bg-[#FDF8F3]">
-                                      <div className="max-w-3xl mx-auto px-4">
-                                        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
-                                          <DynamicForm form={form} pageSlug={currentPage.slug} pageTitle={currentPage.title} />
-                                        </div>
-                                      </div>
-                                    </section>
-                                  );
+                                  return <FormBlock key={section.id} blockId={section.id} formId={section.form.formId} pageSlug={currentPage.slug} pageTitle={currentPage.title} />;
                       
                                 case 'SPACER':
                                   return <div key={section.id} id={section.id} style={{ height: section.spacer?.height || 80 }} />;

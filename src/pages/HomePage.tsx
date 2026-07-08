@@ -8,7 +8,7 @@ import MoreServices from '../components/Home/MoreServices';
 import Process from '../components/Home/Process';
 import Testimonials from '../components/Home/Testimonials';
 import DynamicForm from '../components/form/DynamicForm';
-import { formService } from '../services/formService';
+import { useForm } from '../hooks/useForm';
 
 export default function Home({ page }: { page: Page }) {
   // 1. 抓取 blocks
@@ -17,7 +17,7 @@ export default function Home({ page }: { page: Page }) {
   // 2. 表單邏輯
   const showForm = page?.content?.showForm;
   const formId = page?.content?.formId;
-  const selectedForm = formId ? formService.getById(formId) : null;
+  const selectedForm = useForm(formId);
 
   return (
     <div className="min-h-screen bg-white">

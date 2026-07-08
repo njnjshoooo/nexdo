@@ -279,47 +279,6 @@ export default function Blog() {
           </div>
         )}
 
-        {/* Recommended Services Module */}
-        {loadedRecommendedServices.length > 0 && (
-          <section className="mt-20 border-t border-stone-200 pt-16">
-            <h2 className="text-3xl font-bold text-stone-900 mb-8">好鄰居的貼心推薦</h2>
-            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scrollbar-hide pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
-              {loadedRecommendedServices.map(service => (
-                <motion.div
-                  key={service.id}
-                  className="min-w-[83%] md:min-w-0 snap-start flex-shrink-0"
-                  whileHover={{ y: -5 }}
-                >
-                  <Card className="rounded-2xl h-full">
-                    <CardImageWrapper className="w-full h-48 border-b border-stone-100">
-                      <CardImage 
-                        src={service.image} 
-                        alt={service.title} 
-                      />
-                    </CardImageWrapper>
-                    
-                    <CardContent className="p-6">
-                      <CardTitle className="text-xl mb-3">{service.title}</CardTitle>
-                      <CardDescription className="text-sm mb-8 flex-grow line-clamp-3">
-                        {service.description}
-                      </CardDescription>
-                      
-                      <div className="flex justify-end mt-auto">
-                        <Link 
-                          to={`/${service.slug}`}
-                          className="inline-flex items-center gap-1 bg-[#885200] hover:bg-[#663D00] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
-                        >
-                          服務介紹
-                          <ArrowRight size={14} />
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );

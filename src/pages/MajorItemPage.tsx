@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { pageService } from '../services/pageService';
 import { productService } from '../services/productService';
-import { formService } from '../services/formService';
+import { useForm } from '../hooks/useForm';
 import { Page, Product } from '../types/admin';
 import DynamicForm from '../components/form/DynamicForm';
 import ServiceCarousel from '../components/ServiceCarousel';
@@ -16,6 +16,9 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
   const currentSlug = slug || 'home';
   const fullSlug = category ? `${category}/${currentSlug}` : currentSlug;
   const currentPage = propPage || pageService.getBySlug(fullSlug);
+  
+  const formId = currentPage?.content?.formId;
+  const selectedForm = useForm(formId);
 
   // 2. 避免白屏：如果真的找不到資料，顯示錯誤提示
   if (!currentPage || !currentPage.content.hero) {
@@ -246,12 +249,12 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
       )}
 
       {/* 底部預約表單 */}
-      {currentPage.content.showForm && currentPage.content.formId && formService.getById(currentPage.content.formId) && (
+      {currentPage.content.showForm && currentPage.content.formId && selectedForm && (
         <div className="py-20 bg-stone-50">
           <div className="max-w-3xl mx-auto px-4">
             <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
               <DynamicForm 
-                form={formService.getById(currentPage.content.formId)!} 
+                form={selectedForm} 
                 pageSlug={currentPage.slug} 
                 pageTitle={currentPage.title} 
               />

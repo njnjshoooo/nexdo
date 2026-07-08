@@ -56,21 +56,39 @@ class FormService {
     }
   }
 
+  private refreshPromise: Promise<void> | null = null;
+  private lastFetchTime = 0;
+
   /** 從 Supabase 拉最新並更新快取 */
-  async refresh(): Promise<void> {
+  async refresh(force = false): Promise<void> {
     if (!isSupabaseConfigured) return;
-    try {
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .select('*')
-        .order('updated_at', { ascending: false });
-      if (error) throw error;
-      this.forms = (data ?? []).map(this.mapRow);
-      this.saveCache();
-      window.dispatchEvent(new CustomEvent('forms_refreshed'));
-    } catch (e) {
-      console.warn('[formService] refresh failed', e);
+
+    if (!force && Date.now() - this.lastFetchTime < 300000) {
+      if (this.refreshPromise) return this.refreshPromise;
+      if (this.forms.length > 0) return;
     }
+
+    if (this.refreshPromise) return this.refreshPromise;
+
+    this.refreshPromise = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from(TABLE_NAME)
+          .select('*')
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        this.forms = (data ?? []).map(row => this.mapRow(row));
+        this.saveCache();
+        this.lastFetchTime = Date.now();
+        window.dispatchEvent(new CustomEvent('forms_refreshed'));
+      } catch (e) {
+        console.warn('[formService] refresh failed', e);
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   /** 已棄用：保留以維持外部相容（無實際呼叫差異） */

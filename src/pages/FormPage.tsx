@@ -1,38 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { formService } from '../services/formService';
-import { Form } from '../types/form';
+import { useForm } from '../hooks/useForm';
 import DynamicForm from '../components/form/DynamicForm';
 import { ArrowLeft, Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function FormPage() {
   const { formId } = useParams();
-  const [form, setForm] = useState<Form | null>(null);
-  const [loading, setLoading] = useState(true);
+  const form = useForm(formId);
   const { user: currentUser } = useAuth();
-
-  useEffect(() => {
-    console.log('FormPage: formId from params:', formId);
-    if (formId) {
-      // Try to find by formId (slug) first, then by internal id
-      let foundForm = formService.getByFormId(formId);
-      if (!foundForm) {
-        foundForm = formService.getById(formId);
-      }
-      console.log('FormPage: foundForm:', foundForm);
-      setForm(foundForm || null);
-    }
-    setLoading(false);
-  }, [formId]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-stone-50 pt-20 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (!form) {
     return (

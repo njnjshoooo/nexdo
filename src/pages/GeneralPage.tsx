@@ -2,7 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { pageService } from '../services/pageService';
 import { formService } from '../services/formService';
+import { useForm } from '../hooks/useForm';
 import { Page, GeneralBlock } from '../types/admin';
+
+// Helper component to load form data using the hook
+function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, pageSlug: string, pageTitle: string, blockId: string }) {
+  const form = useForm(formId);
+  if (!form) return null;
+  return (
+    <section key={blockId} id={blockId} className="py-16 bg-[#FDF8F3]">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
+          <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+        </div>
+      </div>
+    </section>
+  );
+}
 import Markdown from 'react-markdown';
 import { motion } from 'framer-motion'; // 確保你的專案是用 framer-motion 或 motion
 import { 
@@ -293,17 +309,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
 
           case 'FORM':
             if (!block.form?.formId) return null;
-            const form = formService.getById(block.form.formId);
-            if (!form) return null;
-            return (
-              <section key={block.id} id={block.id} className="py-16 bg-[#FDF8F3]">
-                <div className="max-w-3xl mx-auto px-4">
-                  <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
-                    <DynamicForm form={form} pageSlug={currentPage.slug} pageTitle={currentPage.title} />
-                  </div>
-                </div>
-              </section>
-            );
+            return <FormBlock key={block.id} blockId={block.id} formId={block.form.formId} pageSlug={currentPage.slug} pageTitle={currentPage.title} />;
 
           case 'SPACER':
             return <div key={block.id} id={block.id} style={{ height: block.spacer?.height || 80 }} />;

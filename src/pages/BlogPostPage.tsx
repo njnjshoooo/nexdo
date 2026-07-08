@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { articleService } from '../services/articleService';
 import { pageService } from '../services/pageService';
 import { productService } from '../services/productService';
-import { formService } from '../services/formService';
+import { useForm } from '../hooks/useForm';
 import { Article } from '../types/article';
 import { Page } from '../types/admin';
 import { Form } from '../types/form';
@@ -16,7 +16,6 @@ export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [article, setArticle] = useState<Article | null>(null);
-  const [ctaForm, setCtaForm] = useState<Form | null>(null);
   const [loadedRelatedServices, setLoadedRelatedServices] = useState<any[]>([]);
 
   useEffect(() => {
@@ -55,14 +54,6 @@ export default function BlogPostPage() {
           } else {
             setLoadedRelatedServices([]);
           }
-
-          // Fetch CTA form
-          if (foundArticle.showForm && foundArticle.formId) {
-            const form = formService.getByFormId(foundArticle.formId);
-            if (form) {
-              setCtaForm(form);
-            }
-          }
         } else {
           navigate('/blog');
         }
@@ -70,6 +61,8 @@ export default function BlogPostPage() {
     };
     loadRelated();
   }, [slug, navigate]);
+
+  const ctaForm = useForm(article?.showForm ? article?.formId : null);
 
   if (!article) return <div className="p-20 text-center">載入中...</div>;
 
@@ -154,47 +147,6 @@ export default function BlogPostPage() {
         </div>
       )}
 
-      {/* Related Services Module */}
-      {loadedRelatedServices.length > 0 && (
-        <div className="max-w-6xl mx-auto px-6 pb-24 relative z-20">
-          <section className="border-t border-stone-200 pt-16">
-            <h2 className="text-3xl font-bold text-stone-900 mb-8 text-center">好鄰居的貼心推薦</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loadedRelatedServices.map(service => (
-                <motion.div
-                  key={service.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col border border-stone-100"
-                  whileHover={{ y: -5 }}
-                >
-                  <div className="w-full h-48 bg-stone-200 rounded-xl mb-6 overflow-hidden">
-                    <img 
-                      src={service.image || undefined} 
-                      alt={service.title} 
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-stone-900 mb-3">{service.title}</h3>
-                  <p className="text-stone-600 text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
-                    {service.description}
-                  </p>
-                  
-                  <div className="flex justify-end mt-auto">
-                    <Link 
-                      to={`/${service.slug}`}
-                      className="inline-flex items-center gap-1 bg-[#885200] hover:bg-[#663D00] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
-                    >
-                      服務介紹
-                      <ArrowRight size={14} />
-                    </Link>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        </div>
-      )}
     </div>
   );
 }
