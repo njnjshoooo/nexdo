@@ -38,6 +38,7 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
   }, [emblaApi]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       const data = await Promise.all(services.map(async (item, index) => {
         const targetPage = item.targetPageId ? pageService.getById(item.targetPageId) : null;
@@ -45,20 +46,46 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
         const subItemContent = targetPage?.content?.subItem;
         const productData = subItemContent?.productId ? await productService.getById(subItemContent.productId) : null;
         
+        let calculatedPrice = item.price || '依需求報價';
+        if (productData && !item.price) {
+          if (productData.orderMode === 'FIXED' && productData.fixedConfig) {
+            calculatedPrice = `NT$ ${productData.fixedConfig.price?.toLocaleString() || 0} / ${productData.fixedConfig.unit || '次'}`;
+          } else if (productData.orderMode === 'QUOTE' && productData.quoteConfig?.priceText) {
+            calculatedPrice = productData.quoteConfig.priceText;
+          }
+        }
+        
         return {
           id: item.id || index,
           linkUrl,
-          displayTitle: item.title || productData?.name || '',
+          displayTitle: targetPage?.title || item.title || productData?.name || '',
           displayDescription: item.description || productData?.description || '',
           displayImage: item.image || productData?.image || '',
           displayChecklist: (item.items && item.items.length > 0) ? item.items : productData?.checklist?.map(c => c.text) || [],
-          price: item.price
+          price: calculatedPrice
         };
       }));
-      setLoadedServices(data);
-      setLoading(false);
+      
+      if (isMounted) {
+        setLoadedServices(data);
+        setLoading(false);
+      }
     };
+    
     loadData();
+    
+    const handleRefresh = () => {
+      loadData();
+    };
+    
+    window.addEventListener('pages_refreshed', handleRefresh);
+    window.addEventListener('products_updated', handleRefresh);
+    
+    return () => {
+      isMounted = false;
+      window.removeEventListener('pages_refreshed', handleRefresh);
+      window.removeEventListener('products_updated', handleRefresh);
+    };
   }, [services]);
 
   useEffect(() => {

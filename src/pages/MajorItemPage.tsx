@@ -37,6 +37,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
   const [productDataMap, setProductDataMap] = useState<Record<string, Product>>({});
 
   useEffect(() => {
+    let isMounted = true;
     const fetchProductData = async () => {
       const newMap: Record<string, Product> = {};
       for (const item of services) {
@@ -49,9 +50,24 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
           }
         }
       }
-      setProductDataMap(newMap);
+      if (isMounted) {
+        setProductDataMap(newMap);
+      }
     };
     fetchProductData();
+    
+    const handleRefresh = () => {
+      fetchProductData();
+    };
+    
+    window.addEventListener('pages_refreshed', handleRefresh);
+    window.addEventListener('products_updated', handleRefresh);
+    
+    return () => {
+      isMounted = false;
+      window.removeEventListener('pages_refreshed', handleRefresh);
+      window.removeEventListener('products_updated', handleRefresh);
+    };
   }, [services]);
 
   return (
@@ -250,7 +266,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
 
       {/* 底部預約表單 */}
       {currentPage.content.showForm && currentPage.content.formId && selectedForm && (
-        <div className="py-20 bg-stone-50">
+        <div className="py-16 bg-[#FDF8F3]">
           <div className="max-w-3xl mx-auto px-4">
             <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
               <DynamicForm 

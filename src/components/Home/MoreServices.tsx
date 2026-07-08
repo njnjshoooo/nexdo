@@ -22,12 +22,12 @@ export default function MoreServices({ data }: MoreServicesProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       if (!data || !data.pageIds || data.pageIds.length === 0) {
-        setLoading(false);
+        if (isMounted) setLoading(false);
         return;
       }
-
       const servicesData = await Promise.all(data.pageIds.map(async (id, index) => {
         const targetPage = pageService.getById(id);
         const linkUrl = targetPage ? `/${targetPage.slug}` : null;
@@ -39,22 +39,46 @@ export default function MoreServices({ data }: MoreServicesProps) {
           targetPageId: id
         };
 
+        let calculatedPrice = data.defaultPriceText || '依需求報價';
+        if (productData) {
+          if (productData.orderMode === 'FIXED' && productData.fixedConfig) {
+            calculatedPrice = `NT$ ${productData.fixedConfig.price?.toLocaleString() || 0} / ${productData.fixedConfig.unit || '次'}`;
+          } else if (productData.orderMode === 'QUOTE' && productData.quoteConfig?.priceText) {
+            calculatedPrice = productData.quoteConfig.priceText;
+          }
+        }
+
         return {
           id: item.id || index,
           linkUrl,
-          displayTitle: item.title || productData?.name || '',
+          displayTitle: targetPage?.title || productData?.name || '',
           displayDescription: item.description || productData?.description || '',
           displayImage: item.image || productData?.image || '',
           displayChecklist: (item.items && item.items.length > 0) ? item.items : productData?.checklist?.map(c => c.text) || [],
-          price: item.price || data.defaultPriceText || '依需求報價'
+          price: calculatedPrice
         };
       }));
-
-      setLoadedServices(servicesData);
-      setLoading(false);
+      
+      if (isMounted) {
+        setLoadedServices(servicesData);
+        setLoading(false);
+      }
     };
-
+    
     loadData();
+    
+    const handleRefresh = () => {
+      loadData();
+    };
+    
+    window.addEventListener('pages_refreshed', handleRefresh);
+    window.addEventListener('products_updated', handleRefresh);
+    
+    return () => {
+      isMounted = false;
+      window.removeEventListener('pages_refreshed', handleRefresh);
+      window.removeEventListener('products_updated', handleRefresh);
+    };
   }, [data]);
 
   if (!data || !data.pageIds || data.pageIds.length === 0 || loading) return null;
