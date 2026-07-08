@@ -46,6 +46,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
     if (type === 'SINGLE_IMAGE') newBlock.singleImage = { image: '', caption: '' };
     if (type === 'IMAGE_CAROUSEL') newBlock.imageCarousel = { items: [] };
     if (type === 'IMAGE_TEXT_GRID') newBlock.imageTextGrid = { layout: 'imageLeft', image: '', title: '', content: '', cta: { text: '', link: '' } };
+    if (type === 'FEATURE') newBlock.feature = { title: '', showCarousel: true, images: [], content: '', layout: 'LEFT', imageFit: 'cover' };
+    if (type === 'COMPARISON') newBlock.comparison = { title: '', beforeImage: '', afterImage: '', beforeLabel: 'Before', afterLabel: 'After' };
+    if (type === 'TEXT_LIST') newBlock.textList = { title: '', items: [] };
+    if (type === 'HTML_CODE') newBlock.htmlCode = { html: '' };
 
     append(newBlock);
     e.target.value = ""; 
@@ -62,16 +66,20 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
           const blockType = watch(`content.general.blocks.${index}.type`);
           const isEnabled = watch(`content.general.blocks.${index}.enabled`) ?? true;
           
-          const blockLabels: Record<string, string> = {
-            'HERO_1': 'HERO區塊（無CTA）',
-            'HERO_2': 'HERO區塊（含CTA）',
-            'TEXT': '文字區塊',
-            'GRID': '多方格區塊',
+                    const blockLabels: Record<string, string> = {
+            'HERO_1': '滿版主視覺 (無按鈕)',
+            'HERO_2': '滿版主視覺 (含按鈕)',
+            'TEXT': '純文字段落',
+            'GRID': '多欄位卡片組',
             'FORM': '嵌入表單',
             'SPACER': '空白間距',
-            'SINGLE_IMAGE': '純圖片區塊',
-            'IMAGE_TEXT_GRID': '圖文區塊',
-            'IMAGE_CAROUSEL': '圖片輪播'
+            'SINGLE_IMAGE': '單張大圖',
+            'IMAGE_TEXT_GRID': '左圖右文 / 右圖左文',
+            'IMAGE_CAROUSEL': '圖片輪播',
+            'FEATURE': '大圖特色介紹',
+            'COMPARISON': 'B/A 對比 (Before/After)',
+            'TEXT_LIST': '文字列表 (如常見問題)',
+            'HTML_CODE': '自訂 HTML'
           };
           const displayLabel = blockLabels[blockType] || '通用區塊設定';
 
@@ -123,6 +131,104 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                     </div>
                   )}
 
+                  {blockType === 'HTML_CODE' && (
+                    <div className="space-y-4">
+                      <FieldLabel>HTML 程式碼</FieldLabel>
+                      <textarea 
+                        {...register(`content.general.blocks.${index}.htmlCode.html`)} 
+                        placeholder="請貼上 HTML 程式碼..." 
+                        rows={10} 
+                        className={InputClass + " font-mono"} 
+                      />
+                    </div>
+                  )}
+                  {blockType === 'TEXT_LIST' && (
+                    <div className="space-y-4">
+                      <input {...register(`content.general.blocks.${index}.textList.title`)} placeholder="標題 (如：常見問題)" className={InputClass} />
+                      <div className="space-y-2">
+                        {(watch(`content.general.blocks.${index}.textList.items`) || []).map((_: any, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-start bg-stone-50 p-2 rounded-lg">
+                            <div className="flex-1 space-y-2">
+                              <input {...register(`content.general.blocks.${index}.textList.items.${idx}.title`)} placeholder="項目標題" className={InputClass} />
+                              <textarea {...register(`content.general.blocks.${index}.textList.items.${idx}.text`)} placeholder="項目內容" rows={2} className={InputClass} />
+                            </div>
+                            <button type="button" onClick={() => {
+                              const items = [...watch(`content.general.blocks.${index}.textList.items`)];
+                              items.splice(idx, 1);
+                              setValue(`content.general.blocks.${index}.textList.items`, items);
+                            }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">刪除</button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => {
+                          const items = watch(`content.general.blocks.${index}.textList.items`) || [];
+                          setValue(`content.general.blocks.${index}.textList.items`, [...items, { id: Date.now().toString(), title: '', text: '' }]);
+                        }} className="text-sm text-primary font-bold">+ 新增項目</button>
+                      </div>
+                    </div>
+                  )}
+                  {blockType === 'FEATURE' && (
+                    <div className="space-y-4">
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.feature.title`)} placeholder="區塊標題" />
+                      <FieldLabel>內容文字 (支援 Markdown)</FieldLabel>
+                      <textarea className={InputClass} {...register(`content.general.blocks.${index}.feature.content`)} rows={4} />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <FieldLabel>排版佈局</FieldLabel>
+                          <select {...register(`content.general.blocks.${index}.feature.layout`)} className={InputClass}>
+                            <option value="LEFT">左圖右文</option>
+                            <option value="RIGHT">右圖左文</option>
+                            <option value="TOP">上圖下文</option>
+                            <option value="BOTTOM">下圖上文</option>
+                            <option value="TEXT_ONLY">純文字</option>
+                            <option value="IMAGE_ONLY">純圖片</option>
+                          </select>
+                        </div>
+                        <div>
+                          <FieldLabel>圖片填充方式</FieldLabel>
+                          <select {...register(`content.general.blocks.${index}.feature.imageFit`)} className={InputClass}>
+                            <option value="cover">填滿 (Cover)</option>
+                            <option value="contain">包含 (Contain)</option>
+                          </select>
+                        </div>
+                      </div>
+                      <FieldLabel>圖片 (可多張)</FieldLabel>
+                      <div className="space-y-2">
+                        {(watch(`content.general.blocks.${index}.feature.images`) || []).map((img: string, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-center">
+                            <div className="flex-1">
+                              <Controller control={control} name={`content.general.blocks.${index}.feature.images.${idx}`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                            </div>
+                            <button type="button" onClick={() => {
+                              const images = [...watch(`content.general.blocks.${index}.feature.images`)];
+                              images.splice(idx, 1);
+                              setValue(`content.general.blocks.${index}.feature.images`, images);
+                            }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">刪除</button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => {
+                          const images = watch(`content.general.blocks.${index}.feature.images`) || [];
+                          setValue(`content.general.blocks.${index}.feature.images`, [...images, '']);
+                        }} className="text-sm text-primary font-bold">+ 新增圖片</button>
+                      </div>
+                    </div>
+                  )}
+                  {blockType === 'COMPARISON' && (
+                    <div className="space-y-4">
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.title`)} placeholder="標題" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <FieldLabel>Before 圖片</FieldLabel>
+                          <Controller control={control} name={`content.general.blocks.${index}.comparison.beforeImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                          <input className={InputClass + " mt-2"} {...register(`content.general.blocks.${index}.comparison.beforeLabel`)} placeholder="Before 標籤" />
+                        </div>
+                        <div>
+                          <FieldLabel>After 圖片</FieldLabel>
+                          <Controller control={control} name={`content.general.blocks.${index}.comparison.afterImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                          <input className={InputClass + " mt-2"} {...register(`content.general.blocks.${index}.comparison.afterLabel`)} placeholder="After 標籤" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {blockType === 'HERO_1' && (
                     <div className="space-y-4">
                       <input className={InputClass} {...register(`content.general.blocks.${index}.hero1.title`)} placeholder="標題" />
@@ -274,15 +380,19 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
       <div className="flex justify-center mt-6 pt-6 border-t border-stone-200">
         <select className={InputClass + " max-w-xs text-center font-bold text-stone-700 bg-stone-50 transition-colors shadow-sm cursor-pointer"} onChange={handleAddBlock}>
           <option value="">➕ 新增區塊...</option>
-          <option value="HERO_1">HERO區塊（無CTA）</option>
-          <option value="HERO_2">HERO區塊（含CTA）</option>
-          <option value="TEXT">文字區塊</option>
-          <option value="GRID">多方格區塊</option>
+          <option value="HERO_1">滿版主視覺 (無按鈕)</option>
+          <option value="HERO_2">滿版主視覺 (含按鈕)</option>
+          <option value="TEXT">純文字段落</option>
+          <option value="GRID">多欄位卡片組</option>
           <option value="FORM">嵌入表單</option>
           <option value="SPACER">空白間距</option>
-          <option value="SINGLE_IMAGE">純圖片區塊</option>
+          <option value="SINGLE_IMAGE">單張大圖</option>
           <option value="IMAGE_CAROUSEL">圖片輪播</option>
-          <option value="IMAGE_TEXT_GRID">圖文區塊</option>
+          <option value="IMAGE_TEXT_GRID">左圖右文 / 右圖左文</option>
+          <option value="FEATURE">大圖特色介紹</option>
+          <option value="COMPARISON">B/A 對比 (Before/After)</option>
+          <option value="TEXT_LIST">文字列表 (如常見問題)</option>
+          <option value="HTML_CODE">自訂 HTML</option>
         </select>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { pageService } from '../services/pageService';
 import { formService } from '../services/formService';
 import { productService } from '../services/productService';
 import { Page, Product } from '../types/admin';
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Check, ChevronDown, Package } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Check, ChevronDown, Package, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Markdown from 'react-markdown';
@@ -90,6 +90,29 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   const fixedConfig = productData?.fixedConfig;
   const internalFormConfig = productData?.internalFormConfig;
   const externalLinkConfig = productData?.externalLinkConfig;
+
+  // 處理錨點捲動
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, link?: string, type?: string) => {
+    if (type === 'FORM') {
+      e.preventDefault();
+      const form = formService.getById(link || '');
+      if (form) {
+        const element = document.getElementById(form.formId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+    }
+
+    if (link?.startsWith('#')) {
+      e.preventDefault();
+      const element = document.getElementById(link.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   // New state for variants and field toggles
   const [selectedVariantId, setSelectedVariantId] = useState<string>('');
@@ -187,11 +210,11 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
   return (
     <div className="min-h-screen bg-stone-50 pt-20 pb-20">
-      <div className="max-w-7xl mx-auto px-0 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-0 lg:gap-12">
+      <div className="max-w-[1280px] mx-auto px-0 lg:px-6 xl:px-4">
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-10 xl:gap-12">
           
           {/* Product Info Column (Top on Mobile, Right on Desktop) */}
-          <div className="lg:w-[35%] order-1 lg:order-2 lg:sticky lg:top-24 self-start flex flex-col max-h-[calc(100vh-6rem)] bg-white rounded-none lg:rounded-3xl shadow-sm lg:shadow-lg border-b lg:border border-stone-200 lg:border-stone-100 overflow-hidden" ref={productInfoRef}>
+          <div className="lg:w-[280px] xl:w-[300px] flex-shrink-0 order-1 lg:order-2 lg:sticky lg:top-24 self-start flex flex-col max-h-[calc(100vh-6rem)] bg-white rounded-none lg:rounded-3xl shadow-sm lg:shadow-lg border-b lg:border border-stone-200 lg:border-stone-100 overflow-hidden" ref={productInfoRef}>
             
             {/* Scrollable Content Area */}
             <div className="p-0 md:p-8 overflow-y-auto scrollbar-hide flex-1 pb-4">
@@ -217,47 +240,47 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                 </div>
                 <div className="px-5 md:px-0">
                   <div className="flex items-center gap-2 mb-3 md:mb-4">
-                    <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs md:text-sm font-bold">
+                    <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
                       熱門服務
                     </span>
                   </div>
-                  <h1 className="text-2xl md:text-4xl font-extrabold text-stone-900 mb-2 md:mb-4 leading-tight tracking-tight text-left">
+                  <h1 className="text-xl md:text-2xl font-extrabold text-stone-900 mb-2 md:mb-3 leading-tight tracking-tight text-left">
                     {productData?.name || currentPage.title}
                   </h1>
                   
                   {/* Price/Quote Display */}
-                  <div className="mb-4 md:mb-6">
+                  <div className="mb-4 md:mb-5">
                     {orderMode === 'FIXED' ? (
                       <div className="flex items-baseline gap-1">
-                        <span className="text-xs md:text-sm font-bold text-stone-400">NT$</span>
-                        <span className="text-2xl md:text-3xl font-black text-primary">
+                        <span className="text-[10px] md:text-xs font-bold text-stone-400">NT$</span>
+                        <span className="text-xl md:text-2xl font-black text-primary">
                           {((fixedConfig?.price || 0) + (productData?.variants?.find(v => v.id === selectedVariantId)?.price || 0)).toLocaleString()}
                         </span>
-                        <span className="text-xs md:text-sm font-bold text-stone-400">
+                        <span className="text-[10px] md:text-xs font-bold text-stone-400">
                           / {productData?.variants?.find(v => v.id === selectedVariantId)?.unit || fixedConfig?.unit || '次'}
                         </span>
                       </div>
                     ) : orderMode === 'INTERNAL_FORM' ? (
-                      <div className="text-xl md:text-2xl font-bold text-primary">
+                      <div className="text-lg md:text-xl font-bold text-primary">
                         {internalFormConfig?.priceText || '依需求報價'}
                       </div>
                     ) : (
-                      <div className="text-xl md:text-2xl font-bold text-primary">
+                      <div className="text-lg md:text-xl font-bold text-primary">
                         {externalLinkConfig?.priceText || '依需求報價'}
                       </div>
                     )}
                   </div>
 
-                  <p className="text-stone-600 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 line-clamp-3 md:line-clamp-none">
+                  <p className="text-stone-600 text-xs md:text-sm leading-relaxed mb-4 md:mb-5 line-clamp-3 md:line-clamp-none">
                     {productData?.description}
                   </p>
 
                 {productData?.checklist && productData.checklist.length > 0 && (
-                  <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                  <ul className="space-y-2 md:space-y-2.5 mb-6 md:mb-6">
                     {productData.checklist.map((item: any, index: number) => (
                       <li key={index} className="flex items-start gap-2 md:gap-3">
-                        <CheckCircle2 className="text-[#5C704A] w-4 h-4 md:w-5 md:h-5 flex-shrink-0 mt-1" />
-                        <span className="text-stone-700 text-sm md:text-base font-medium">{item.text}</span>
+                        <CheckCircle2 className="text-[#5C704A] w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0 mt-0.5" />
+                        <span className="text-stone-700 text-xs md:text-sm font-medium">{item.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -266,39 +289,39 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                 {/* Variants Selection */}
                 {orderMode === 'FIXED' && productData?.variants && productData.variants.length > 0 && (
                   <div className="mb-6 space-y-3">
-                    <h3 className="text-sm font-bold text-stone-900">選擇方案</h3>
+                    <h3 className="text-xs font-bold text-stone-900">選擇方案</h3>
                     <div className="space-y-2">
-                      <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariantId === '' ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
+                      <label className={`flex items-start gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariantId === '' ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
                         <input 
                           type="radio" 
                           name="variant" 
                           checked={selectedVariantId === ''}
                           onChange={() => setSelectedVariantId('')}
-                          className="mt-1 w-4 h-4 text-primary focus:ring-primary border-stone-300"
+                          className="mt-0.5 w-3.5 h-3.5 md:w-4 md:h-4 text-primary focus:ring-primary border-stone-300"
                         />
                         <div>
-                          <p className="font-bold text-stone-900">標準方案</p>
-                          <p className="text-sm text-stone-500 mt-1">基本服務內容</p>
+                          <p className="text-xs md:text-sm font-bold text-stone-900">標準方案</p>
+                          <p className="text-[10px] md:text-xs text-stone-500 mt-1">基本服務內容</p>
                         </div>
                       </label>
                       {productData.variants.map(variant => (
-                        <label key={variant.id} className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariantId === variant.id ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
+                        <label key={variant.id} className={`flex items-start gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariantId === variant.id ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
                           <input 
                             type="radio" 
                             name="variant" 
                             checked={selectedVariantId === variant.id}
                             onChange={() => setSelectedVariantId(variant.id)}
-                            className="mt-1 w-4 h-4 text-primary focus:ring-primary border-stone-300"
+                            className="mt-0.5 w-3.5 h-3.5 md:w-4 md:h-4 text-primary focus:ring-primary border-stone-300"
                           />
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="font-bold text-stone-900">{variant.name}</p>
-                              <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              <p className="text-xs md:text-sm font-bold text-stone-900">{variant.name}</p>
+                              <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                 +NT$ {variant.price.toLocaleString()}
                               </span>
                             </div>
                             {variant.description && (
-                              <p className="text-sm text-stone-500 mt-1">{variant.description}</p>
+                              <p className="text-[10px] md:text-xs text-stone-500 mt-1">{variant.description}</p>
                             )}
                           </div>
                         </label>
@@ -309,32 +332,32 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
                 {/* Field Toggles */}
                 {orderMode === 'FIXED' && (productData?.requireDate || productData?.requireTime || productData?.requireNotes) && (
-                  <div className="mb-6 space-y-4 p-5 bg-stone-50 rounded-2xl border border-stone-100">
-                    <h3 className="text-sm font-bold text-stone-900 mb-2">需求資訊</h3>
+                  <div className="mb-6 space-y-4 p-4 md:p-5 bg-stone-50 rounded-2xl border border-stone-100">
+                    <h3 className="text-xs font-bold text-stone-900 mb-2">需求資訊</h3>
                     {productData.requireDate && (
-                      <div className="space-y-3">
-                        <label className="block text-xs font-bold text-stone-600 mb-1">期望日期（請選三個） <span className="text-red-500">*</span></label>
+                      <div className="space-y-2 md:space-y-3">
+                        <label className="block text-[10px] md:text-xs font-bold text-stone-600 mb-1">期望日期（請選三個） <span className="text-red-500">*</span></label>
                         <div className="grid grid-cols-1 gap-2">
                           <input 
                             type="date" 
                             value={expectedDate1}
                             min={minDate}
                             onChange={(e) => setExpectedDate1(e.target.value)}
-                            className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
+                            className="w-full px-3 py-1.5 md:px-4 md:py-2 bg-white border border-stone-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
                           />
                           <input 
                             type="date" 
                             value={expectedDate2}
                             min={minDate}
                             onChange={(e) => setExpectedDate2(e.target.value)}
-                            className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
+                            className="w-full px-3 py-1.5 md:px-4 md:py-2 bg-white border border-stone-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
                           />
                           <input 
                             type="date" 
                             value={expectedDate3}
                             min={minDate}
                             onChange={(e) => setExpectedDate3(e.target.value)}
-                            className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
+                            className="w-full px-3 py-1.5 md:px-4 md:py-2 bg-white border border-stone-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-primary/20 outline-none disabled:bg-stone-100 disabled:text-stone-400"
                           />
                         </div>
                         <p className="text-[10px] text-stone-400 mt-1">* 為確保媒合品質，請選擇 4 天後的日期</p>
@@ -342,9 +365,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     )}
                     {productData.requireTime && (
                       <div className="space-y-2">
-                        <label className="block text-xs font-bold text-stone-600 mb-1">期望時段 (可多選) <span className="text-red-500">*</span></label>
+                        <label className="block text-[10px] md:text-xs font-bold text-stone-600 mb-1">期望時段 (可多選) <span className="text-red-500">*</span></label>
                         <div className="flex flex-col gap-2">
-                          <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${expectedTime.includes('9:00~12:00') ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
+                          <label className={`flex items-center gap-2 p-2.5 md:p-3 rounded-xl border cursor-pointer transition-all ${expectedTime.includes('9:00~12:00') ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
                             <input 
                               type="checkbox" 
                               name="expectedTime" 
@@ -359,12 +382,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                               }}
                               className="hidden" 
                             />
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${expectedTime.includes('9:00~12:00') ? 'border-primary bg-primary' : 'border-stone-300'}`}>
+                            <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded border flex items-center justify-center ${expectedTime.includes('9:00~12:00') ? 'border-primary bg-primary' : 'border-stone-300'}`}>
                               {expectedTime.includes('9:00~12:00') && <Check size={12} className="text-white" />}
                             </div>
-                            <span className="text-sm text-stone-700">9:00~12:00</span>
+                            <span className="text-xs md:text-sm text-stone-700">9:00~12:00</span>
                           </label>
-                          <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${expectedTime.includes('13:00~18:00') ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
+                          <label className={`flex items-center gap-2 p-2.5 md:p-3 rounded-xl border cursor-pointer transition-all ${expectedTime.includes('13:00~18:00') ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
                             <input 
                               type="checkbox" 
                               name="expectedTime" 
@@ -379,23 +402,23 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                               }}
                               className="hidden" 
                             />
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${expectedTime.includes('13:00~18:00') ? 'border-primary bg-primary' : 'border-stone-300'}`}>
+                            <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded border flex items-center justify-center ${expectedTime.includes('13:00~18:00') ? 'border-primary bg-primary' : 'border-stone-300'}`}>
                               {expectedTime.includes('13:00~18:00') && <Check size={12} className="text-white" />}
                             </div>
-                            <span className="text-sm text-stone-700">13:00~18:00</span>
+                            <span className="text-xs md:text-sm text-stone-700">13:00~18:00</span>
                           </label>
                         </div>
                       </div>
                     )}
                     {productData.requireNotes && (
                       <div>
-                        <label className="block text-xs font-bold text-stone-600 mb-1">備註需求</label>
+                        <label className="block text-[10px] md:text-xs font-bold text-stone-600 mb-1">備註需求</label>
                         <textarea 
                           value={notes}
                           onChange={(e) => setNotes(e.target.value)}
                           placeholder="請填寫其他需求或備註事項"
                           rows={3}
-                          className="w-full px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                          className="w-full px-3 py-1.5 md:px-4 md:py-2 bg-white border border-stone-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none"
                         />
                       </div>
                     )}
@@ -455,14 +478,14 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       }
                     }
                   }}
-                  className="block w-full bg-[#885200] hover:bg-[#663D00] text-white text-center font-bold py-4 rounded-xl transition-colors shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all"
+                  className="block w-full bg-[#885200] hover:bg-[#663D00] text-white text-center font-bold py-3 md:py-3.5 text-sm md:text-base rounded-xl transition-colors shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all"
                 >
                   {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
                   {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}
                 </button>
               )}
-              <div className="pt-3">
-                <p className="text-xs text-stone-500 text-center flex flex-col gap-1">
+              <div className="pt-2 md:pt-3">
+                <p className="text-[10px] md:text-xs text-stone-500 text-center flex flex-col gap-0.5 md:gap-1">
                   <span>有任何疑問？歡迎直接聯繫我們</span>
                   <a href="tel:02-7755-0920" className="font-bold hover:text-primary transition-colors">或撥打：02-7755-0920</a>
                 </p>
@@ -476,10 +499,11 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
             {/* Product/Service Main Title */}
             {(subItem.mainTitle || subItem.coreServicesSectionTitle) && (
-              <div className="pb-4 border-b border-stone-100 mt-8 mb-10">
-                <h2 className="text-3xl md:text-4xl font-extrabold text-stone-900 tracking-tight text-left">
+              <div className="pb-6 border-b-2 border-stone-100 mt-8 mb-12 relative">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-stone-900 tracking-tight text-left leading-tight">
                   {subItem.mainTitle || subItem.coreServicesSectionTitle}
                 </h2>
+                <div className="absolute bottom-[-2px] left-0 w-24 h-[2px] bg-primary"></div>
               </div>
             )}
 
@@ -487,183 +511,380 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             {(subItem.serviceIntro?.sections || subItem.serviceIntro?.blockA?.enabled || subItem.serviceIntro?.blockB?.enabled || subItem.serviceIntro?.blockC?.enabled) && (
               <div className="space-y-16 md:space-y-20">
                 {/* Dynamic Sections */}
-                {subItem.serviceIntro?.sections?.map((section, sectionIdx) => (
-                  <div key={section.id || sectionIdx}>
-                    {section.type === 'GRID' && section.enabled && section.grid && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {section.grid.title}
-                          </h2>
-                        </div>
-                        {section.grid.showCarousel !== false ? (
-                          <IntroCarousel items={section.grid.items} />
-                        ) : (
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                            {section.grid.items.map((item, index) => (
-                              <motion.div 
-                                key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-md transition-shadow"
-                              >
-                                <div className="aspect-square overflow-hidden">
-                                  <img 
-                                    src={item.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                                    alt={item.title} 
-                                    className="w-full h-full object-cover"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                                <div className="p-4 text-center">
-                                  <h3 className="font-bold text-stone-900 text-sm md:text-base">{item.title}</h3>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        )}
-                      </section>
-                    )}
-
-                    {section.type === 'FEATURE' && section.enabled && section.feature && (
-                      <section>
-                        {section.feature.layout === 'IMAGE_ONLY' ? (
-                          <div className="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
-                            {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
-                              section.feature.showCarousel !== false ? (
-                                <ProductGallery
-                                  images={section.feature.images.filter((img): img is string => !!img)}
-                                  autoplay={true}
-                                  fill={false}
-                                  roundedClass="rounded-none"
-                                  imageFit={section.feature.imageFit || 'cover'}
-                                />
-                              ) : (
-                                <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full`}>
-                                  {section.feature.images.filter(Boolean).map((img, idx) => (
-                                    <img
-                                      key={idx}
-                                      src={img || undefined}
-                                      alt={`${section.feature.title}-${idx}`}
-                                      className={`w-full h-auto ${section.feature.imageFit === 'cover' ? 'object-cover aspect-video' : 'object-contain'}`}
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ))}
-                                </div>
-                              )
-                            ) : null}
-                          </div>
-                        ) : section.feature.layout === 'TEXT_ONLY' ? (
-                          <div className="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden p-6 md:p-10">
-                            <h3 className="text-2xl md:text-3xl font-bold text-stone-900 mb-6">{section.feature.title}</h3>
-                            <div className="markdown-body text-stone-600 leading-relaxed text-lg">
-                              <Markdown>{section.feature.content}</Markdown>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className={`flex flex-col md:items-center ${
-                            section.feature.layout === 'LEFT' ? 'md:flex-row gap-8 lg:gap-16' :
-                            section.feature.layout === 'RIGHT' ? 'md:flex-row-reverse gap-8 lg:gap-16' :
-                            section.feature.layout === 'TOP' ? 'flex-col gap-8 lg:gap-12' : 'flex-col-reverse gap-8 lg:gap-12'
-                          }`}>
-                            <div className={`${
-                              (section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT') && section.feature.content ? 'md:w-1/2' : 'w-full'
-                            } ${section.feature.imageFit === 'contain' ? 'h-auto' : 'aspect-video md:aspect-[4/3] min-h-[300px]'} relative rounded-2xl shadow-xl overflow-hidden bg-white`}>
-                              {section.feature.images && section.feature.images.filter(Boolean).length > 0 ? (
-                                section.feature.showCarousel !== false ? (
-                                  <ProductGallery
-                                    images={section.feature.images.filter((img): img is string => !!img)}
-                                    autoplay={true}
-                                    fill={section.feature.imageFit !== 'contain'}
-                                    aspectClass={section.feature.imageFit === 'contain' ? 'aspect-auto' : undefined}
-                                    roundedClass="rounded-none"
-                                    imageFit={section.feature.imageFit || 'cover'}
-                                  />
-                                ) : (
-                                  <div className={`grid ${section.feature.images.filter(Boolean).length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-0 w-full ${section.feature.imageFit === 'contain' ? 'h-auto' : 'h-full'}`}>
-                                    {section.feature.images.filter(Boolean).map((img, idx) => (
-                                      <img
-                                        key={idx}
-                                        src={img || undefined}
-                                        alt={`${section.feature.title}-${idx}`}
-                                        className={`w-full ${section.feature.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full aspect-video object-cover'}`}
-                                        referrerPolicy="no-referrer"
-                                      />
-                                    ))}
-                                  </div>
-                                )
-                              ) : (
-                                <img
-                                  src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'
-                                  alt={section.feature.title}
-                                  className={`w-full ${section.feature.imageFit === 'contain' ? 'h-auto object-contain' : 'h-full object-cover'}`}
-                                  referrerPolicy="no-referrer"
-                                />
-                              )}
-                            </div>
-                            {section.feature.content && (
-                              <div className={`${
-                                section.feature.layout === 'LEFT' || section.feature.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                              } flex flex-col justify-center py-6 md:py-10`}>
-                                <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-6 tracking-tight">{section.feature.title}</h3>
-                                <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
-                                  <Markdown>{section.feature.content}</Markdown>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </section>
-                    )}
-
-                    {section.type === 'COMPARISON' && section.enabled && section.comparison && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {section.comparison.title}
-                          </h2>
-                        </div>
-                        <div className="bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-stone-100">
-                          <BeforeAfterSlider 
-                            beforeImage={section.comparison.beforeImage || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
-                            afterImage={section.comparison.afterImage || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=2070&auto=format&fit=crop'} 
-                            beforeLabel={section.comparison.beforeLabel}
-                            afterLabel={section.comparison.afterLabel}
-                          />
-                        </div>
-                      </section>
-                    )}
-
-                    {section.type === 'TEXT_LIST' && section.enabled && section.textList && (
-                      <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
-                          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
-                            {section.textList.title}
-                          </h2>
-                        </div>
-                        <div className="space-y-4">
-                          {section.textList.items.map((item, idx) => {
-                            const num = idx + 1;
-                            return (
-                              <div key={item.id} className="flex gap-4 md:gap-6 items-start bg-white p-6 rounded-3xl shadow-sm border border-stone-100 group hover:shadow-md transition-shadow">
-                                <div className="text-primary font-bold text-2xl md:text-3xl w-8 md:w-12 shrink-0 pt-0.5">
-                                  {num}
-                                </div>
-                                <div>
-                                  {item.title && <h3 className="text-xl md:text-2xl font-bold text-stone-900 mb-2">{item.title}</h3>}
-                                  <p className="text-stone-700 leading-relaxed text-base md:text-lg whitespace-pre-line">
-                                    {item.text}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </section>
-                    )}
+                {subItem.serviceIntro?.sections?.map((section, sectionIdx) => {
+                  const isFirstBlock = sectionIdx === 0;
+                  return (
+                    <div key={section.id || sectionIdx}>
+                      {(() => {
+                      switch (section.type) {
+                                case 'HERO_1':
+                                  return (
+                                    <section key={section.id} id={section.id} className={`relative pt-24 pb-16 md:pt-20 md:pb-16 overflow-hidden bg-[#FFF9F2] ${isFirstBlock ? 'mt-20' : ''}`}>
+                                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                                          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                                            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
+                                              {section.hero1?.title}
+                                            </h1>
+                                            <div className="flex flex-col gap-4">
+                                              {section.hero1?.buttons?.map((btn, i) => (
+                                                <a key={i} href={btn.link} onClick={(e) => handleAnchorClick(e, btn.link)} className="inline-flex items-center justify-between border-b border-stone-200 pb-3 text-stone-600 hover:text-primary hover:border-primary transition-colors group">
+                                                  <span className="text-lg font-bold">{btn.text}</span>
+                                                  <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+                                                </a>
+                                              ))}
+                                            </div>
+                                          </motion.div>
+                                          <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[3/2]">
+                                            <img src={section.hero1?.image || undefined} alt="" className="w-full h-full object-cover" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'SECONDARY_SERVICES':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-24 bg-white">
+                                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                                          {section.secondaryServices?.map((service, i) => {
+                                            const targetPage = pageService.getById(service.pageId) || pageService.getBySlug(service.pageId);
+                                            return (
+                                              <motion.div 
+                                                key={i}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                                className="group cursor-pointer"
+                                                onClick={() => targetPage && navigate(`/${targetPage.slug}`)}
+                                              >
+                                                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-6 shadow-lg">
+                                                  <img src={service.image || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 mb-4">
+                                                  {service.tags.map((tag, j) => (
+                                                    <span key={j} className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">{tag}</span>
+                                                  ))}
+                                                </div>
+                                                <p className="text-stone-600 mb-6 leading-relaxed">{service.description}</p>
+                                                <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100">
+                                                  <p className="text-stone-500 text-sm italic mb-2">「{service.testimonial.text}」</p>
+                                                  <p className="text-stone-400 text-xs">— {service.testimonial.author}</p>
+                                                </div>
+                                              </motion.div>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'ADDITIONAL_SERVICES':
+                                  const additionalContent = section.additionalServices;
+                                  const additionalItems = Array.isArray(additionalContent) ? additionalContent : (additionalContent?.items || []);
+                                  const additionalTitle = Array.isArray(additionalContent) ? '更多專業服務' : (additionalContent?.title || '更多專業服務');
+                                  
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-20 bg-stone-50">
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        <h2 className="text-2xl font-bold text-stone-900 mb-12 text-center">{additionalTitle}</h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                          {additionalItems.map((id, i) => {
+                                            const p = pageService.getById(id) || pageService.getBySlug(id);
+                                            if (!p) return null;
+                                            return (
+                                              <a key={i} href={`/${p.slug}`} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                                                <span className="font-bold text-stone-800">{p.title}</span>
+                                                <ArrowUpRight className="w-5 h-5 text-stone-400 group-hover:text-primary transition-colors" />
+                                              </a>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'TEXT':
+                                  const textStyles = {
+                                    heading: 'text-3xl font-bold text-center mb-16 text-stone-900',
+                                    medium_heading: 'text-xl font-bold text-stone-900 mb-3',
+                                    body: 'text-stone-600 leading-relaxed'
+                                  }[section.text?.fontSize || 'body'];
+                      
+                                  return (
+                                    <section key={section.id} id={section.id} className={`py-16 bg-white ${isFirstBlock ? 'mt-20' : ''}`}>
+                                      <div className="max-w-4xl mx-auto px-6">
+                                        <div className={`${textStyles} ${
+                                          section.text?.alignment === 'center' ? 'text-center' : 
+                                          section.text?.alignment === 'right' ? 'text-right' : ''
+                                        }`}>
+                                          <Markdown>{section.text?.content || ''}</Markdown>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'GRID':
+                                  const cols = section.grid?.columns || 3;
+                                  let gridClass = 'grid-cols-1 md:grid-cols-3 sm:grid-cols-2';
+                                  if (cols === 2) gridClass = 'grid-cols-1 sm:grid-cols-2';
+                                  if (cols === 3) gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
+                                  if (cols === 4) gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4';
+                                  if (cols === 5) gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5';
+                                  if (cols === 6) gridClass = 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
+                      
+                                  return (
+                                    <section key={section.id} id={section.id} className={`py-20 bg-stone-50 ${isFirstBlock ? 'mt-20' : ''}`}>
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        <h2 className="text-3xl font-bold text-center mb-16 text-stone-900">{section.grid?.title}</h2>
+                                        <div className={`grid ${gridClass} gap-8`}>
+                                          {section.grid?.items?.map((item, i) => {
+                                            const isLink = !!item.link;
+                                            const Wrapper = isLink ? 'a' : 'div';
+                                            const wrapperProps = isLink ? { href: item.link, target: item.link?.startsWith('http') ? '_blank' : '_self', rel: 'noopener noreferrer' } : {};
+                                            
+                                            return (
+                                              <Wrapper 
+                                                key={i} 
+                                                {...wrapperProps}
+                                                className={`bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden flex flex-col ${isLink ? 'hover:shadow-md hover:border-primary/30 hover:-translate-y-1 transition-all cursor-pointer group' : 'hover:shadow-md transition-shadow'}`}
+                                              >
+                                                {item.showImage && item.image && (
+                                                  <div className="w-full h-48 md:h-56 shrink-0 border-b border-stone-100 overflow-hidden">
+                                                    <img 
+                                                      src={item.image || undefined} 
+                                                      alt={item.title} 
+                                                      className={`w-full h-full object-cover ${isLink ? 'transition-transform duration-500 group-hover:scale-105' : ''}`} 
+                                                      referrerPolicy="no-referrer"
+                                                    />
+                                                  </div>
+                                                )}
+                                                <div className="p-6 flex flex-col flex-1">
+                                                  <h3 className={`text-xl font-bold mb-3 ${isLink ? 'text-stone-900 group-hover:text-primary transition-colors' : 'text-stone-900'}`}>{item.title}</h3>
+                                                  <div className="text-stone-600 leading-relaxed prose prose-stone prose-sm max-w-none">
+                                                    <Markdown>{item.description}</Markdown>
+                                                  </div>
+                                                </div>
+                                              </Wrapper>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'HERO_2':
+                                  return (
+                                    <section key={section.id} id={section.id} className={`relative pt-24 pb-16 md:pt-32 md:pb-24 bg-[#FFF9F2] overflow-hidden ${isFirstBlock ? 'mt-0' : ''}`}>
+                                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                                          {/* Left Text */}
+                                          <motion.div
+                                            initial={{ opacity: 0, x: -30 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.8 }}
+                                            className="space-y-8"
+                                          >
+                                            <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
+                                              {section.hero2?.title}
+                                            </h1>
+                                            <p className="text-stone-600 leading-relaxed text-lg whitespace-pre-line">
+                                              {section.hero2?.description}
+                                            </p>
+                                            <div className="flex flex-wrap gap-4 pt-4">
+                                              {section.hero2?.mainButton?.isVisible && (
+                                                <a 
+                                                  href={section.hero2.mainButton.value || '#'} 
+                                                  onClick={(e) => handleAnchorClick(e, section.hero2?.mainButton.value, section.hero2?.mainButton.type)}
+                                                  className="px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors"
+                                                >
+                                                  {section.hero2.mainButton.text || '預約諮詢'}
+                                                </a>
+                                              )}
+                                              {section.hero2?.secondaryButton?.isVisible && (
+                                                <a 
+                                                  href={section.hero2.secondaryButton.value || '#'} 
+                                                  onClick={(e) => handleAnchorClick(e, section.hero2?.secondaryButton.value, section.hero2?.secondaryButton.type)}
+                                                  className="px-8 py-4 bg-transparent border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary/5 transition-colors"
+                                                >
+                                                  {section.hero2.secondaryButton.text || '查看案例'}
+                                                </a>
+                                              )}
+                                            </div>
+                                          </motion.div>
+                                          
+                                          {/* Right Image */}
+                                          <motion.div
+                                            initial={{ opacity: 0, x: 30 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.8 }}
+                                            className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] lg:aspect-square"
+                                          >
+                                            <img 
+                                              src={section.hero2?.backgroundImage || undefined} 
+                                              alt={section.hero2?.title} 
+                                              className="w-full h-full object-cover"
+                                              referrerPolicy="no-referrer"
+                                            />
+                                          </motion.div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'FORM':
+                                  if (!section.form?.formId) return null;
+                                  const form = formService.getById(section.form.formId);
+                                  if (!form) return null;
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-16 bg-[#FDF8F3]">
+                                      <div className="max-w-3xl mx-auto px-4">
+                                        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
+                                          <DynamicForm form={form} pageSlug={currentPage.slug} pageTitle={currentPage.title} />
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'SPACER':
+                                  return <div key={section.id} id={section.id} style={{ height: section.spacer?.height || 80 }} />;
+                      
+                                case 'SINGLE_IMAGE':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-16 bg-white">
+                                      <div className="max-w-4xl mx-auto px-6">
+                                        <img src={section.singleImage?.image || undefined} alt={section.singleImage?.caption} className="w-full rounded-3xl shadow-lg" referrerPolicy="no-referrer" />
+                                        {section.singleImage?.caption && <p className="text-center text-stone-500 mt-4">{section.singleImage.caption}</p>}
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'IMAGE_CAROUSEL':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-16 bg-white overflow-hidden">
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        <GeneralImageCarousel items={section.imageCarousel?.items || []} />
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'IMAGE_TEXT_GRID':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-20 bg-white">
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        {/* 強制左側文字、右側圖片 */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                                          <div className="w-full md:order-1">
+                                            <h2 className="text-3xl font-bold text-stone-900 mb-6">{section.imageTextGrid?.title}</h2>
+                                            <div className="prose prose-stone mb-8">
+                                              <Markdown>{section.imageTextGrid?.content || ''}</Markdown>
+                                            </div>
+                                            {section.imageTextGrid?.cta?.text && (
+                                              <a href={section.imageTextGrid.cta.link} className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-all">
+                                                {section.imageTextGrid.cta.text}
+                                                <ArrowUpRight size={18} />
+                                              </a>
+                                            )}
+                                          </div>
+                                          <div className="w-full md:order-2">
+                                            <img 
+                                              src={section.imageTextGrid?.image || undefined} 
+                                              alt={section.imageTextGrid?.title} 
+                                              className="w-full rounded-3xl shadow-xl" 
+                                              referrerPolicy="no-referrer" 
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                      
+                                case 'FEATURE':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-20 bg-white">
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        {section.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.feature.title}</h2>}
+                                        <div className={`grid grid-cols-1 ${section.feature?.layout !== 'TEXT_ONLY' && section.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-12 items-center`}>
+                                          {(section.feature?.layout === 'LEFT' || section.feature?.layout === 'TOP' || section.feature?.layout === 'IMAGE_ONLY') && section.feature?.images && section.feature.images.length > 0 && (
+                                            <div className={`${section.feature.layout === 'TOP' ? 'lg:col-span-2' : ''}`}>
+                                              <div className={`rounded-3xl overflow-hidden shadow-xl ${section.feature.layout === 'TOP' ? 'aspect-video' : 'aspect-square'}`}>
+                                                <img src={section.feature.images[0] || undefined} alt="" className={`w-full h-full ${section.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
+                                              </div>
+                                            </div>
+                                          )}
+                                          {(section.feature?.layout !== 'IMAGE_ONLY') && (
+                                            <div className={`${section.feature?.layout === 'BOTTOM' || section.feature?.layout === 'TOP' ? 'lg:col-span-2 text-center' : ''}`}>
+                                              <div className="prose prose-stone prose-lg max-w-none">
+                                                <Markdown>{section.feature?.content || ''}</Markdown>
+                                              </div>
+                                            </div>
+                                          )}
+                                          {(section.feature?.layout === 'RIGHT' || section.feature?.layout === 'BOTTOM') && section.feature?.images && section.feature.images.length > 0 && (
+                                            <div className={`${section.feature.layout === 'BOTTOM' ? 'lg:col-span-2' : ''}`}>
+                                              <div className={`rounded-3xl overflow-hidden shadow-xl ${section.feature.layout === 'BOTTOM' ? 'aspect-video' : 'aspect-square'}`}>
+                                                <img src={section.feature.images[0] || undefined} alt="" className={`w-full h-full ${section.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                                case 'COMPARISON':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-20 bg-stone-50">
+                                      <div className="max-w-7xl mx-auto px-4">
+                                        {section.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.comparison.title}</h2>}
+                                        <div className="max-w-4xl mx-auto">
+                                          <div className="relative aspect-[4/3] sm:aspect-[16/9] rounded-3xl overflow-hidden shadow-xl group">
+                                            <div className="absolute inset-0 w-1/2 overflow-hidden z-10 border-r-4 border-white transition-all duration-300 ease-in-out group-hover:w-[45%]">
+                                              <img src={section.comparison?.beforeImage || undefined} alt="Before" className="absolute top-0 left-0 w-[200vw] sm:w-[100vw] md:w-[896px] h-full object-cover" referrerPolicy="no-referrer" style={{ maxWidth: 'none' }}/>
+                                              {section.comparison?.beforeLabel && <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">{section.comparison.beforeLabel}</div>}
+                                            </div>
+                                            <img src={section.comparison?.afterImage || undefined} alt="After" className="absolute inset-0 w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                            {section.comparison?.afterLabel && <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-bold shadow-sm z-20">{section.comparison.afterLabel}</div>}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                                case 'TEXT_LIST':
+                                  return (
+                                    <section key={section.id} id={section.id} className="py-20 bg-white">
+                                      <div className="max-w-3xl mx-auto px-4">
+                                        {section.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.textList.title}</h2>}
+                                        <div className="space-y-6">
+                                          {section.textList?.items.map((item, idx) => (
+                                            <div key={item.id} className="flex gap-4 sm:gap-6 bg-stone-50 p-6 sm:p-8 rounded-3xl">
+                                              <div className="text-primary font-bold text-2xl sm:text-3xl w-8 sm:w-12 shrink-0 pt-0.5">{idx + 1}</div>
+                                              <div>
+                                                {item.title && <h3 className="text-xl sm:text-2xl font-bold text-stone-900 mb-3">{item.title}</h3>}
+                                                <p className="text-stone-700 leading-relaxed text-base sm:text-lg whitespace-pre-line">{item.text}</p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </section>
+                                  );
+                                case 'HTML_CODE':
+                                  return (
+                                    <section key={section.id} id={section.id} className="w-full">
+                                      <div dangerouslySetInnerHTML={{ __html: section.htmlCode?.html || '' }} />
+                                    </section>
+                                  );
+                      default:
+                      return <div key={section.id} className="p-4 text-stone-400 italic text-center">不支援的區塊類型: {section.type}</div>;
+                      }
+                    })()}
                   </div>
-                ))}
+                );
+                })}
 
                 {/* Legacy Fallback Blocks */}
                 {!subItem.serviceIntro?.sections && (
@@ -752,7 +973,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                           {subItem.serviceIntro.blockB.content && (
                             <div className={`${
                               subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
-                            } flex flex-col justify-center py-6 md:py-10`}>
+                            } flex flex-col justify-center py-0`}>
                               <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-6 tracking-tight">{subItem.serviceIntro.blockB.title}</h3>
                               <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
                                 <Markdown>{subItem.serviceIntro.blockB.content}</Markdown>
@@ -1321,6 +1542,56 @@ function BeforeAfterSlider({ beforeImage, afterImage, beforeLabel, afterLabel }:
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GeneralImageCarousel({ items }: { items: { image: string, alt: string }[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    loop: true,
+    skipSnaps: false,
+    dragFree: true,
+  });
+
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
+
+  return (
+    <div className="relative group p-4 -m-4">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-4 sm:gap-6">
+          {items.map((item, i) => (
+            <div key={i} className="flex-[0_0_85%] min-w-0 md:flex-[0_0_40%] bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden flex flex-col transition-all hover:shadow-md">
+              <img src={item.image || undefined} alt={item.alt} className={`w-full object-cover ${item.alt ? 'aspect-video' : 'h-[300px] md:h-[400px]'}`} referrerPolicy="no-referrer" />
+              {item.alt && (
+                <div className="p-6">
+                  <p className="text-stone-700 font-medium text-lg text-center">{item.alt}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {items.length > 1 && (
+        <>
+          <button 
+            type="button"
+            onClick={scrollPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg text-stone-600 hover:text-stone-900 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50 z-10"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button 
+            type="button"
+            onClick={scrollNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg text-stone-600 hover:text-stone-900 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50 z-10"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
     </div>
   );
 }

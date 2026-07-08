@@ -358,6 +358,80 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
               </section>
             );
 
+          case 'FEATURE':
+            return (
+              <section key={block.id} id={block.id} className="py-20 bg-white">
+                <div className="max-w-7xl mx-auto px-4">
+                  {block.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.feature.title}</h2>}
+                  <div className={`grid grid-cols-1 ${block.feature?.layout !== 'TEXT_ONLY' && block.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-12 items-center`}>
+                    {(block.feature?.layout === 'LEFT' || block.feature?.layout === 'TOP' || block.feature?.layout === 'IMAGE_ONLY') && block.feature?.images && block.feature.images.length > 0 && (
+                      <div className={`${block.feature.layout === 'TOP' ? 'lg:col-span-2' : ''}`}>
+                        <div className={`rounded-3xl overflow-hidden shadow-xl ${block.feature.layout === 'TOP' ? 'aspect-video' : 'aspect-square'}`}>
+                          <img src={block.feature.images[0] || undefined} alt="" className={`w-full h-full ${block.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
+                        </div>
+                      </div>
+                    )}
+                    {(block.feature?.layout !== 'IMAGE_ONLY') && (
+                      <div className={`${block.feature?.layout === 'BOTTOM' || block.feature?.layout === 'TOP' ? 'lg:col-span-2 text-center' : ''}`}>
+                        <div className="prose prose-stone prose-lg max-w-none">
+                          <Markdown>{block.feature?.content || ''}</Markdown>
+                        </div>
+                      </div>
+                    )}
+                    {(block.feature?.layout === 'RIGHT' || block.feature?.layout === 'BOTTOM') && block.feature?.images && block.feature.images.length > 0 && (
+                      <div className={`${block.feature.layout === 'BOTTOM' ? 'lg:col-span-2' : ''}`}>
+                        <div className={`rounded-3xl overflow-hidden shadow-xl ${block.feature.layout === 'BOTTOM' ? 'aspect-video' : 'aspect-square'}`}>
+                          <img src={block.feature.images[0] || undefined} alt="" className={`w-full h-full ${block.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            );
+          case 'COMPARISON':
+            return (
+              <section key={block.id} id={block.id} className="py-20 bg-stone-50">
+                <div className="max-w-7xl mx-auto px-4">
+                  {block.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.comparison.title}</h2>}
+                  <div className="max-w-4xl mx-auto">
+                    <div className="relative aspect-[4/3] sm:aspect-[16/9] rounded-3xl overflow-hidden shadow-xl group">
+                      <div className="absolute inset-0 w-1/2 overflow-hidden z-10 border-r-4 border-white transition-all duration-300 ease-in-out group-hover:w-[45%]">
+                        <img src={block.comparison?.beforeImage || undefined} alt="Before" className="absolute top-0 left-0 w-[200vw] sm:w-[100vw] md:w-[896px] h-full object-cover" referrerPolicy="no-referrer" style={{ maxWidth: 'none' }}/>
+                        {block.comparison?.beforeLabel && <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">{block.comparison.beforeLabel}</div>}
+                      </div>
+                      <img src={block.comparison?.afterImage || undefined} alt="After" className="absolute inset-0 w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      {block.comparison?.afterLabel && <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-bold shadow-sm z-20">{block.comparison.afterLabel}</div>}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            );
+          case 'TEXT_LIST':
+            return (
+              <section key={block.id} id={block.id} className="py-20 bg-white">
+                <div className="max-w-3xl mx-auto px-4">
+                  {block.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.textList.title}</h2>}
+                  <div className="space-y-6">
+                    {block.textList?.items.map((item, idx) => (
+                      <div key={item.id} className="flex gap-4 sm:gap-6 bg-stone-50 p-6 sm:p-8 rounded-3xl">
+                        <div className="text-primary font-bold text-2xl sm:text-3xl w-8 sm:w-12 shrink-0 pt-0.5">{idx + 1}</div>
+                        <div>
+                          {item.title && <h3 className="text-xl sm:text-2xl font-bold text-stone-900 mb-3">{item.title}</h3>}
+                          <p className="text-stone-700 leading-relaxed text-base sm:text-lg whitespace-pre-line">{item.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            );
+          case 'HTML_CODE':
+            return (
+              <section key={block.id} id={block.id} className="w-full">
+                <div dangerouslySetInnerHTML={{ __html: block.htmlCode?.html || '' }} />
+              </section>
+            );
 default:
 return <div key={block.id} className="p-4 text-stone-400 italic text-center">不支援的區塊類型: {block.type}</div>;
 }

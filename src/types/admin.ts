@@ -254,38 +254,8 @@ export interface Product {
   updatedAt: string;
 }
 
-export type ServiceIntroBlockType = 'GRID' | 'FEATURE' | 'COMPARISON' | 'TEXT_LIST';
-
-export interface ServiceIntroSection {
-  id: string;
-  type: ServiceIntroBlockType;
-  enabled: boolean;
-  grid?: {
-    title: string;
-    showCarousel: boolean;
-    items: { id: string; title: string; image: string; }[];
-  };
-  feature?: {
-    title: string;
-    showCarousel: boolean;
-    images: string[];
-    content: string;
-    layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM' | 'TEXT_ONLY' | 'IMAGE_ONLY';
-    imageFit?: 'cover' | 'contain';
-  };
-  comparison?: {
-    title: string;
-    beforeImage: string;
-    afterImage: string;
-    beforeLabel: string;
-    afterLabel: string;
-  };
-  textList?: {
-    title: string;
-    items: { id: string; title: string; text: string; }[];
-  };
-}
-
+export type ServiceIntroBlockType = GeneralBlockType;
+export type ServiceIntroSection = GeneralBlock;
 export interface SubItemContent {
   productId?: string; // New field for linked product
   mainTitle?: string; // Adding main title
@@ -326,7 +296,7 @@ export interface SubItemContent {
   };
 }
 
-export type GeneralBlockType = 
+export type GeneralBlockType = 'FEATURE' | 'COMPARISON' | 'TEXT_LIST' | 'HTML_CODE' 
   | 'HERO_1' 
   | 'HERO_2' 
   | 'MAIN_SERVICE' 
@@ -403,10 +373,34 @@ export interface GeneralBlock {
     items: HomeTestimonial[];
   };
   items?: HomeTestimonial[]; // For direct items in block
+  enabled?: boolean;
   grid?: {
     title: string;
-    columns: 2 | 3 | 4 | 5 | 6;
-    items: { title: string; description: string; image?: string; showImage?: boolean; tag?: string; link?: string; }[];
+    columns?: 2 | 3 | 4 | 5 | 6;
+    showCarousel?: boolean;
+    items: any[];
+  };
+  feature?: {
+    title: string;
+    showCarousel: boolean;
+    images: string[];
+    content: string;
+    layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM' | 'TEXT_ONLY' | 'IMAGE_ONLY';
+    imageFit?: 'cover' | 'contain';
+  };
+  comparison?: {
+    title: string;
+    beforeImage: string;
+    afterImage: string;
+    beforeLabel: string;
+    afterLabel: string;
+  };
+  textList?: {
+    title: string;
+    items: { id: string; title: string; text: string; }[];
+  };
+  htmlCode?: {
+    html: string;
   };
   partners?: {
     title: string;
