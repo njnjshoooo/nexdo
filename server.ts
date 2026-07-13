@@ -10,6 +10,7 @@ import ecpayCreateHandler from './api/ecpay/create.ts';
 import ecpayCallbackHandler from './api/ecpay/callback.ts';
 import updateUserHandler from './api/admin/update-user.ts';
 import createUserHandler from './api/admin/create-user.ts';
+import sitemapHandler from './api/sitemap.ts';
 
 async function startServer() {
   const app = express();
@@ -30,6 +31,7 @@ async function startServer() {
   app.all('/api/ecpay/callback', ecpayCallbackHandler);
   app.all('/api/admin/update-user', updateUserHandler);
   app.all('/api/admin/create-user', createUserHandler);
+  app.get('/sitemap.xml', sitemapHandler);
 
   // ====== Vite Middleware for Web App ======
   if (process.env.NODE_ENV !== 'production') {

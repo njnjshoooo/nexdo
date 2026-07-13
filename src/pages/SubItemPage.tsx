@@ -232,7 +232,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   return (
     <div className="min-h-screen bg-stone-50 pt-20 pb-20">
       <div className="max-w-[1280px] mx-auto px-0 lg:px-6 xl:px-4">
-        <div className="flex flex-col lg:flex-row gap-0 lg:gap-10 xl:gap-12">
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-10 xl:gap-10">
           
           {/* Product Info Column (Top on Mobile, Right on Desktop) */}
           <div className="lg:w-[280px] xl:w-[300px] flex-shrink-0 order-1 lg:order-2 lg:sticky lg:top-24 self-start flex flex-col max-h-[calc(100vh-6rem)] bg-white rounded-none lg:rounded-3xl shadow-sm lg:shadow-lg border-b lg:border border-stone-200 lg:border-stone-100 overflow-hidden" ref={productInfoRef}>
@@ -241,7 +241,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             <div className="p-0 md:p-8 overflow-y-auto scrollbar-hide flex-1 pb-4">
               <div className="mb-2">
                 {/* Product Gallery / Main Image */}
-                <div className="mb-6 md:mb-6">
+                <div className="mb-5 md:mb-5">
                   {productData?.images && productData.images.length > 0 ? (
                     <ProductGallery 
                       images={[productData.image, ...productData.images].filter((img): img is string => !!img)} 
@@ -297,7 +297,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                   </p>
 
                 {productData?.checklist && productData.checklist.length > 0 && (
-                  <ul className="space-y-2 md:space-y-2.5 mb-6 md:mb-6">
+                  <ul className="space-y-2 md:space-y-2.5 mb-5 md:mb-5">
                     {productData.checklist.map((item: any, index: number) => (
                       <li key={index} className="flex items-start gap-2 md:gap-3">
                         <CheckCircle2 className="text-[#5C704A] w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0 mt-0.5" />
@@ -309,7 +309,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
                 {/* Variants Selection */}
                 {orderMode === 'FIXED' && productData?.variants && productData.variants.length > 0 && (
-                  <div className="mb-6 space-y-3">
+                  <div className="mb-5 space-y-3">
                     <h3 className="text-xs font-bold text-stone-900">選擇方案</h3>
                     <div className="space-y-2">
                       <label className={`flex items-start gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariantId === '' ? 'border-primary bg-primary/5' : 'border-stone-100 hover:border-stone-200'}`}>
@@ -353,7 +353,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
                 {/* Field Toggles */}
                 {orderMode === 'FIXED' && (productData?.requireDate || productData?.requireTime || productData?.requireNotes) && (
-                  <div className="mb-6 space-y-4 p-4 md:p-5 bg-stone-50 rounded-2xl border border-stone-100">
+                  <div className="mb-5 space-y-4 p-4 md:p-5 bg-stone-50 rounded-2xl border border-stone-100">
                     <h3 className="text-xs font-bold text-stone-900 mb-2">需求資訊</h3>
                     {productData.requireDate && (
                       <div className="space-y-2 md:space-y-3">
@@ -520,7 +520,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
             {/* Product/Service Main Title */}
             {(subItem.mainTitle || subItem.coreServicesSectionTitle) && (
-              <div className="pb-6 border-b-2 border-stone-100 mt-8 mb-12 relative">
+              <div className="pb-6 border-b-2 border-stone-100 mt-8 mb-5 relative">
                 <h2 className="text-4xl md:text-5xl font-extrabold text-stone-900 tracking-tight text-left leading-tight">
                   {subItem.mainTitle || subItem.coreServicesSectionTitle}
                 </h2>
@@ -542,8 +542,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className={`relative p-8 md:p-12 overflow-hidden bg-[#FAF9F7] rounded-[2.5rem] ${isFirstBlock ? 'mt-8' : ''}`}>
                                       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                                          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                                          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-5">
                                             <h1 className="text-4xl md:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
                                               {section.hero1?.title}
                                             </h1>
@@ -568,7 +568,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                                           {section.secondaryServices?.map((service, i) => {
                                             const targetPage = pageService.getById(service.pageId) || pageService.getBySlug(service.pageId);
                                             return (
@@ -581,7 +581,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                                 className="group cursor-pointer"
                                                 onClick={() => targetPage && navigate(`/${targetPage.slug}`)}
                                               >
-                                                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-6 shadow-lg">
+                                                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-5 shadow-lg">
                                                   <img src={service.image || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
                                                 </div>
@@ -590,7 +590,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                                     <span key={j} className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">{tag}</span>
                                                   ))}
                                                 </div>
-                                                <p className="text-stone-600 mb-6 leading-relaxed">{service.description}</p>
+                                                <p className="text-stone-600 mb-5 leading-relaxed">{service.description}</p>
                                                 <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100">
                                                   <p className="text-stone-500 text-sm italic mb-2">「{service.testimonial.text}」</p>
                                                   <p className="text-stone-400 text-xs">— {service.testimonial.author}</p>
@@ -611,7 +611,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-7xl mx-auto px-4">
-                                        <h2 className="text-2xl font-bold text-stone-900 mb-12 text-center">{additionalTitle}</h2>
+                                        <h2 className="text-2xl font-bold text-stone-900 mb-5 text-center">{additionalTitle}</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                           {additionalItems.map((id, i) => {
                                             const p = pageService.getById(id) || pageService.getBySlug(id);
@@ -630,7 +630,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       
                                 case 'TEXT':
                                   const textStyles = {
-                                    heading: 'text-3xl font-bold text-center mb-16 text-stone-900',
+                                    heading: 'text-3xl font-bold text-center mb-5 text-stone-900',
                                     medium_heading: 'text-xl font-bold text-stone-900 mb-3',
                                     body: 'text-stone-700 leading-relaxed text-[18px] md:text-[20px] markdown-body'
                                   }[section.text?.fontSize || 'body'];
@@ -658,9 +658,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   if (cols === 6) gridClass = 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
                       
                                   return (
-                                    <section key={section.id} id={section.id} className={`p-8 md:p-12 bg-stone-50 rounded-[2.5rem] border border-stone-100/50 ${isFirstBlock ? 'mt-8' : ''}`}>
+                                    <section key={section.id} id={section.id} className={`p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 ${isFirstBlock ? 'mt-8' : ''}`}>
                                       <div className="max-w-7xl mx-auto px-4">
-                                        <h2 className="text-3xl font-bold text-center mb-16 text-stone-900">{section.grid?.title}</h2>
+                                        <h2 className="text-3xl font-bold text-center mb-5 text-stone-900">{section.grid?.title}</h2>
                                         <div className={`grid ${gridClass} gap-8`}>
                                           {section.grid?.items?.map((item, i) => {
                                             const isLink = !!item.link;
@@ -701,14 +701,14 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className={`relative p-8 md:p-12 overflow-hidden bg-[#FAF9F7] rounded-[2.5rem] ${isFirstBlock ? 'mt-0' : ''}`}>
                                       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-10 items-center">
                                           {/* Left Text */}
                                           <motion.div
                                             initial={{ opacity: 0, x: -30 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             viewport={{ once: true }}
                                             transition={{ duration: 0.8 }}
-                                            className="space-y-8"
+                                            className="space-y-5"
                                           >
                                             <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
                                               {section.hero2?.title}
@@ -789,10 +789,10 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-7xl mx-auto px-4">
                                         {/* 強制左側文字、右側圖片 */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                                           <div className="w-full md:order-1">
-                                            <h2 className="text-3xl font-bold text-stone-900 mb-6">{section.imageTextGrid?.title}</h2>
-                                            <div className="prose prose-stone mb-8">
+                                            <h2 className="text-3xl font-bold text-stone-900 mb-5">{section.imageTextGrid?.title}</h2>
+                                            <div className="prose prose-stone mb-5">
                                               <Markdown>{section.imageTextGrid?.content || ''}</Markdown>
                                             </div>
                                             {section.imageTextGrid?.cta?.text && (
@@ -819,8 +819,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-7xl mx-auto px-4">
-                                        {section.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.feature.title}</h2>}
-                                        <div className={`grid grid-cols-1 ${section.feature?.layout !== 'TEXT_ONLY' && section.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-12 items-center`}>
+                                        {section.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-5 text-center">{section.feature.title}</h2>}
+                                        <div className={`grid grid-cols-1 ${section.feature?.layout !== 'TEXT_ONLY' && section.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-10 items-center`}>
                                           {(section.feature?.layout === 'LEFT' || section.feature?.layout === 'TOP' || section.feature?.layout === 'IMAGE_ONLY') && section.feature?.images && section.feature.images.length > 0 && (
                                             <div className={`${section.feature.layout === 'TOP' ? 'lg:col-span-2' : ''}`}>
                                               <div className={`rounded-3xl overflow-hidden shadow-xl ${section.feature.layout === 'TOP' ? 'aspect-video' : 'aspect-square'}`}>
@@ -850,7 +850,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-7xl mx-auto px-4">
-                                        {section.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.comparison.title}</h2>}
+                                        {section.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-5 text-center">{section.comparison.title}</h2>}
                                         <div className="max-w-4xl mx-auto">
                                           <div className="relative aspect-[4/3] sm:aspect-[16/9] rounded-3xl overflow-hidden shadow-xl group">
                                             <div className="absolute inset-0 w-1/2 overflow-hidden z-10 border-r-4 border-white transition-all duration-300 ease-in-out group-hover:w-[45%]">
@@ -868,7 +868,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   return (
                                     <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div className="max-w-3xl mx-auto px-4">
-                                        {section.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{section.textList.title}</h2>}
+                                        {section.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-5 text-center">{section.textList.title}</h2>}
                                         <div className="space-y-6">
                                           {section.textList?.items.map((item, idx) => (
                                             <div key={item.id} className="flex gap-4 sm:gap-6 bg-stone-50 p-6 sm:p-8 rounded-3xl">
@@ -885,7 +885,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   );
                                 case 'HTML_CODE':
                                   return (
-                                    <section key={section.id} id={section.id} className="w-full p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
+                                    <section key={section.id} id={section.id} className="p-8 md:p-12 bg-white rounded-[2.5rem] shadow-sm border border-stone-100">
                                       <div dangerouslySetInnerHTML={{ __html: section.htmlCode?.html || '' }} />
                                     </section>
                                   );
@@ -903,7 +903,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     {/* Block A: Grid or Carousel */}
                     {subItem.serviceIntro?.blockA?.enabled && (
                       <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
+                        <div className="mb-5 pl-4 border-l-4 border-primary">
                           <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
                             {subItem.serviceIntro.blockA.title}
                           </h2>
@@ -942,9 +942,9 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     {subItem.serviceIntro?.blockB?.enabled && (
                       <section>
                         <div className={`flex flex-col md:items-center ${
-                          subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row gap-8 lg:gap-16' : 
-                          subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse gap-8 lg:gap-16' : 
-                          subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col gap-8 lg:gap-12' : 'flex-col-reverse gap-8 lg:gap-12'
+                          subItem.serviceIntro.blockB.layout === 'LEFT' ? 'md:flex-row gap-8 lg:gap-10' : 
+                          subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:flex-row-reverse gap-8 lg:gap-10' : 
+                          subItem.serviceIntro.blockB.layout === 'TOP' ? 'flex-col gap-8 lg:gap-10' : 'flex-col-reverse gap-8 lg:gap-10'
                         }`}>
                           <div className={`${
                             (subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT') && subItem.serviceIntro.blockB.content ? 'md:w-1/2' : 'w-full'
@@ -985,7 +985,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             <div className={`${
                               subItem.serviceIntro.blockB.layout === 'LEFT' || subItem.serviceIntro.blockB.layout === 'RIGHT' ? 'md:w-1/2' : 'w-full'
                             } flex flex-col justify-center py-0`}>
-                              <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-6 tracking-tight">{subItem.serviceIntro.blockB.title}</h3>
+                              <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-5 tracking-tight">{subItem.serviceIntro.blockB.title}</h3>
                               <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
                                 <Markdown>{subItem.serviceIntro.blockB.content}</Markdown>
                               </div>
@@ -998,7 +998,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     {/* Block C: Before/After Slider */}
                     {subItem.serviceIntro?.blockC?.enabled && (
                       <section>
-                        <div className="mb-8 pl-4 border-l-4 border-primary">
+                        <div className="mb-5 pl-4 border-l-4 border-primary">
                           <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">
                             {subItem.serviceIntro.blockC.title}
                           </h2>
@@ -1050,7 +1050,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             {/* Real Cases Module */}
             {subItem.cases.length > 0 && (
               <section>
-                <div className="mb-8 pl-4 border-l-4 border-primary">
+                <div className="mb-5 pl-4 border-l-4 border-primary">
                   <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">真實案例</h2>
                 </div>
                 <div className="overflow-hidden md:overflow-visible" ref={emblaRef}>
@@ -1106,7 +1106,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                   {/* Continuous Vertical Line */}
                   <div className="absolute left-[35px] md:left-[43px] top-6 bottom-6 w-0.5 bg-stone-200"></div>
 
-                  <div className="space-y-6 md:space-y-8">
+                  <div className="space-y-6 md:space-y-5">
                     {subItem.coreServices.map((service, index) => (
                       <motion.div 
                         key={index}
@@ -1142,7 +1142,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             {/* FAQ Module */}
             {subItem.faqs && subItem.faqs.length > 0 && (
               <section>
-                <div className="mb-8 pl-4 border-l-4 border-primary">
+                <div className="mb-5 pl-4 border-l-4 border-primary">
                   <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left mb-1">常見問題</h2>
                   <p className="text-stone-500 text-left text-sm md:text-base">有任何疑問嗎？看看是否有您需要的解答</p>
                 </div>
@@ -1157,7 +1157,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             {/* Related Services Module */}
             {relatedPages.length > 0 && (
               <section>
-                <div className="mb-8 pl-4 border-l-4 border-primary">
+                <div className="mb-5 pl-4 border-l-4 border-primary">
                   <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-left">我們還提供</h2>
                 </div>
                 <div className="md:hidden">
@@ -1184,7 +1184,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col border border-stone-100"
                             whileHover={{ y: -5 }}
                           >
-                            <div className="w-full h-48 bg-stone-200 rounded-xl mb-6 overflow-hidden">
+                            <div className="w-full h-48 bg-stone-200 rounded-xl mb-5 overflow-hidden">
                               <img 
                                 src={relatedProductData?.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop'} 
                                 alt={page.title} 
@@ -1194,7 +1194,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             </div>
                             
                             <h3 className="text-xl font-bold text-stone-900 mb-3">{page.title}</h3>
-                            <p className="text-stone-600 text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
+                            <p className="text-stone-600 text-sm leading-relaxed mb-5 flex-grow line-clamp-3">
                               {relatedProductData?.description}
                             </p>
                             
