@@ -258,6 +258,7 @@ export type ServiceIntroBlockType = GeneralBlockType;
 export type ServiceIntroSection = GeneralBlock;
 export interface SubItemContent {
   productId?: string; // New field for linked product
+  hideProductMainImage?: boolean; // Toggle to hide product main image in CTA
   mainTitle?: string; // Adding main title
   coreServicesSectionTitle?: string;
   coreServices: CoreServiceItem[]; // Should be 4

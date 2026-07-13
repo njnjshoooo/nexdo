@@ -50,7 +50,7 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
         if (productData && !item.price) {
           if (productData.orderMode === 'FIXED' && productData.fixedConfig) {
             calculatedPrice = `NT$ ${productData.fixedConfig.price?.toLocaleString() || 0} / ${productData.fixedConfig.unit || '次'}`;
-          } else if (productData.orderMode === 'QUOTE' && productData.quoteConfig?.priceText) {
+          } else if (productData.orderMode === 'INTERNAL_FORM' && (productData as any).quoteConfig?.priceText) {
             calculatedPrice = productData.quoteConfig.priceText;
           }
         }

@@ -43,7 +43,7 @@ export default function MoreServices({ data }: MoreServicesProps) {
         if (productData) {
           if (productData.orderMode === 'FIXED' && productData.fixedConfig) {
             calculatedPrice = `NT$ ${productData.fixedConfig.price?.toLocaleString() || 0} / ${productData.fixedConfig.unit || '次'}`;
-          } else if (productData.orderMode === 'QUOTE' && productData.quoteConfig?.priceText) {
+          } else if (productData.orderMode === 'INTERNAL_FORM' && (productData as any).quoteConfig?.priceText) {
             calculatedPrice = productData.quoteConfig.priceText;
           }
         }

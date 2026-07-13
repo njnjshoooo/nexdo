@@ -4,7 +4,9 @@ import { getSupabaseAdmin } from './_lib/supabase-admin.js';
 export default async function sitemapHandler(req: Request, res: Response) {
   try {
     const supabase = getSupabaseAdmin();
-    const baseUrl = 'https://nexdo.tw';
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'www.nexdo.tw';
+    const baseUrl = `${protocol}://${host}`;
 
     const [{ data: pages }, { data: articles }] = await Promise.all([
       supabase.from('pages').select('slug, updated_at, is_published').eq('is_published', true),

@@ -155,6 +155,20 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
               </div>
             </div>
 
+            
+            {/* Display Settings */}
+            <div className="mb-6 p-4 bg-white border border-stone-200 rounded-xl">
+              <h3 className="text-sm font-bold text-stone-900 mb-3">頁面顯示設定</h3>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input 
+                  type="checkbox"
+                  {...register('content.subItem.hideProductMainImage')}
+                  className="w-4 h-4 text-primary border-stone-300 rounded focus:ring-primary"
+                />
+                <span className="text-sm text-stone-700 font-medium">在頁面中隱藏產品主圖 (CTA 區域)</span>
+              </label>
+            </div>
+
             {/* Warning Message */}
             <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-3">
               <AlertCircle className="text-amber-500 mt-0.5" size={18} />
