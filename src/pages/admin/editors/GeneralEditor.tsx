@@ -268,6 +268,88 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                       </div>
                     </div>
                   )}
+
+                  {blockType === 'HERO_1' && (
+                    <div className="space-y-4">
+                      <FieldLabel>標題</FieldLabel>
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.hero1.title`)} placeholder="標題" />
+                      <FieldLabel>背景圖片</FieldLabel>
+                      <Controller control={control} name={`content.general.blocks.${index}.hero1.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                    </div>
+                  )}
+                  {blockType === 'HERO_2' && (
+                    <div className="space-y-4">
+                      <FieldLabel>標題</FieldLabel>
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.title`)} placeholder="標題" />
+                      <FieldLabel>描述</FieldLabel>
+                      <textarea className={InputClass} {...register(`content.general.blocks.${index}.hero2.description`)} placeholder="描述" rows={3} />
+                      <FieldLabel>背景圖片</FieldLabel>
+                      <Controller control={control} name={`content.general.blocks.${index}.hero2.backgroundImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={innerCardClass}>
+                          <FieldLabel>主按鈕文字</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.mainButton.text`)} placeholder="主按鈕文字" />
+                          <FieldLabel>主按鈕類型</FieldLabel>
+                          <select className={InputClass} {...register(`content.general.blocks.${index}.hero2.mainButton.type`)}>
+                            <option value="URL">網址</option>
+                            <option value="FORM">表單</option>
+                            <option value="EMAIL">Email</option>
+                            <option value="PHONE">電話</option>
+                          </select>
+                          <FieldLabel>主按鈕連結/表單ID</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.mainButton.value`)} placeholder="連結或表單ID" />
+                          <label className="flex items-center gap-2 mt-2">
+                            <input type="checkbox" {...register(`content.general.blocks.${index}.hero2.mainButton.isVisible`)} /> 顯示主按鈕
+                          </label>
+                        </div>
+                        <div className={innerCardClass}>
+                          <FieldLabel>次按鈕文字</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.secondaryButton.text`)} placeholder="次按鈕文字" />
+                          <FieldLabel>次按鈕類型</FieldLabel>
+                          <select className={InputClass} {...register(`content.general.blocks.${index}.hero2.secondaryButton.type`)}>
+                            <option value="URL">網址</option>
+                            <option value="FORM">表單</option>
+                            <option value="EMAIL">Email</option>
+                            <option value="PHONE">電話</option>
+                          </select>
+                          <FieldLabel>次按鈕連結/表單ID</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.secondaryButton.value`)} placeholder="連結或表單ID" />
+                          <label className="flex items-center gap-2 mt-2">
+                            <input type="checkbox" {...register(`content.general.blocks.${index}.hero2.secondaryButton.isVisible`)} /> 顯示次按鈕
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {blockType === 'COMPARISON' && (
+                    <div className="space-y-4">
+                      <FieldLabel>標題</FieldLabel>
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.title`)} placeholder="標題" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={innerCardClass}>
+                          <FieldLabel>Before 圖片</FieldLabel>
+                          <Controller control={control} name={`content.general.blocks.${index}.comparison.beforeImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                          <FieldLabel>Before 標籤</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.beforeLabel`)} placeholder="例如: Before" />
+                        </div>
+                        <div className={innerCardClass}>
+                          <FieldLabel>After 圖片</FieldLabel>
+                          <Controller control={control} name={`content.general.blocks.${index}.comparison.afterImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                          <FieldLabel>After 標籤</FieldLabel>
+                          <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.afterLabel`)} placeholder="例如: After" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {blockType === 'FORM' && (
+                    <div className="space-y-4">
+                      <FieldLabel>選擇表單</FieldLabel>
+                      <select className={InputClass} {...register(`content.general.blocks.${index}.form.formId`)}>
+                        <option value="">-- 請選擇表單 --</option>
+                        {forms?.map((f: any) => (<option key={f.id} value={f.id}>{f.name}</option>))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
             );
