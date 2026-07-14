@@ -1141,7 +1141,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
                         {/* Content Card */}
                         <div className="flex-1 bg-white p-6 md:p-8 rounded-[1.5rem] shadow-sm border border-stone-100 group-hover:shadow-md group-hover:border-[#8B5E34]/20 transition-all duration-300">
-                          <h3 className="text-xl md:text-2xl font-bold text-stone-900 mb-3 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
+                          <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
                           <div className="markdown-body text-stone-600 leading-relaxed text-sm md:text-base">
                             <Markdown>{service.content}</Markdown>
                           </div>

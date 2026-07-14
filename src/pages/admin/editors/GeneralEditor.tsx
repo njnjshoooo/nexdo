@@ -48,7 +48,7 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
     if (type === 'IMAGE_TEXT_GRID') newBlock.imageTextGrid = { layout: 'imageLeft', image: '', title: '', content: '', cta: { text: '', link: '' } };
     if (type === 'COMPARISON') newBlock.comparison = { title: '', beforeImage: '', afterImage: '', beforeLabel: 'Before', afterLabel: 'After' };
     if (type === 'TEXT_LIST') newBlock.textList = { title: '', items: [] };
-    if (type === 'HTML_CODE') newBlock.htmlCode = { html: '' };
+    if (type === 'HTML_CODE') newBlock.htmlCode = { html: '', adminLabel: '' };
 
     append(newBlock);
     e.target.value = ""; 
@@ -132,13 +132,23 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
 
                   {blockType === 'HTML_CODE' && (
                     <div className="space-y-4">
-                      <FieldLabel>HTML 程式碼</FieldLabel>
-                      <textarea 
-                        {...register(`content.general.blocks.${index}.htmlCode.html`)} 
-                        placeholder="請貼上 HTML 程式碼..." 
-                        rows={10} 
-                        className={InputClass + " font-mono"} 
-                      />
+                      <div>
+                        <FieldLabel>管理員備註 (不會顯示於前台)</FieldLabel>
+                        <input 
+                          {...register(`content.general.blocks.${index}.htmlCode.adminLabel`)} 
+                          placeholder="例如: 這裡是首頁的輪播圖區塊" 
+                          className={InputClass} 
+                        />
+                      </div>
+                      <div>
+                        <FieldLabel>HTML 程式碼</FieldLabel>
+                        <textarea 
+                          {...register(`content.general.blocks.${index}.htmlCode.html`)} 
+                          placeholder="請貼上 HTML 程式碼..." 
+                          rows={10} 
+                          className={InputClass + " font-mono"} 
+                        />
+                      </div>
                     </div>
                   )}
                   {blockType === 'TEXT_LIST' && (

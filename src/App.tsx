@@ -48,6 +48,7 @@ import OrderDetail from './pages/admin/OrderDetail';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import PermissionEditor from './pages/admin/editors/PermissionEditor';
 import SystemSettings from './pages/admin/SystemSettings';
+import DesignSpecPage from './pages/admin/DesignSpecPage';
 import EmailManagement from './pages/admin/EmailManagement';
 import EmailEditor from './pages/admin/editors/EmailEditor';
 import MediaLibrary from './pages/admin/MediaLibrary';
@@ -121,6 +122,7 @@ export default function App() {
         <Route path="bookings" element={<PermissionGuard permission="forms"><FormSubmissions /></PermissionGuard>} />
         <Route path="media" element={<PermissionGuard permission="media"><MediaLibrary /></PermissionGuard>} />
         <Route path="settings" element={<PermissionGuard permission="settings"><SystemSettings /></PermissionGuard>} />
+        <Route path="design-spec" element={<PermissionGuard permission="settings"><DesignSpecPage /></PermissionGuard>} />
         <Route path="emails" element={<PermissionGuard permission="emails"><EmailManagement /></PermissionGuard>} />
         <Route path="emails/:id" element={<PermissionGuard permission="emails"><EmailEditor /></PermissionGuard>} />
       </Route>

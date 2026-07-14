@@ -59,7 +59,7 @@ export default function Sidebar() {
       if (!expandedCategories.includes('內容管理')) setExpandedCategories(prev => [...prev, '內容管理']);
     } else if (path.startsWith('/admin/vendors') || path.startsWith('/admin/forms')) {
       if (!expandedCategories.includes('資源管理')) setExpandedCategories(prev => [...prev, '資源管理']);
-    } else if (path.startsWith('/admin/settings') || path.startsWith('/admin/navigation') || path.startsWith('/admin/emails') || path.startsWith('/admin/permissions')) {
+    } else if (path.startsWith('/admin/settings') || path.startsWith('/admin/navigation') || path.startsWith('/admin/emails') || path.startsWith('/admin/permissions') || path.startsWith('/admin/design-spec')) {
       if (!expandedCategories.includes('系統配置')) setExpandedCategories(prev => [...prev, '系統配置']);
     }
   }, [location.pathname]);
@@ -102,6 +102,7 @@ export default function Sidebar() {
       icon: Settings,
       items: [
         { title: '網站外觀設定', path: '/admin/settings', permission: 'settings' },
+        { title: '設計規範', path: '/admin/design-spec', permission: 'settings' },
         { title: '導覽列管理', path: '/admin/navigation', permission: 'navigation' },
         { title: '自動發信管理', path: '/admin/emails', permission: 'emails' },
         { title: '管理員與權限設定', path: '/admin/permissions', permission: 'permissions' },

@@ -393,6 +393,7 @@ comparison?: {
     items: { id: string; title: string; text: string; }[];
   };
   htmlCode?: {
+    adminLabel?: string;
     html: string;
   };
   partners?: {

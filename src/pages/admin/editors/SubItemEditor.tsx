@@ -445,16 +445,38 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                       const type = e.target.value;
                       if (!type) return;
                       const newBlock: any = { id: `block-${Date.now()}`, type, enabled: true };
-                      // ... minimal init ...
+                      if (type === 'HERO_1') newBlock.hero1 = { title: '', image: '' };
+                      if (type === 'HERO_2') newBlock.hero2 = { 
+                        title: '', 
+                        description: '', 
+                        backgroundImage: '', 
+                        mainButton: { text: '預約諮詢', type: 'FORM', value: '', isVisible: true },
+                        secondaryButton: { text: '查看案例', type: 'URL', value: '#cases', isVisible: true }
+                      };
+                      if (type === 'TEXT') newBlock.text = { content: '', alignment: 'left', fontSize: 'body' };
                       if (type === 'GRID') newBlock.grid = { title: '服務項目', columns: 3, items: [{ id: Date.now().toString(), title: '項目名稱', image: '' }] };
-                      if (type === 'HTML_CODE') newBlock.htmlCode = { html: '' };
+                      if (type === 'SPACER') newBlock.spacer = { height: 80 };
+                      if (type === 'FORM') newBlock.form = { formId: '' };
+                      if (type === 'SINGLE_IMAGE') newBlock.singleImage = { image: '', caption: '' };
+                      if (type === 'IMAGE_CAROUSEL') newBlock.imageCarousel = { items: [] };
+                      if (type === 'IMAGE_TEXT_GRID') newBlock.imageTextGrid = { layout: 'imageLeft', image: '', title: '', content: '', cta: { text: '', link: '' } };
+                      if (type === 'COMPARISON') newBlock.comparison = { title: '', beforeImage: '', afterImage: '', beforeLabel: 'Before', afterLabel: 'After' };
+                      if (type === 'TEXT_LIST') newBlock.textList = { title: '', items: [] };
+                      if (type === 'HTML_CODE') newBlock.htmlCode = { html: '', adminLabel: '' };
                       appendSection(newBlock);
                       e.target.value = '';
                     }}
                   >
                     <option value="">➕ 選擇第一個小工具...</option>
+                    <option value="HERO_1">滿版主視覺 (無按鈕)</option>
+                    <option value="HERO_2">滿版主視覺 (含按鈕)</option>
+                    <option value="TEXT">純文字段落</option>
                     <option value="GRID">多欄位卡片組</option>
-                    
+                    <option value="FORM">嵌入表單</option>
+                    <option value="SPACER">空白間距</option>
+                    <option value="SINGLE_IMAGE">單張大圖</option>
+                    <option value="IMAGE_CAROUSEL">圖片輪播</option>
+                    <option value="IMAGE_TEXT_GRID">圖文區塊</option>
                     <option value="COMPARISON">B/A對比</option>
                     <option value="TEXT_LIST">文字列表</option>
                     <option value="HTML_CODE">自訂 HTML</option>
@@ -525,13 +547,23 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
 
                   {type === 'HTML_CODE' && (
                     <div className="space-y-4">
-                      <FieldLabel>HTML 程式碼</FieldLabel>
-                      <textarea 
-                        {...register(`content.subItem.serviceIntro.sections.${index}.htmlCode.html`)} 
-                        placeholder="請貼上 HTML 程式碼..." 
-                        rows={10} 
-                        className={InputClass + " font-mono"} 
-                      />
+                      <div>
+                        <FieldLabel>管理員備註 (不會顯示於前台)</FieldLabel>
+                        <input 
+                          {...register(`content.subItem.serviceIntro.sections.${index}.htmlCode.adminLabel`)} 
+                          placeholder="例如: 這裡是首頁的輪播圖區塊" 
+                          className={InputClass} 
+                        />
+                      </div>
+                      <div>
+                        <FieldLabel>HTML 程式碼</FieldLabel>
+                        <textarea 
+                          {...register(`content.subItem.serviceIntro.sections.${index}.htmlCode.html`)} 
+                          placeholder="請貼上 HTML 程式碼..." 
+                          rows={10} 
+                          className={InputClass + " font-mono"} 
+                        />
+                      </div>
                     </div>
                   )}
                   {type === 'TEXT_LIST' && (
@@ -775,7 +807,7 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                     if (type === 'IMAGE_TEXT_GRID') newBlock.imageTextGrid = { layout: 'imageLeft', image: '', title: '', content: '', cta: { text: '', link: '' } };
                     if (type === 'COMPARISON') newBlock.comparison = { title: '', beforeImage: '', afterImage: '', beforeLabel: 'Before', afterLabel: 'After' };
                     if (type === 'TEXT_LIST') newBlock.textList = { title: '', items: [] };
-                    if (type === 'HTML_CODE') newBlock.htmlCode = { html: '' };
+                    if (type === 'HTML_CODE') newBlock.htmlCode = { html: '', adminLabel: '' };
 
                     appendSection(newBlock);
                     e.target.value = '';
