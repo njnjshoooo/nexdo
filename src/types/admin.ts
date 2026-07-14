@@ -381,15 +381,7 @@ export interface GeneralBlock {
     showCarousel?: boolean;
     items: any[];
   };
-  feature?: {
-    title: string;
-    showCarousel: boolean;
-    images: string[];
-    content: string;
-    layout: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM' | 'TEXT_ONLY' | 'IMAGE_ONLY';
-    imageFit?: 'cover' | 'contain';
-  };
-  comparison?: {
+comparison?: {
     title: string;
     beforeImage: string;
     afterImage: string;

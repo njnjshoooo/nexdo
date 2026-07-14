@@ -857,37 +857,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                     </section>
                                   );
                       
-                                case 'FEATURE':
-                                  return (
-                                    <section key={section.id} id={section.id} className="p-6 md:p-10 bg-white rounded-3xl shadow-sm ring-1 ring-stone-900/5 hover:shadow-md transition-shadow duration-300">
-                                      <div className="max-w-7xl mx-auto">
-                                        {section.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-5 text-center">{section.feature.title}</h2>}
-                                        <div className={`grid grid-cols-1 ${section.feature?.layout !== 'TEXT_ONLY' && section.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-10 items-center`}>
-                                          {(section.feature?.layout === 'LEFT' || section.feature?.layout === 'TOP' || section.feature?.layout === 'IMAGE_ONLY') && section.feature?.images && section.feature.images.length > 0 && (
-                                            <div className={`${section.feature.layout === 'TOP' ? 'lg:col-span-2' : ''}`}>
-                                              <div className="rounded-3xl overflow-hidden shadow-xl flex items-center justify-center">
-                                                <img src={section.feature.images[0] || undefined} alt="" className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-                                              </div>
-                                            </div>
-                                          )}
-                                          {(section.feature?.layout !== 'IMAGE_ONLY') && (
-                                            <div className={`${section.feature?.layout === 'BOTTOM' || section.feature?.layout === 'TOP' ? 'lg:col-span-2 text-center' : ''}`}>
-                                              <div className="prose prose-stone prose-lg max-w-none">
-                                                <Markdown>{section.feature?.content || ''}</Markdown>
-                                              </div>
-                                            </div>
-                                          )}
-                                          {(section.feature?.layout === 'RIGHT' || section.feature?.layout === 'BOTTOM') && section.feature?.images && section.feature.images.length > 0 && (
-                                            <div className={`${section.feature.layout === 'BOTTOM' ? 'lg:col-span-2' : ''}`}>
-                                              <div className="rounded-3xl overflow-hidden shadow-xl flex items-center justify-center">
-                                                <img src={section.feature.images[0] || undefined} alt="" className="w-full h-auto object-contain" referrerPolicy="no-referrer" />
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </section>
-                                  );
+                                
                                 case 'COMPARISON':
                                   return (
                                     <section key={section.id} id={section.id} className="p-6 md:p-10 bg-white rounded-3xl shadow-sm ring-1 ring-stone-900/5 hover:shadow-md transition-shadow duration-300">
@@ -913,11 +883,13 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                         {section.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-5 text-center">{section.textList.title}</h2>}
                                         <div className="space-y-6">
                                           {section.textList?.items.map((item, idx) => (
-                                            <div key={item.id} className="flex gap-4 sm:gap-6 bg-stone-50 p-6 sm:p-8 rounded-3xl">
-                                              <div className="text-primary font-bold text-2xl sm:text-3xl w-8 sm:w-12 shrink-0 pt-0.5">{idx + 1}</div>
-                                              <div>
-                                                {item.title && <h3 className="text-xl sm:text-2xl font-bold text-stone-900 mb-3">{item.title}</h3>}
-                                                <p className="text-stone-700 leading-relaxed text-[18px] sm:text-[20px] whitespace-pre-line">{item.text}</p>
+                                            <div key={item.id} className="flex items-start gap-4 md:gap-6 bg-stone-50 p-6 rounded-xl hover:bg-stone-100 transition-colors">
+                                              <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex-shrink-0 flex items-center justify-center shadow-sm">
+                                                <div className="w-3 h-3 rounded-full bg-primary" />
+                                              </div>
+                                              <div className="flex-1 pt-1">
+                                                {item.title && <h3 className="text-lg font-bold text-stone-900 mb-2">{item.title}</h3>}
+                                                <p className="text-stone-600 text-sm md:text-base leading-relaxed whitespace-pre-line">{item.text}</p>
                                               </div>
                                             </div>
                                           ))}

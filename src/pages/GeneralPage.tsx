@@ -364,37 +364,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
               </section>
             );
 
-          case 'FEATURE':
-            return (
-              <section key={block.id} id={block.id} className="py-20 bg-white">
-                <div className="max-w-7xl mx-auto px-4">
-                  {block.feature?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.feature.title}</h2>}
-                  <div className={`grid grid-cols-1 ${block.feature?.layout !== 'TEXT_ONLY' && block.feature?.layout !== 'IMAGE_ONLY' ? 'lg:grid-cols-2' : ''} gap-12 items-center`}>
-                    {(block.feature?.layout === 'LEFT' || block.feature?.layout === 'TOP' || block.feature?.layout === 'IMAGE_ONLY') && block.feature?.images && block.feature.images.length > 0 && (
-                      <div className={`${block.feature.layout === 'TOP' ? 'lg:col-span-2' : ''}`}>
-                        <div className={`rounded-3xl overflow-hidden shadow-xl ${block.feature.layout === 'TOP' ? 'aspect-video' : 'aspect-square'}`}>
-                          <img src={block.feature.images[0] || undefined} alt="" className={`w-full h-full ${block.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
-                        </div>
-                      </div>
-                    )}
-                    {(block.feature?.layout !== 'IMAGE_ONLY') && (
-                      <div className={`${block.feature?.layout === 'BOTTOM' || block.feature?.layout === 'TOP' ? 'lg:col-span-2 text-center' : ''}`}>
-                        <div className="prose prose-stone prose-lg max-w-none">
-                          <Markdown>{block.feature?.content || ''}</Markdown>
-                        </div>
-                      </div>
-                    )}
-                    {(block.feature?.layout === 'RIGHT' || block.feature?.layout === 'BOTTOM') && block.feature?.images && block.feature.images.length > 0 && (
-                      <div className={`${block.feature.layout === 'BOTTOM' ? 'lg:col-span-2' : ''}`}>
-                        <div className={`rounded-3xl overflow-hidden shadow-xl ${block.feature.layout === 'BOTTOM' ? 'aspect-video' : 'aspect-square'}`}>
-                          <img src={block.feature.images[0] || undefined} alt="" className={`w-full h-full ${block.feature.imageFit === 'contain' ? 'object-contain bg-stone-50' : 'object-cover'}`} referrerPolicy="no-referrer" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
-            );
+
           case 'COMPARISON':
             return (
               <section key={block.id} id={block.id} className="py-20 bg-stone-50">

@@ -18,6 +18,53 @@ class PageService {
     }
   }
 
+
+  private migrateContent(content: any): any {
+    if (!content) return content;
+    
+    // Migrate SubItem pages
+    if (content.subItem && content.subItem.serviceIntro && content.subItem.serviceIntro.sections) {
+      content.subItem.serviceIntro.sections = content.subItem.serviceIntro.sections.map((section: any) => {
+        if (section.type === 'FEATURE' && section.feature) {
+          return {
+            ...section,
+            type: 'IMAGE_TEXT_GRID',
+            imageTextGrid: {
+              layout: (section.feature.layout === 'RIGHT' || section.feature.layout === 'BOTTOM') ? 'imageRight' : 'imageLeft',
+              image: section.feature.images && section.feature.images.length > 0 ? section.feature.images[0] : '',
+              title: section.feature.title || '',
+              content: section.feature.content || '',
+              cta: { text: '', link: '' }
+            }
+          };
+        }
+        return section;
+      });
+    }
+
+    // Migrate General pages
+    if (content.general && content.general.sections) {
+      content.general.sections = content.general.sections.map((section: any) => {
+        if (section.type === 'FEATURE' && section.feature) {
+          return {
+            ...section,
+            type: 'IMAGE_TEXT_GRID',
+            imageTextGrid: {
+              layout: (section.feature.layout === 'RIGHT' || section.feature.layout === 'BOTTOM') ? 'imageRight' : 'imageLeft',
+              image: section.feature.images && section.feature.images.length > 0 ? section.feature.images[0] : '',
+              title: section.feature.title || '',
+              content: section.feature.content || '',
+              cta: { text: '', link: '' }
+            }
+          };
+        }
+        return section;
+      });
+    }
+
+    return content;
+  }
+
   private mapRow(row: any): Page {
     return {
       id: row.id,
@@ -25,7 +72,7 @@ class PageService {
       title: row.title,
       template: row.template,
       parentId: row.parent_id ?? undefined,
-      content: row.content,
+      content: this.migrateContent(row.content),
       isPublished: !!row.is_published,
       createdAt: row.created_at,
       updatedAt: row.updated_at,

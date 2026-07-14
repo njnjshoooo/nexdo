@@ -46,7 +46,6 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
     if (type === 'SINGLE_IMAGE') newBlock.singleImage = { image: '', caption: '' };
     if (type === 'IMAGE_CAROUSEL') newBlock.imageCarousel = { items: [] };
     if (type === 'IMAGE_TEXT_GRID') newBlock.imageTextGrid = { layout: 'imageLeft', image: '', title: '', content: '', cta: { text: '', link: '' } };
-    if (type === 'FEATURE') newBlock.feature = { title: '', showCarousel: true, images: [], content: '', layout: 'LEFT', imageFit: 'cover' };
     if (type === 'COMPARISON') newBlock.comparison = { title: '', beforeImage: '', afterImage: '', beforeLabel: 'Before', afterLabel: 'After' };
     if (type === 'TEXT_LIST') newBlock.textList = { title: '', items: [] };
     if (type === 'HTML_CODE') newBlock.htmlCode = { html: '' };
@@ -74,11 +73,11 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
             'FORM': '嵌入表單',
             'SPACER': '空白間距',
             'SINGLE_IMAGE': '單張大圖',
-            'IMAGE_TEXT_GRID': '左圖右文 / 右圖左文',
+            'IMAGE_TEXT_GRID': '圖文區塊',
             'IMAGE_CAROUSEL': '圖片輪播',
             'FEATURE': '大圖特色介紹',
-            'COMPARISON': 'B/A 對比 (Before/After)',
-            'TEXT_LIST': '文字列表 (如常見問題)',
+            'COMPARISON': 'B/A對比',
+            'TEXT_LIST': '文字列表',
             'HTML_CODE': '自訂 HTML'
           };
           const displayLabel = blockLabels[blockType] || '通用區塊設定';
@@ -166,113 +165,11 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                       </div>
                     </div>
                   )}
-                  {blockType === 'FEATURE' && (
-                    <div className="space-y-4">
-                      <input className={InputClass} {...register(`content.general.blocks.${index}.feature.title`)} placeholder="區塊標題" />
-                      <FieldLabel>內容文字 (支援 Markdown)</FieldLabel>
-                      <textarea className={InputClass} {...register(`content.general.blocks.${index}.feature.content`)} rows={4} />
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <FieldLabel>排版佈局</FieldLabel>
-                          <select {...register(`content.general.blocks.${index}.feature.layout`)} className={InputClass}>
-                            <option value="LEFT">左圖右文</option>
-                            <option value="RIGHT">右圖左文</option>
-                            <option value="TOP">上圖下文</option>
-                            <option value="BOTTOM">下圖上文</option>
-                            <option value="TEXT_ONLY">純文字</option>
-                            <option value="IMAGE_ONLY">純圖片</option>
-                          </select>
-                        </div>
-                        <div>
-                          <FieldLabel>圖片填充方式</FieldLabel>
-                          <select {...register(`content.general.blocks.${index}.feature.imageFit`)} className={InputClass}>
-                            <option value="cover">填滿 (Cover)</option>
-                            <option value="contain">包含 (Contain)</option>
-                          </select>
-                        </div>
-                      </div>
-                      <FieldLabel>圖片 (可多張)</FieldLabel>
-                      <div className="space-y-2">
-                        {(watch(`content.general.blocks.${index}.feature.images`) || []).map((img: string, idx: number) => (
-                          <div key={idx} className="flex gap-2 items-center">
-                            <div className="flex-1">
-                              <Controller control={control} name={`content.general.blocks.${index}.feature.images.${idx}`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                            </div>
-                            <button type="button" onClick={() => {
-                              const images = [...watch(`content.general.blocks.${index}.feature.images`)];
-                              images.splice(idx, 1);
-                              setValue(`content.general.blocks.${index}.feature.images`, images);
-                            }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">刪除</button>
-                          </div>
-                        ))}
-                        <button type="button" onClick={() => {
-                          const images = watch(`content.general.blocks.${index}.feature.images`) || [];
-                          setValue(`content.general.blocks.${index}.feature.images`, [...images, '']);
-                        }} className="text-sm text-primary font-bold">+ 新增圖片</button>
-                      </div>
-                    </div>
-                  )}
-                  {blockType === 'COMPARISON' && (
-                    <div className="space-y-4">
-                      <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.title`)} placeholder="標題" />
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <FieldLabel>Before 圖片</FieldLabel>
-                          <Controller control={control} name={`content.general.blocks.${index}.comparison.beforeImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                          <input className={InputClass + " mt-2"} {...register(`content.general.blocks.${index}.comparison.beforeLabel`)} placeholder="Before 標籤" />
-                        </div>
-                        <div>
-                          <FieldLabel>After 圖片</FieldLabel>
-                          <Controller control={control} name={`content.general.blocks.${index}.comparison.afterImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                          <input className={InputClass + " mt-2"} {...register(`content.general.blocks.${index}.comparison.afterLabel`)} placeholder="After 標籤" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {blockType === 'HERO_1' && (
-                    <div className="space-y-4">
-                      <input className={InputClass} {...register(`content.general.blocks.${index}.hero1.title`)} placeholder="標題" />
-                      <Controller control={control} name={`content.general.blocks.${index}.hero1.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                    </div>
-                  )}
-
-                  {blockType === 'HERO_2' && (
-                    <div className="space-y-4">
-                      <div>
-                        <FieldLabel>標題</FieldLabel>
-                        <AdminMarkdownEditor className={InputClass} {...register(`content.general.blocks.${index}.hero2.title`)} rows={2} placeholder="標題" />
-                      </div>
-                      <div>
-                        <FieldLabel>描述</FieldLabel>
-                        <AdminMarkdownEditor className={InputClass} {...register(`content.general.blocks.${index}.hero2.description`)} rows={3} placeholder="描述" />
-                      </div>
-                      <div>
-                        <FieldLabel>背景圖片</FieldLabel>
-                        <Controller control={control} name={`content.general.blocks.${index}.hero2.backgroundImage`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                      </div>
-                      <div className="pt-4 border-t border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <ButtonEditor control={control} register={register} name={`content.general.blocks.${index}.hero2.mainButton`} label="主按鈕設定" forms={forms} />
-                        <ButtonEditor control={control} register={register} name={`content.general.blocks.${index}.hero2.secondaryButton`} label="次按鈕設定" forms={forms} />
-                      </div>
-                    </div>
-                  )}
-
-                  {blockType === 'FORM' && (
-                    <select className={InputClass} {...register(`content.general.blocks.${index}.form.formId`)}>
-                      <option value="">選擇表單...</option>
-                      {forms?.map((f: any) => <option key={f.id} value={f.id}>{f.name}</option>)}
-                    </select>
-                  )}
-
                   {blockType === 'GRID' && (
                     <div className="space-y-4">
                       <div>
-                        <FieldLabel>區塊標題</FieldLabel>
-                        <input className={InputClass} {...register(`content.general.blocks.${index}.grid.title`)} placeholder="區塊標題" />
-                      </div>
-                      <div>
-                        <FieldLabel>欄位數</FieldLabel>
-                        <select className={InputClass} {...register(`content.general.blocks.${index}.grid.columns`, { valueAsNumber: true })}>
+                        <FieldLabel>每列欄數</FieldLabel>
+                        <select className={InputClass} {...register(`content.general.blocks.${index}.grid.columns`)}>
                           {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} 欄</option>)}
                         </select>
                       </div>
@@ -388,10 +285,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
           <option value="SPACER">空白間距</option>
           <option value="SINGLE_IMAGE">單張大圖</option>
           <option value="IMAGE_CAROUSEL">圖片輪播</option>
-          <option value="IMAGE_TEXT_GRID">左圖右文 / 右圖左文</option>
-          <option value="FEATURE">大圖特色介紹</option>
-          <option value="COMPARISON">B/A 對比 (Before/After)</option>
-          <option value="TEXT_LIST">文字列表 (如常見問題)</option>
+          <option value="IMAGE_TEXT_GRID">圖文區塊</option>
+          
+          <option value="COMPARISON">B/A對比</option>
+          <option value="TEXT_LIST">文字列表</option>
           <option value="HTML_CODE">自訂 HTML</option>
         </select>
       </div>
