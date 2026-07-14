@@ -52,7 +52,7 @@ export function ModalHeader({ children, className, onClose }: { children: React.
         {children}
       </div>
       {onClose && (
-        <button onClick={onClose} className="p-2 hover:bg-stone-200 rounded-full transition-colors shrink-0 ml-4">
+        <button type="button" onClick={onClose} className="p-2 hover:bg-stone-200 rounded-full transition-colors shrink-0 ml-4">
           <X size={20} className="text-stone-400" />
         </button>
       )}

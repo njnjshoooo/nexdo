@@ -8,6 +8,8 @@ import { Article } from '../types/article';
 import { Page } from '../types/admin';
 import { Form } from '../types/form';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { ArrowLeft, Calendar, Tag, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import DynamicForm from '../components/form/DynamicForm';
@@ -123,7 +125,7 @@ export default function BlogPostPage() {
           )}
           
           <div className="prose prose-stone prose-lg max-w-none prose-h2:text-2xl prose-h2:font-bold prose-h2:text-[#4A5D3B] prose-h2:mb-3 prose-headings:text-stone-900 prose-p:text-stone-700 prose-p:leading-relaxed prose-strong:text-stone-900 prose-blockquote:border-[#8B5E34] prose-blockquote:bg-stone-100/50 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:rounded-l-none prose-blockquote:not-italic">
-            <Markdown>{article.content}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{article.content}</Markdown>
           </div>
         </div>
       </div>

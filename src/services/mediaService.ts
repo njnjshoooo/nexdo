@@ -928,7 +928,11 @@ class MediaService {
         }
       }
       // 刪 DB row
-      const { error } = await supabase.from('media').delete().eq('id', id);
+      const { data, error } = await supabase.from('media').delete().eq('id', id).select();
+      if (!error && (!data || data.length === 0)) {
+        console.warn('RLS block on delete media');
+        throw new Error('刪除失敗：您的 Supabase media 資料表缺少 DELETE 權限 (RLS)，或者該檔案已被刪除。請到 Supabase 後台新增 DELETE Policy。');
+      }
       if (error) {
         throw new Error(`刪除媒體失敗：${error.message}`);
       }

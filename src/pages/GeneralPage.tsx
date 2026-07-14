@@ -20,6 +20,8 @@ function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, p
   );
 }
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { motion } from 'framer-motion'; // 確保你的專案是用 framer-motion 或 motion
 import { 
   ArrowUpRight,
@@ -181,7 +183,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             const textStyles = {
               heading: 'text-3xl font-bold text-center mb-16 text-stone-900',
               medium_heading: 'text-xl font-bold text-stone-900 mb-3',
-              body: 'text-stone-600 leading-relaxed'
+              body: 'text-stone-600 leading-relaxed markdown-body'
             }[block.text?.fontSize || 'body'];
 
             return (
@@ -191,7 +193,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
                     block.text?.alignment === 'center' ? 'text-center' : 
                     block.text?.alignment === 'right' ? 'text-right' : ''
                   }`}>
-                    <Markdown>{block.text?.content || ''}</Markdown>
+                    <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{block.text?.content || ''}</Markdown>
                   </div>
                 </div>
               </section>
@@ -235,7 +237,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
                           <div className="p-6 flex flex-col flex-1">
                             <h3 className={`text-xl font-bold mb-3 ${isLink ? 'text-stone-900 group-hover:text-primary transition-colors' : 'text-stone-900'}`}>{item.title}</h3>
                             <div className="text-stone-600 leading-relaxed prose prose-stone prose-sm max-w-none">
-                              <Markdown>{item.description}</Markdown>
+                              <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{item.description}</Markdown>
                             </div>
                           </div>
                         </Wrapper>
@@ -342,7 +344,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
                     <div className="w-full md:order-1">
                       <h2 className="text-3xl font-bold text-stone-900 mb-6">{block.imageTextGrid?.title}</h2>
                       <div className="prose prose-stone mb-8">
-                        <Markdown>{block.imageTextGrid?.content || ''}</Markdown>
+                        <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{block.imageTextGrid?.content || ''}</Markdown>
                       </div>
                       {block.imageTextGrid?.cta?.text && (
                         <a href={block.imageTextGrid.cta.link} className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-all">

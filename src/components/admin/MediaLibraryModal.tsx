@@ -65,7 +65,7 @@ export default function MediaLibraryModal({
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await mediaService.delete(id);
+    try { await mediaService.delete(id); } catch(err: any) { alert(err.message); }
     await loadMedia();
   };
 
@@ -162,6 +162,7 @@ export default function MediaLibraryModal({
 
                 {/* Delete Button */}
               <button
+                type="button"
                 onClick={(e) => handleDelete(item.id, e)}
                 className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-red-500 opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all shadow-sm"
                 title="刪除圖片"
