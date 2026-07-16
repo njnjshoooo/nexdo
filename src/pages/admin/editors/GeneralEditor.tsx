@@ -178,6 +178,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                   {blockType === 'GRID' && (
                     <div className="space-y-4">
                       <div>
+                        <FieldLabel>區塊標題</FieldLabel>
+                        <input className={InputClass} {...register(`content.general.blocks.${index}.grid.title`)} placeholder="例如：服務項目" />
+                      </div>
+                      <div>
                         <FieldLabel>每列欄數</FieldLabel>
                         <select className={InputClass} {...register(`content.general.blocks.${index}.grid.columns`)}>
                           {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} 欄</option>)}

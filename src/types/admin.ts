@@ -316,7 +316,8 @@ export type GeneralBlockType = 'FEATURE' | 'COMPARISON' | 'TEXT_LIST' | 'HTML_CO
   | 'SINGLE_IMAGE'
   | 'IMAGE_CAROUSEL'
   | 'IMAGE_TEXT_GRID'
-  | 'MORE_SERVICES';
+  | 'MORE_SERVICES'
+  | 'LATEST_BLOGS';
 
 export interface GeneralBlock {
   id: string;
@@ -433,6 +434,10 @@ comparison?: {
       text: string;
       link: string;
     };
+  };
+  latestBlogs?: {
+    title?: string;
+    limit?: number;
   };
   moreServices?: {
     title: string;
@@ -583,7 +588,8 @@ export const DEFAULT_HOME_TEMPLATE: HomeContent = {
   blocks: [
     { id: 'block-services', type: 'SERVICES', services: [] },
     { id: 'block-process', type: 'PROCESS', process: { title: '預約流程', description: '預約流程描述', steps: [] } },
-    { id: 'block-testimonials', type: 'TESTIMONIALS', testimonials: { title: '客戶好評', items: [] } }
+    { id: 'block-testimonials', type: 'TESTIMONIALS', testimonials: { title: '客戶好評', items: [] } },
+    { id: 'block-latest-blogs', type: 'LATEST_BLOGS', latestBlogs: { title: '好齡居誌', limit: 6 } }
   ],
   mainService: {
     pageId: '',

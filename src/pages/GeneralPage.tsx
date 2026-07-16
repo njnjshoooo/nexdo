@@ -209,7 +209,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
             if (cols === 6) gridClass = 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
 
             return (
-              <section key={block.id} id={block.id} className={`py-20 bg-stone-50 ${isFirstBlock ? 'mt-20' : ''}`}>
+              <section key={block.id} id={block.id} className={`py-20 bg-white ${isFirstBlock ? 'mt-20' : ''}`}>
                 <div className="max-w-7xl mx-auto px-4">
                   <h2 className="text-3xl font-bold text-center mb-16 text-stone-900">{block.grid?.title}</h2>
                   <div className={`grid ${gridClass} gap-8`}>

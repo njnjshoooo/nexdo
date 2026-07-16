@@ -256,6 +256,7 @@ export default function PageEditor() {
                   <TabButton active={activeTab === 'home_more_services'} label="我們還提供" onClick={() => setActiveTab('home_more_services')} />
                   <TabButton active={activeTab === 'home_consultation'} label="預約流程" onClick={() => setActiveTab('home_consultation')} />
                   <TabButton active={activeTab === 'home_testimonials'} label="客戶心得" onClick={() => setActiveTab('home_testimonials')} />
+                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}
@@ -264,6 +265,7 @@ export default function PageEditor() {
                   <TabButton active={activeTab === 'hero'} label="Hero 區塊" onClick={() => setActiveTab('hero')} />
                   <TabButton active={activeTab === 'services'} label="服務清單" onClick={() => setActiveTab('services')} />
                   <TabButton active={activeTab === 'cases'} label="成功案例" onClick={() => setActiveTab('cases')} />
+                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}
@@ -276,6 +278,7 @@ export default function PageEditor() {
                   <TabButton active={activeTab === 'sub_core_services'} label="服務流程" onClick={() => setActiveTab('sub_core_services')} />
                   <TabButton active={activeTab === 'sub_faqs'} label="常見問題" onClick={() => setActiveTab('sub_faqs')} />
                   <TabButton active={activeTab === 'sub_related'} label="關聯服務" onClick={() => setActiveTab('sub_related')} />
+                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}

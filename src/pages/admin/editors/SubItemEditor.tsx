@@ -487,7 +487,6 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
 
             {introSections.map((field, index) => {
               const type = watch(`content.subItem.serviceIntro.sections.${index}.type`);
-              const isEnabled = watch(`content.subItem.serviceIntro.sections.${index}.enabled`);
           const blockLabels: Record<string, string> = {
             'HERO_1': '滿版主視覺 (無按鈕)',
             'HERO_2': '滿版主視覺 (含按鈕)',
@@ -513,8 +512,6 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                     onMoveUp={() => moveSection(index, index - 1)}
                     onMoveDown={() => moveSection(index, index + 1)}
                     onDelete={() => removeSection(index)}
-                    onToggleVisible={() => setValue(`content.subItem.serviceIntro.sections.${index}.enabled`, !isEnabled)}
-                    isVisible={isEnabled !== false}
                     title={displayLabel}
                     badgeLabel={type}
                   />
@@ -592,6 +589,10 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                   )}
                   {type === 'GRID' && (
                     <div className="space-y-4">
+                      <div>
+                        <FieldLabel>區塊標題</FieldLabel>
+                        <input className={InputClass} {...register(`content.subItem.serviceIntro.sections.${index}.grid.title`)} placeholder="例如：服務項目" />
+                      </div>
                       <div>
                         <FieldLabel>每列欄數</FieldLabel>
                         <select className={InputClass} {...register(`content.subItem.serviceIntro.sections.${index}.grid.columns`)}>

@@ -7,12 +7,22 @@ import AdditionalServices from '../components/Home/AdditionalServices';
 import MoreServices from '../components/Home/MoreServices';
 import Process from '../components/Home/Process';
 import Testimonials from '../components/Home/Testimonials';
+import LatestBlogs from '../components/Home/LatestBlogs';
 import DynamicForm from '../components/form/DynamicForm';
 import { useForm } from '../hooks/useForm';
 
 export default function Home({ page }: { page: Page }) {
   // 1. 抓取 blocks
-  const blocks = page?.content?.home?.blocks || [];
+  
+  const blocks = [...(page?.content?.home?.blocks || [])];
+  if (!blocks.some(b => b.type === 'LATEST_BLOGS')) {
+    blocks.push({
+      id: 'latest-blogs-block',
+      type: 'LATEST_BLOGS',
+      latestBlogs: { title: '好齡居誌', limit: 6 }
+    });
+  }
+  
 
   // 2. 表單邏輯
   const showForm = page?.content?.showForm;
@@ -49,7 +59,11 @@ export default function Home({ page }: { page: Page }) {
           case 'PROCESS':
             return <Process key={block.id} data={block.process} />;
 
-          case 'TESTIMONIALS': {
+          
+          case 'LATEST_BLOGS':
+            return <LatestBlogs key={block.id} data={block.latestBlogs} />;
+
+case 'TESTIMONIALS': {
             const testimonialsBlock = block.testimonials;
             return (
               <Testimonials 

@@ -1,3 +1,4 @@
+import { articleService } from '../../../services/articleService';
 import AdminMarkdownEditor from '../../../components/admin/AdminMarkdownEditor';
 import React from 'react';
 import { Control, UseFormRegister, Controller, useFieldArray } from 'react-hook-form';
@@ -18,6 +19,8 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
   });
 
   // --- [ 2. 客戶好評項目 Hook ] ---
+  // --- [ 最新文章 Hook ] ---
+  const latestBlogsIdx = getIdx('LATEST_BLOGS');
   const testimonialIdx = getIdx('TESTIMONIALS');
   const { fields: testimonialFields, append: appendTestimonial, remove: removeTestimonial } = useFieldArray({
     control,
@@ -316,6 +319,45 @@ export default function HomeEditor({ control, register, activeTab, watch, setVal
   }
 
   // --- 頁尾表單 ---
+  
+  if (activeTab === 'home_latest_blogs') {
+    const allArticles = articleService.getAll().filter(a => a.isPublished);
+    // Sort by date descending
+    allArticles.sort((a, b) => new Date(b.publishedAt || b.updatedAt).getTime() - new Date(a.publishedAt || a.updatedAt).getTime());
+    
+    // Prioritize recommended, then latest
+    const recommended = allArticles.filter(a => a.isRecommended);
+    const others = allArticles.filter(a => !a.isRecommended);
+    
+    const displayArticles = [...recommended, ...others].slice(0, 6);
+
+    return (
+      <div className="bg-white p-10 rounded-[2.5rem] border border-stone-200 shadow-sm space-y-8">
+        <h2 className="text-2xl font-bold text-stone-800 px-2 tracking-tight">好齡居誌 (推薦文章)</h2>
+        <p className="text-sm text-stone-500 px-2 -mt-4">此區塊將自動連結並顯示 6 篇最新推薦文章。目前為預覽模式，不需手動設定。</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+          {displayArticles.map(article => (
+            <div key={article.id} className="border border-stone-200 rounded-2xl overflow-hidden shadow-sm flex flex-col bg-stone-50/50 opacity-80 cursor-not-allowed">
+              <div className="aspect-[4/3] bg-stone-100">
+                {article.coverImage ? (
+                  <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover grayscale-[20%]" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-stone-300 text-sm font-medium">無圖片</div>
+                )}
+              </div>
+              <div className="p-4 flex flex-col flex-1">
+                <span className="text-xs font-bold text-primary mb-2">{article.categoryId || '未分類'}</span>
+                <h3 className="text-sm font-bold text-stone-900 line-clamp-2 mb-2">{article.title}</h3>
+                <p className="text-xs text-stone-500 line-clamp-2 mt-auto">{article.summary}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (activeTab === 'home_form') {
     const isShowForm = watch('content.showForm'); // 監控目前的開關狀態
 

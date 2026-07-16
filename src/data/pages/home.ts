@@ -156,6 +156,14 @@ export const homePage: Page = {
               }
             ]
           }
+        },
+        {
+          id: "latest-blogs-block",
+          type: "LATEST_BLOGS",
+          latestBlogs: {
+            title: "好齡居誌",
+            limit: 6
+          }
         }
       ]
     }
