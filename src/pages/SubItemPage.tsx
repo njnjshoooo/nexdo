@@ -693,7 +693,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                                   );
                       
                                 case 'GRID':
-                                  const cols = section.grid?.columns || 3;
+                                  const cols = Number(section.grid?.columns || 3);
                                   let gridClass = 'grid-cols-1 md:grid-cols-3 sm:grid-cols-2';
                                   if (cols === 2) gridClass = 'grid-cols-1 sm:grid-cols-2';
                                   if (cols === 3) gridClass = 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';

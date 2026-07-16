@@ -183,28 +183,38 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                       </div>
                       <div>
                         <FieldLabel>每列欄數</FieldLabel>
-                        <select className={InputClass} {...register(`content.general.blocks.${index}.grid.columns`)}>
+                        <select className={InputClass} {...register(`content.general.blocks.${index}.grid.columns`, { valueAsNumber: true })}>
                           {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} 欄</option>)}
                         </select>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-4">
                         <FieldLabel>項目</FieldLabel>
-                        {(watch(`content.general.blocks.${index}.grid.items`) || []).map((_: any, itemIndex: number) => (
-                          <div key={itemIndex} className={innerCardClass}>
-                            <FieldLabel>標題</FieldLabel>
-                            <input className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.title`)} placeholder="標題"  />
-                            <FieldLabel>圖片</FieldLabel>
-                            <Controller control={control} name={`content.general.blocks.${index}.grid.items.${itemIndex}.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
-                            <label className="flex items-center gap-2 mb-2">
-                              <input type="checkbox" {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.showImage`)} />
-                              <span className="block text-sm font-medium text-stone-700 mb-0">顯示圖片</span>
-                            </label>
-                            <FieldLabel>描述</FieldLabel>
-                            <AdminMarkdownEditor className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.description`)} placeholder="描述"  />
-                            <FieldLabel>連結 (選填)</FieldLabel>
-                            <input className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.link`)} placeholder="https://..." />
-                          </div>
-                        ))}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {(watch(`content.general.blocks.${index}.grid.items`) || []).map((_: any, itemIndex: number) => (
+                            <div key={itemIndex} className={innerCardClass + " relative group"}>
+                              <div className="absolute top-4 right-4">
+                                <button type="button" onClick={() => {
+                                  const items = watch(`content.general.blocks.${index}.grid.items`) || [];
+                                  setValue(`content.general.blocks.${index}.grid.items`, items.filter((_: any, i: number) => i !== itemIndex));
+                                }} className="p-1.5 text-stone-300 hover:text-red-500 transition-colors" title="刪除項目">
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                              <FieldLabel>標題</FieldLabel>
+                              <input className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.title`)} placeholder="標題"  />
+                              <FieldLabel>圖片</FieldLabel>
+                              <Controller control={control} name={`content.general.blocks.${index}.grid.items.${itemIndex}.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
+                              <label className="flex items-center gap-2 mb-2">
+                                <input type="checkbox" {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.showImage`)} />
+                                <span className="block text-sm font-medium text-stone-700 mb-0">顯示圖片</span>
+                              </label>
+                              <FieldLabel>描述</FieldLabel>
+                              <AdminMarkdownEditor className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.description`)} placeholder="描述"  />
+                              <FieldLabel>連結 (選填)</FieldLabel>
+                              <input className={InputClass} {...register(`content.general.blocks.${index}.grid.items.${itemIndex}.link`)} placeholder="https://..." />
+                            </div>
+                          ))}
+                        </div>
                         <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm" type="button" onClick={() => {
                           const items = watch(`content.general.blocks.${index}.grid.items`) || [];
                           setValue(`content.general.blocks.${index}.grid.items`, [...items, { title: '', image: '', showImage: true, description: '', link: '' }]);
