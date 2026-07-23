@@ -31,6 +31,9 @@ export default function FinanceManagement() {
 
   useEffect(() => {
     loadData();
+    const handleRefresh = () => loadData();
+    window.addEventListener('statements_refreshed', handleRefresh);
+    return () => window.removeEventListener('statements_refreshed', handleRefresh);
   }, []);
 
   const loadData = async () => {

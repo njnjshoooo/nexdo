@@ -117,7 +117,15 @@ export default function EmailEditor() {
     const after = currentText.substring(end);
 
     const newText = before + prefix + selection + suffix + after;
-    setContent(newText);
+    
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(textarea, newText);
+    } else {
+      textarea.value = newText;
+    }
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
     
     setTimeout(() => {
       textarea.focus();

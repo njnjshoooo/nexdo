@@ -266,8 +266,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                       <div>
                         <FieldLabel>佈局</FieldLabel>
                         <select className={InputClass} {...register(`content.general.blocks.${index}.imageTextGrid.layout`)}>
-                          <option value="imageLeft">圖片左</option>
-                          <option value="imageRight">圖片右 </option>
+                          <option value="imageLeft">圖左</option>
+                          <option value="imageRight">圖右</option>
+                          <option value="imageTop">圖上</option>
+                          <option value="imageBottom">圖下</option>
                         </select>
                       </div>
                       <div>

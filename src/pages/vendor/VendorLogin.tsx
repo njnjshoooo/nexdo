@@ -79,15 +79,15 @@ export default function VendorLogin() {
       {/* Header */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
-          <Link to="/" className="flex items-center gap-2 text-stone-600 hover:text-primary transition-colors">
+          <Link to="/" className="flex items-center gap-2 text-stone-600 hover:text-primary transition-colors z-10">
             <ArrowLeft size={20} />
-            <span className="font-medium">返回首頁</span>
+            <span className="font-medium hidden sm:inline">返回首頁</span>
           </Link>
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg">
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 w-full justify-center sm:w-auto">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
               好
             </div>
-            <span className="text-lg font-bold text-stone-900">好齡居 NEXDO</span>
+            <span className="text-lg font-bold text-stone-900 truncate">好齡居 NEXDO</span>
           </div>
           <div className="w-24"></div> {/* Spacer to balance the header */}
         </div>

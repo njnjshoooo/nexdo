@@ -238,7 +238,61 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
         />
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4 mb-6">
+        {paginatedStaff.map(staff => (
+          <div key={staff.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+            <div className="flex justify-between items-start border-b border-stone-50 pb-3">
+              <div className="flex items-center gap-3">
+                {staff.photoUrl ? (
+                  <img src={staff.photoUrl || undefined} alt={staff.name} className="w-12 h-12 rounded-full object-cover shadow-sm" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
+                    <User size={24} />
+                  </div>
+                )}
+                <div>
+                  <span className="font-bold text-stone-900 text-lg block">{staff.name}</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    {staff.hasPoliceRecord ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg text-xs font-bold">
+                        <ShieldCheck size={12} /> 已提供
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg text-xs font-bold">
+                        <ShieldAlert size={12} /> 未提供
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <AdminTable.Edit onClick={() => {
+                  setEditingStaff(staff);
+                  setIsEditorOpen(true);
+                }} />
+                <AdminTable.Delete onClick={() => handleDeleteStaff(staff.id)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-sm items-center pt-2">
+              <div className="text-stone-500">聯絡電話</div>
+              <div className="text-stone-900 font-medium col-span-2 text-right">{staff.phone}</div>
+              <div className="text-stone-500">信箱</div>
+              <div className="text-stone-900 col-span-2 text-right truncate">{staff.email}</div>
+              <div className="text-stone-500">年齡/性別</div>
+              <div className="text-stone-900 col-span-2 text-right">{calculateAge(staff.birthDate)} 歲 / {staff.gender === 'MALE' ? '男' : staff.gender === 'FEMALE' ? '女' : '其他'}</div>
+            </div>
+          </div>
+        ))}
+        {paginatedStaff.length === 0 && (
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+            找不到符合條件的服務人員
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-sm border border-stone-100">
         <AdminTable.Main>
           <AdminTable.Head>
             <tr>
@@ -282,25 +336,20 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
                     </span>
                   )}
                 </AdminTable.Td>
-                <AdminTable.Td className="text-center">
+                <AdminTable.Td>
                   <div className="flex items-center justify-center gap-2">
-                    <VendorEditButton 
-                      onClick={() => {
-                        setSelectedStaff(staff);
-                        setFormData(staff);
-                        setIsEditing(true);
-                      }}
-                    />
-                    <VendorDeleteButton 
-                      onClick={() => handleDelete(staff)}
-                    />
+                    <AdminTable.Edit onClick={() => {
+                      setEditingStaff(staff);
+                      setIsEditorOpen(true);
+                    }} />
+                    <AdminTable.Delete onClick={() => handleDeleteStaff(staff.id)} />
                   </div>
                 </AdminTable.Td>
               </AdminTable.Row>
             ))}
             {paginatedStaff.length === 0 && (
               <AdminTable.Empty colSpan={5}>
-                目前沒有服務人員資料
+                找不到符合條件的服務人員
               </AdminTable.Empty>
             )}
           </AdminTable.Body>

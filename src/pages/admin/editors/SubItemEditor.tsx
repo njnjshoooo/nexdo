@@ -487,6 +487,7 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
 
             {introSections.map((field, index) => {
               const type = watch(`content.subItem.serviceIntro.sections.${index}.type`);
+              const isEnabled = watch(`content.subItem.serviceIntro.sections.${index}.enabled`) ?? true;
           const blockLabels: Record<string, string> = {
             'HERO_1': '滿版主視覺 (無按鈕)',
             'HERO_2': '滿版主視覺 (含按鈕)',
@@ -514,6 +515,8 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                     onDelete={() => removeSection(index)}
                     title={displayLabel}
                     badgeLabel={type}
+                    isVisible={isEnabled}
+                    onToggleVisible={() => setValue(`content.subItem.serviceIntro.sections.${index}.enabled`, !isEnabled)}
                   />
                   {type === 'TEXT' && (
                     <div className="space-y-4">
@@ -678,8 +681,10 @@ export default function SubItemEditor({ control, register, activeTab, watch, set
                       <div>
                         <FieldLabel>佈局</FieldLabel>
                         <select className={InputClass} {...register(`content.subItem.serviceIntro.sections.${index}.imageTextGrid.layout`)}>
-                          <option value="imageLeft">圖片左</option>
-                          <option value="imageRight">圖片右 </option>
+                          <option value="imageLeft">圖左</option>
+                          <option value="imageRight">圖右</option>
+                          <option value="imageTop">圖上</option>
+                          <option value="imageBottom">圖下</option>
                         </select>
                       </div>
                       <div>

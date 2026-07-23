@@ -178,7 +178,37 @@ export default function PendingClosureOrders({ vendor }: PendingClosureOrdersPro
               ) : null}
             </div>
             
-            <div className="overflow-x-auto">
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {currentOrders.length === 0 ? (
+                <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+                  本月尚無結算資料
+                </div>
+              ) : (
+                currentOrders.map(order => {
+                  const completedUpdate = order.statusUpdates?.find(u => u.status === 'COMPLETED');
+                  return (
+                    <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+                      <div className="flex justify-between items-center border-b border-stone-50 pb-3">
+                        <span className="font-mono text-base font-bold text-stone-900">{order.id}</span>
+                        <OrderStatusBadge status={order.status} role="vendor" />
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-sm items-center">
+                        <div className="text-stone-500">客戶姓名</div>
+                        <div className="text-stone-900 font-medium col-span-2 text-right">{order.customerInfo.name}</div>
+                        <div className="text-stone-500">服務項目</div>
+                        <div className="text-stone-900 col-span-2 text-right truncate">{order.items.map(i => i.name).join(', ')}</div>
+                        <div className="text-stone-500">完成時間</div>
+                        <div className="text-stone-900 col-span-2 text-right">{completedUpdate ? new Date(completedUpdate.timestamp).toLocaleString() : '-'}</div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-sm border border-stone-100">
               <AdminTable.Main>
                 <AdminTable.Head>
                   <tr>

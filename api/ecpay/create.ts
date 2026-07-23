@@ -153,9 +153,9 @@ export default async function handler(req: any, res: any): Promise<void> {
   }
 
   // 5. 產生綠界表單參數
-  const siteUrl = (process.env.PUBLIC_SITE_URL || '').replace(/\/$/, '');
+  const siteUrl = (process.env.PUBLIC_SITE_URL || req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : '') || '').replace(/\/$/, '');
   if (!siteUrl) {
-    res.status(500).json({ error: 'Missing PUBLIC_SITE_URL' });
+    res.status(500).json({ error: 'Missing PUBLIC_SITE_URL and could not determine origin' });
     return;
   }
 

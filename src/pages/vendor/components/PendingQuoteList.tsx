@@ -206,7 +206,41 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
         </h2>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4 mb-6">
+        {paginatedOrders.map(order => (
+          <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+            <div className="flex justify-between items-center border-b border-stone-50 pb-3">
+              <button 
+                onClick={() => {
+                  setSelectedOrder(order);
+                  setQuoteAmount('');
+                }}
+                className="font-mono text-base font-bold text-primary hover:underline"
+              >
+                {order.id}
+              </button>
+              <OrderStatusBadge status={order.status} role="vendor" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-sm items-center">
+              <div className="text-stone-500">客戶姓名</div>
+              <div className="text-stone-900 font-medium col-span-2 text-right">{order.customerInfo.name}</div>
+              <div className="text-stone-500">服務地址</div>
+              <div className="text-stone-900 col-span-2 text-right break-words">{order.customerInfo.address}</div>
+              <div className="text-stone-500">指派時間</div>
+              <div className="text-stone-900 col-span-2 text-right">{new Date(order.createdAt).toLocaleDateString()}</div>
+            </div>
+          </div>
+        ))}
+        {paginatedOrders.length === 0 && (
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+            目前沒有待報價的需求單
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-sm border border-stone-100">
         <AdminTable.Main>
           <AdminTable.Head>
             <tr>

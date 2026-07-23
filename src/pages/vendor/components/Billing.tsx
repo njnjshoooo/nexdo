@@ -106,47 +106,84 @@ export default function Billing({ vendor }: BillingProps) {
           </div>
         </div>
 
-        <AdminTable.Container>
-          <AdminTable.Main>
-            <AdminTable.Head>
-              <tr>
-                <AdminTable.Th>訂單編號</AdminTable.Th>
-                <AdminTable.Th>客戶姓名</AdminTable.Th>
-                <AdminTable.Th>結算金額</AdminTable.Th>
-                <AdminTable.Th>狀態</AdminTable.Th>
-                <AdminTable.Th>更新時間</AdminTable.Th>
-                <AdminTable.Th className="text-center">操作</AdminTable.Th>
-              </tr>
-            </AdminTable.Head>
-            <AdminTable.Body>
-              {paginatedOrders.map(order => (
-                <AdminTable.Row key={order.id}>
-                  <AdminTable.Td className="font-mono text-sm font-bold text-stone-900">{order.id}</AdminTable.Td>
-                  <AdminTable.Td className="text-sm text-stone-600">{order.customerInfo.name}</AdminTable.Td>
-                  <AdminTable.Td className="text-sm font-bold text-stone-900">NT$ {(order.totalAmount || 0).toLocaleString()}</AdminTable.Td>
-                  <AdminTable.Td>
-                    <OrderStatusBadge status={order.status} role="vendor" />
-                  </AdminTable.Td>
-                  <AdminTable.Td className="text-sm text-stone-500">
-                    {new Date(order.statusUpdates?.[order.statusUpdates.length - 1]?.timestamp || order.createdAt).toLocaleDateString()}
-                  </AdminTable.Td>
-                  <AdminTable.Td className="text-center">
-                    <VendorIconButton 
-                      icon={Download}
-                      onClick={() => alert('下載結算明細')}
-                      title="下載明細"
-                    />
-                  </AdminTable.Td>
-                </AdminTable.Row>
-              ))}
-              {paginatedOrders.length === 0 && (
-                <AdminTable.Empty colSpan={6}>
-                  尚無相關結算紀錄
-                </AdminTable.Empty>
-              )}
-            </AdminTable.Body>
-          </AdminTable.Main>
-        </AdminTable.Container>
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4 mb-6">
+          {paginatedOrders.map(order => (
+            <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+              <div className="flex justify-between items-center border-b border-stone-50 pb-3">
+                <span className="font-mono text-base font-bold text-stone-900">{order.id}</span>
+                <OrderStatusBadge status={order.status} role="vendor" />
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-sm items-center pt-2">
+                <div className="text-stone-500">客戶姓名</div>
+                <div className="text-stone-900 font-medium col-span-2 text-right">{order.customerInfo.name}</div>
+                <div className="text-stone-500">更新時間</div>
+                <div className="text-stone-900 col-span-2 text-right">{new Date(order.statusUpdates?.[order.statusUpdates.length - 1]?.timestamp || order.createdAt).toLocaleDateString()}</div>
+                <div className="text-stone-500">結算金額</div>
+                <div className="text-stone-900 font-bold text-lg col-span-2 text-right">NT$ {(order.totalAmount || 0).toLocaleString()}</div>
+              </div>
+              <div className="pt-2 border-t border-stone-50">
+                <button
+                  onClick={() => alert('下載結算明細')}
+                  className="w-full py-2 flex items-center justify-center gap-2 text-primary bg-primary/5 hover:bg-primary/10 rounded-lg font-bold transition-colors"
+                >
+                  <Download size={18} />
+                  下載明細
+                </button>
+              </div>
+            </div>
+          ))}
+          {paginatedOrders.length === 0 && (
+            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+              尚無相關結算紀錄
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block">
+          <AdminTable.Container>
+            <AdminTable.Main>
+              <AdminTable.Head>
+                <tr>
+                  <AdminTable.Th>訂單編號</AdminTable.Th>
+                  <AdminTable.Th>客戶姓名</AdminTable.Th>
+                  <AdminTable.Th>結算金額</AdminTable.Th>
+                  <AdminTable.Th>狀態</AdminTable.Th>
+                  <AdminTable.Th>更新時間</AdminTable.Th>
+                  <AdminTable.Th className="text-center">操作</AdminTable.Th>
+                </tr>
+              </AdminTable.Head>
+              <AdminTable.Body>
+                {paginatedOrders.map(order => (
+                  <AdminTable.Row key={order.id}>
+                    <AdminTable.Td className="font-mono text-sm font-bold text-stone-900">{order.id}</AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-600">{order.customerInfo.name}</AdminTable.Td>
+                    <AdminTable.Td className="text-sm font-bold text-stone-900">NT$ {(order.totalAmount || 0).toLocaleString()}</AdminTable.Td>
+                    <AdminTable.Td>
+                      <OrderStatusBadge status={order.status} role="vendor" />
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-500">
+                      {new Date(order.statusUpdates?.[order.statusUpdates.length - 1]?.timestamp || order.createdAt).toLocaleDateString()}
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-center">
+                      <VendorIconButton 
+                        icon={Download}
+                        onClick={() => alert('下載結算明細')}
+                        title="下載明細"
+                      />
+                    </AdminTable.Td>
+                  </AdminTable.Row>
+                ))}
+                {paginatedOrders.length === 0 && (
+                  <AdminTable.Empty colSpan={6}>
+                    尚無相關結算紀錄
+                  </AdminTable.Empty>
+                )}
+              </AdminTable.Body>
+            </AdminTable.Main>
+          </AdminTable.Container>
+        </div>
 
         {totalPages > 1 && (
           <div className="mt-6 flex justify-center">

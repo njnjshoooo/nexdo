@@ -473,7 +473,47 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4 mb-6">
+        {paginatedOrders.map(order => (
+          <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+            <div className="flex justify-between items-center border-b border-stone-50 pb-3">
+              <button 
+                onClick={() => {
+                  setSelectedOrder(order);
+                  setCancelReason('');
+                  setPhotoUrl('');
+                  setReceiptPhotoUrl('');
+                  setPaymentProofUrl('');
+                  setShowQRCode(false);
+                }}
+                className="font-mono text-base font-bold text-primary hover:underline"
+              >
+                {order.id}
+              </button>
+              <OrderStatusBadge status={order.status} role="vendor" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-sm items-center">
+              <div className="text-stone-500">客戶姓名</div>
+              <div className="text-stone-900 font-medium col-span-2 text-right">{order.customerInfo.name}</div>
+              <div className="text-stone-500">客戶電話</div>
+              <div className="text-stone-900 col-span-2 text-right">{maskPhone(order.customerInfo.phone, order.status)}</div>
+              <div className="text-stone-500">服務地址</div>
+              <div className="text-stone-900 col-span-2 text-right break-words">{order.customerInfo.address}</div>
+              <div className="text-stone-500">服務人員</div>
+              <div className="text-stone-900 col-span-2 text-right">{order.status !== 'PENDING' ? order.statusUpdates?.find(u => u.status === 'ACTIVE')?.staffName || '-' : '-'}</div>
+            </div>
+          </div>
+        ))}
+        {paginatedOrders.length === 0 && (
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+            找不到符合條件的訂單
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow-sm border border-stone-100">
         <AdminTable.Main>
           <AdminTable.Head>
             <tr>

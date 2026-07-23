@@ -19,11 +19,14 @@ const AdminMarkdownEditor = forwardRef<HTMLTextAreaElement, Props>((props, ref) 
     const selection = text.substring(start, end);
     const after = text.substring(end);
 
-    const net = before + prefix + selection + suffix + after;
-    
-    // To make React Hook Form register the change, we need to set the value natively and dispatch an event
+    const newText = before + prefix + selection + suffix + after;
+
     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
-    nativeInputValueSetter?.call(textarea, newText);
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(textarea, newText);
+    } else {
+      textarea.value = newText;
+    }
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
     // Restore focus and selection

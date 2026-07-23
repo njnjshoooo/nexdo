@@ -298,51 +298,91 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
           </h2>
         </div>
         
-        <AdminTable.Container>
-          <AdminTable.Main>
-            <AdminTable.Head>
-              <tr>
-                <AdminTable.Th>訂單編號</AdminTable.Th>
-                <AdminTable.Th>客戶姓名</AdminTable.Th>
-                <AdminTable.Th>客戶電話</AdminTable.Th>
-                <AdminTable.Th>服務地址</AdminTable.Th>
-                <AdminTable.Th>狀態</AdminTable.Th>
-              </tr>
-            </AdminTable.Head>
-            <AdminTable.Body>
-              {orders.map(order => (
-                <AdminTable.Row key={order.id}>
-                  <AdminTable.Td>
-                    <button 
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setSelectedDate('');
-                        setSelectedTime('');
-                        setSelectedStaffId('');
-                        setRejectReason('');
-                        autoSelectOptions(order);
-                      }}
-                      className="font-mono text-sm font-bold text-primary hover:underline"
-                    >
-                      {order.id}
-                    </button>
-                  </AdminTable.Td>
-                  <AdminTable.Td className="text-sm text-stone-900">{order.customerInfo.name}</AdminTable.Td>
-                  <AdminTable.Td className="text-sm text-stone-500">{maskPhone(order.customerInfo.phone)}</AdminTable.Td>
-                  <AdminTable.Td className="text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</AdminTable.Td>
-                  <AdminTable.Td>
-                    <OrderStatusBadge status={order.status} role="vendor" />
-                  </AdminTable.Td>
-                </AdminTable.Row>
-              ))}
-              {orders.length === 0 && (
-                <AdminTable.Empty colSpan={5}>
-                  目前沒有新派案
-                </AdminTable.Empty>
-              )}
-            </AdminTable.Body>
-          </AdminTable.Main>
-        </AdminTable.Container>
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4 mb-6">
+          {orders.map(order => (
+            <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col gap-3">
+              <div className="flex justify-between items-center border-b border-stone-50 pb-3">
+                <button 
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setSelectedDate('');
+                    setSelectedTime('');
+                    setSelectedStaffId('');
+                    setRejectReason('');
+                    autoSelectOptions(order);
+                  }}
+                  className="font-mono text-base font-bold text-primary hover:underline"
+                >
+                  {order.id}
+                </button>
+                <OrderStatusBadge status={order.status} role="vendor" />
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-sm items-center">
+                <div className="text-stone-500">客戶姓名</div>
+                <div className="text-stone-900 font-medium col-span-2 text-right">{order.customerInfo.name}</div>
+                <div className="text-stone-500">客戶電話</div>
+                <div className="text-stone-900 col-span-2 text-right">{maskPhone(order.customerInfo.phone)}</div>
+                <div className="text-stone-500">服務地址</div>
+                <div className="text-stone-900 col-span-2 text-right break-words">{order.customerInfo.address}</div>
+              </div>
+            </div>
+          ))}
+          {orders.length === 0 && (
+            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+              目前沒有新派案
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block">
+          <AdminTable.Container>
+            <AdminTable.Main>
+              <AdminTable.Head>
+                <tr>
+                  <AdminTable.Th>訂單編號</AdminTable.Th>
+                  <AdminTable.Th>客戶姓名</AdminTable.Th>
+                  <AdminTable.Th>客戶電話</AdminTable.Th>
+                  <AdminTable.Th>服務地址</AdminTable.Th>
+                  <AdminTable.Th>狀態</AdminTable.Th>
+                </tr>
+              </AdminTable.Head>
+              <AdminTable.Body>
+                {orders.map(order => (
+                  <AdminTable.Row key={order.id}>
+                    <AdminTable.Td>
+                      <button 
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setSelectedDate('');
+                          setSelectedTime('');
+                          setSelectedStaffId('');
+                          setRejectReason('');
+                          autoSelectOptions(order);
+                        }}
+                        className="font-mono text-sm font-bold text-primary hover:underline"
+                      >
+                        {order.id}
+                      </button>
+                    </AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-900">{order.customerInfo.name}</AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-500">{maskPhone(order.customerInfo.phone)}</AdminTable.Td>
+                    <AdminTable.Td className="text-sm text-stone-500 truncate max-w-[200px]">{order.customerInfo.address}</AdminTable.Td>
+                    <AdminTable.Td>
+                      <OrderStatusBadge status={order.status} role="vendor" />
+                    </AdminTable.Td>
+                  </AdminTable.Row>
+                ))}
+                {orders.length === 0 && (
+                  <AdminTable.Empty colSpan={5}>
+                    目前沒有新派案
+                  </AdminTable.Empty>
+                )}
+              </AdminTable.Body>
+            </AdminTable.Main>
+          </AdminTable.Container>
+        </div>
       </div>
 
       {/* Feedback Toast for list view */}

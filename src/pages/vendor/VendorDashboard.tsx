@@ -110,7 +110,7 @@ export default function VendorDashboard() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed md:sticky top-0 left-0 z-20 h-screen w-64 bg-white border-r border-stone-200 flex flex-col transition-transform duration-300
+        fixed md:sticky top-[65px] md:top-0 left-0 z-20 h-[calc(100vh-65px)] md:h-screen w-64 bg-white border-r border-stone-200 flex flex-col transition-transform duration-300
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         <div className="p-6 hidden md:flex items-center gap-3 border-b border-stone-100">

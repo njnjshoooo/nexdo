@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from 'lucide-react';
 import { articleService } from '../../services/articleService';
-import { Article } from '../../types/admin';
+import { Article } from '../../types/article';
 
 export default function LatestBlogs({ data }: { data: any }) {
   const [articles, setArticles] = useState<Article[]>([]);
