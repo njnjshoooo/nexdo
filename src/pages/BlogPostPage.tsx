@@ -130,6 +130,34 @@ export default function BlogPostPage() {
         </div>
       </div>
 
+      {/* Related Services Section */}
+      {loadedRelatedServices.length > 0 && (
+        <div className="max-w-4xl mx-auto px-6 mb-20 relative z-20">
+          <h2 className="text-2xl font-bold text-stone-900 mb-8 text-center text-[#4A5D3B]">相關服務推薦</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {loadedRelatedServices.map(service => (
+              <Link 
+                key={service.id} 
+                to={`/${service.slug}`}
+                className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#8B5E34]/30"
+              >
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
+                  <p className="text-stone-500 text-sm line-clamp-2 mb-4">{service.description}</p>
+                  <div className="mt-auto flex items-center justify-between text-sm font-bold text-[#8B5E34]">
+                    <span>了解更多</span>
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* CTA Form Section */}
       {article.showForm && ctaForm && (
         <div className="max-w-3xl mx-auto px-6 mb-20 relative z-20">
