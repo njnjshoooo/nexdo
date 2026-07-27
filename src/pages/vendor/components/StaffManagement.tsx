@@ -268,10 +268,14 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
               </div>
               <div className="flex gap-2">
                 <AdminTable.Edit onClick={() => {
-                  setEditingStaff(staff);
-                  setIsEditorOpen(true);
+                  setSelectedStaff(staff);
+                  setFormData(staff);
+                  setIsEditing(true);
                 }} />
-                <AdminTable.Delete onClick={() => handleDeleteStaff(staff.id)} />
+                <AdminTable.Delete onClick={() => {
+                  setStaffToDelete(staff);
+                  setShowDeleteConfirm(true);
+                }} />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 text-sm items-center pt-2">
@@ -339,10 +343,14 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
                 <AdminTable.Td>
                   <div className="flex items-center justify-center gap-2">
                     <AdminTable.Edit onClick={() => {
-                      setEditingStaff(staff);
-                      setIsEditorOpen(true);
+                      setSelectedStaff(staff);
+                      setFormData(staff);
+                      setIsEditing(true);
                     }} />
-                    <AdminTable.Delete onClick={() => handleDeleteStaff(staff.id)} />
+                    <AdminTable.Delete onClick={() => {
+                      setStaffToDelete(staff);
+                      setShowDeleteConfirm(true);
+                    }} />
                   </div>
                 </AdminTable.Td>
               </AdminTable.Row>

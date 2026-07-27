@@ -13,8 +13,8 @@ export function WidgetGrid({ block, isFirstBlock, isSubItem }: WidgetProps) {
   if (cols === 6) gridClass = 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
 
   const containerClass = isSubItem
-    ? `p-6 md:p-10 bg-white rounded-3xl shadow-sm border border-stone-100 ${isFirstBlock ? 'mt-8' : ''}`
-    : `py-20 bg-white ${isFirstBlock ? 'mt-20' : ''}`;
+    ? `py-6 px-2 md:py-10 md:px-4 bg-transparent ${isFirstBlock ? 'mt-8' : ''}`
+    : `py-20 bg-transparent ${isFirstBlock ? 'mt-20' : ''}`; // Updated styling
 
   return (
     <section id={block.id} className={containerClass}>
@@ -32,7 +32,7 @@ export function WidgetGrid({ block, isFirstBlock, isSubItem }: WidgetProps) {
                 {...wrapperProps as any}
                 className={`bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden flex flex-col ${isLink ? 'hover:shadow-md hover:border-primary/30 hover:-translate-y-1 transition-all cursor-pointer group' : 'hover:shadow-md transition-shadow'}`}
               >
-                {item.showImage && item.image && (
+                {item.showImage !== false && item.image && (
                   <div className="w-full h-48 md:h-56 shrink-0 border-b border-stone-100 overflow-hidden">
                     <img 
                       src={item.image || undefined} 

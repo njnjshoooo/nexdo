@@ -41,8 +41,8 @@ function HtmlBlock({ html }: { html: string }) {
   );
 }
 
-export function WidgetHtmlCode({ block, isSubItem }: WidgetProps) {
-  const containerClass = `w-full overflow-hidden`;
+export function WidgetHtmlCode({ block }: WidgetProps) {
+  const containerClass = `w-full overflow-hidden rounded-3xl`;
 
   return (
     <section id={block.id} className={containerClass}>
