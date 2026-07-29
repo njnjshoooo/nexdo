@@ -21,8 +21,9 @@ import ProfileSettingsPage from './pages/ProfileSettingsPage';
 import MyReservationsPage from './pages/customer/MyReservationsPage';
 import VendorLogin from './pages/vendor/VendorLogin';
 import VendorDashboard from './pages/vendor/VendorDashboard';
-import { homePage } from './data/pages/home'; 
+import { homePage } from './data/pages/home';
 import { pageService } from './services/pageService'; // 💡 引入 service 來讀取動態資料
+import { useGA4PageView } from './hooks/useGA4PageView';
 
 // ==================== 後台管理組件引入 ====================
 import AdminDashboard from './pages/admin/AdminDashboard'; 
@@ -81,6 +82,8 @@ import PaymentPage from './pages/customer/PaymentPage';
 import EasyCardPartnerPage from './pages/partner/EasyCardPartnerPage';
 
 export default function App() {
+  // GA4：每次路由改變送 page_view（SPA 導航 gtag 不會自動追蹤）
+  useGA4PageView();
   return (
     <Routes>
       {/* 1. 後台管理：保持高優先權 */}

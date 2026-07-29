@@ -4,10 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>好齡居 - 樂齡居住安全專家</title>
+
+    <!-- Google Analytics 4 (GA4) -->
+    <!-- SPA 每個路由的 page_view 由 src/hooks/useGA4PageView.ts 手動送出 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q44KTF3S0S"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Q44KTF3S0S', { send_page_view: false });
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
