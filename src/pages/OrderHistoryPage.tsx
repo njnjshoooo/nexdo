@@ -105,7 +105,7 @@ export default function OrderHistoryPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {filteredOrders.map((order) => {
               const isExpanded = expandedOrderId === order.id;
               const paidAmount = getPaidAmount(order);
@@ -120,7 +120,7 @@ export default function OrderHistoryPage() {
                   {/* Accordion Header */}
                   <button 
                     onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                    className="w-full text-left p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-stone-50/50 transition-colors"
+                    className="w-full text-left p-6 flex flex-col justify-between gap-6 hover:bg-stone-50/50 transition-colors"
                   >
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export default function OrderHistoryPage() {
                     <div className="px-6 pb-6 border-t border-stone-50 pt-6 bg-stone-50/30">
                       <div className="space-y-6">
                         {/* Order Items */}
-                        <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">服務明細</p>
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-stone-100">

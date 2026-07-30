@@ -10,6 +10,7 @@ import { NavItem } from '../types/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import LoginModal from './LoginModal';
+import FontSizeControl from './FontSizeControl';
 import { headerData } from '../data/settings/headerData';
 
 export default function Header() {
@@ -123,7 +124,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
             {navItems.map((item) => (
               <div key={item.id} className="relative group">
                 {item.children?.length ? (
@@ -139,11 +140,11 @@ export default function Header() {
           </nav>
 
           {/* Right Actions */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-3 lg:gap-5">
             <div className="relative">
               <input 
                 type="text" placeholder="搜尋..." 
-                className={`w-28 focus:w-40 transition-all duration-300 pl-3 pr-8 py-1 rounded-full border text-sm ${isServicesOpen ? 'bg-white/10 border-white/20 text-white' : 'bg-stone-100 border-transparent'}`}
+                className={`w-24 focus:w-36 transition-all duration-300 pl-3 pr-8 py-1 rounded-full border text-sm ${isServicesOpen ? 'bg-white/10 border-white/20 text-white' : 'bg-stone-100 border-transparent'}`}
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
@@ -156,6 +157,8 @@ export default function Header() {
               <Search size={16} className={`absolute right-2 top-1.5 ${isServicesOpen ? 'text-white' : 'text-stone-400'}`} />
             </div>
             
+            <FontSizeControl isDark={isServicesOpen} />
+            
             <Link to="/cart" onClick={() => setIsServicesOpen(false)} className={`relative ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>
               <ShoppingCart size={20} />
               {cartItemCount > 0 && <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{cartItemCount}</span>}
@@ -163,7 +166,7 @@ export default function Header() {
             
             {isAuthenticated ? (
               <div className="relative" ref={userMenuRef}>
-                <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>
+                <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className={`flex items-center gap-1.5 px-3 lg:px-4 py-2 rounded-full font-medium ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>
                   <UserIcon size={18} />
                   <span>{user?.name}</span>
                   <ChevronDown size={16} className={`transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
@@ -191,7 +194,7 @@ export default function Header() {
                 </AnimatePresence>
               </div>
             ) : (
-              <button onClick={() => setIsLoginModalOpen(true)} className={`px-6 py-2 rounded-full font-medium ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>會員登入</button>
+              <button onClick={() => setIsLoginModalOpen(true)} className={`px-4 lg:px-6 py-2 rounded-full font-medium ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>會員登入</button>
             )}
           </div>
 
@@ -254,6 +257,13 @@ export default function Header() {
                         )}
                       </div>
                     ))}
+                    
+                    <div className="pt-4 border-t border-stone-100 mt-4 px-3 mb-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-stone-600">字體大小</span>
+                        <FontSizeControl />
+                      </div>
+                    </div>
                     
                     <div className="pt-4 border-t border-stone-100 mt-2">
                       {isAuthenticated ? (

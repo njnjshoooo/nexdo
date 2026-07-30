@@ -134,7 +134,7 @@ export default function MyReservationsPage() {
             <p className="text-stone-500 font-medium">尚無{activeTab === 'ongoing' ? '進行中' : '歷史'}預約紀錄</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {filteredItems.map((item) => {
               const isExpanded = expandedId === item.id;
               const title = item.pageTitle || '預約項目';

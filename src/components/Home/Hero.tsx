@@ -34,7 +34,7 @@ export default function Hero({ data }: { data?: any }) {
             </h2>
             
             {/* 💡 動態標題：支援換行符號 */}
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
+            <h1 className="text-3xl md:text-[2.5rem] lg:text-[2.75rem] font-bold leading-tight text-stone-900 whitespace-pre-line">
               {title}
             </h1>
             

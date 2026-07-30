@@ -864,17 +864,17 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                 <div className="md:hidden">
                   <ServiceCarousel 
                     services={relatedPages.map(p => ({ id: p.id, targetPageId: p.id }))} 
-                    desktopColumns={2}
+                    desktopColumns={3}
                   />
                 </div>
                 <div className="hidden md:block">
                   {relatedPages.length > 2 ? (
                     <ServiceCarousel 
                       services={relatedPages.map(p => ({ id: p.id, targetPageId: p.id }))} 
-                      desktopColumns={2}
+                      desktopColumns={3}
                     />
                   ) : (
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {relatedPages.map(page => {
                         const productId = page.content.subItem?.productId;
                         const relatedProductData = productId ? relatedProducts[productId] : null;

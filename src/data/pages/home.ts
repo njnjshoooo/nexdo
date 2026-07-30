@@ -19,7 +19,7 @@ export const homePage: Page = {
           type: 'HERO_1',
           hero1: {
             subtitle: '樂齡的居住服務',
-            title: '陪伴您把居家環境變安全，\n擁有安心自在的樂齡日常。',
+            title: '從整理開始，人生每個轉折，\n都有好齡居守護您的安心日常。',
             image: 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&q=80&w=1200',
             buttons: [
               { text: '居住安全', link: '/home-safety' },
