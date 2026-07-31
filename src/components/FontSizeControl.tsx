@@ -21,10 +21,10 @@ export default function FontSizeControl({ isDark }: { isDark?: boolean }) {
   };
 
   return (
-    <div className={`flex items-center gap-1 rounded-full p-1 border transition-colors ${isDark ? 'bg-white/10 border-white/20' : 'bg-stone-100 border-stone-200'}`}>
+    <div className={`flex items-center gap-[4px] rounded-full p-[4px] border transition-colors ${isDark ? 'bg-white/10 border-white/20' : 'bg-stone-100 border-stone-200'}`}>
       <button
         onClick={() => changeFontSize('18px')}
-        className={`w-7 h-7 flex items-center justify-center rounded-full text-sm transition-colors ${
+        className={`w-[28px] h-[28px] flex items-center justify-center rounded-full text-[14px] leading-[20px] transition-colors ${
           fontSize === '18px' 
             ? isDark ? 'bg-white text-stone-900 font-bold shadow-sm' : 'bg-white text-stone-900 font-bold shadow-sm'
             : isDark ? 'text-white hover:bg-white/20' : 'text-stone-500 hover:text-stone-900'
@@ -35,7 +35,7 @@ export default function FontSizeControl({ isDark }: { isDark?: boolean }) {
       </button>
       <button
         onClick={() => changeFontSize('20px')}
-        className={`w-7 h-7 flex items-center justify-center rounded-full text-base transition-colors ${
+        className={`w-[28px] h-[28px] flex items-center justify-center rounded-full text-[16px] leading-[24px] transition-colors ${
           fontSize === '20px' 
             ? isDark ? 'bg-white text-stone-900 font-bold shadow-sm' : 'bg-white text-stone-900 font-bold shadow-sm'
             : isDark ? 'text-white hover:bg-white/20' : 'text-stone-500 hover:text-stone-900'

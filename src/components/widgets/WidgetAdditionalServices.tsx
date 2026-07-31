@@ -13,7 +13,7 @@ export function WidgetAdditionalServices({ block, isSubItem }: WidgetProps) {
   
   return (
     <section id={block.id} className={containerClass}>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
         <h2 className="text-2xl font-bold text-stone-900 mb-12 text-center">{additionalTitle}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {additionalItems.map((id: string, i: number) => {

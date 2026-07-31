@@ -56,7 +56,7 @@ export function WidgetComparison({ block, isSubItem }: WidgetProps) {
 
   return (
     <section id={block.id} className={containerClass}>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
         {block.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.comparison.title}</h2>}
         <div className="max-w-4xl mx-auto">
           <div 

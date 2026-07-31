@@ -8,7 +8,7 @@ export function WidgetImageCarousel({ block, isSubItem }: WidgetProps) {
 
   return (
     <section id={block.id} className={containerClass}>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
         <GeneralImageCarousel items={block.imageCarousel?.items || []} />
       </div>
     </section>

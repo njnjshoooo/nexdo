@@ -164,3 +164,7 @@
 .prose a:hover, .markdown-body a:hover {
   color: #B36B00;
 }
+
+.prose > *:last-child, .markdown-body > *:last-child {
+  margin-bottom: 0 !important;
+}

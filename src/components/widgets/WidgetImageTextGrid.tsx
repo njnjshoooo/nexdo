@@ -36,13 +36,13 @@ export function WidgetImageTextGrid({ block, isSubItem }: WidgetProps) {
 
   return (
     <section id={block.id} className={containerClass}>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
         <div className={gridClass}>
           <div className={textOrderClass}>
             {block.imageTextGrid?.title && (
               <h2 className="text-3xl font-bold text-stone-900 mb-6">{block.imageTextGrid.title}</h2>
             )}
-            <div className="prose prose-stone mb-8">
+            <div className={`prose prose-stone ${block.imageTextGrid?.cta?.text ? 'mb-8' : ''}`}>
               <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{block.imageTextGrid?.content || ''}</Markdown>
             </div>
             {block.imageTextGrid?.cta?.text && (

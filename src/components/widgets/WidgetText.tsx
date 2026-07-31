@@ -16,7 +16,7 @@ export function WidgetText({ block, isFirstBlock, isSubItem }: WidgetProps) {
 
   return (
     <section id={block.id} className={containerClass}>
-      <div className="max-w-4xl mx-auto px-6">
+      <div className={isSubItem ? "w-full" : "max-w-4xl mx-auto px-6"}>
         <div className={`${textStyles} ${
           block.text?.alignment === 'center' ? 'text-center' : 
           block.text?.alignment === 'right' ? 'text-right' : ''

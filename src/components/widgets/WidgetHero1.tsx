@@ -32,7 +32,7 @@ export function WidgetHero1({ block, isFirstBlock, isSubItem, handleAnchorClick 
 
   return (
     <section id={block.id} className={`relative pt-24 pb-16 md:pt-20 md:pb-16 overflow-hidden bg-[#FFF9F2] ${isFirstBlock ? 'mt-20' : ''}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
