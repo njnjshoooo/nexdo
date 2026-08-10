@@ -134,7 +134,7 @@ export default function BlogPostPage() {
       {loadedRelatedServices.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 mb-20 relative z-20">
           <h2 className="text-2xl font-bold text-stone-900 mb-8 text-center text-[#4A5D3B]">相關服務推薦</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {loadedRelatedServices.map(service => (
               <Link 
                 key={service.id} 
