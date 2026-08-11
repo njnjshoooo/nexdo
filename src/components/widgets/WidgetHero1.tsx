@@ -3,54 +3,37 @@ import { ArrowUpRight } from 'lucide-react';
 import { WidgetProps } from './WidgetProps';
 
 export function WidgetHero1({ block, isFirstBlock, isSubItem, handleAnchorClick }: WidgetProps) {
-  if (isSubItem) {
-    return (
-      <section id={block.id} className={`p-6 md:p-10 bg-[#FFF9F2] rounded-3xl shadow-sm ring-1 ring-stone-900/5 ${isFirstBlock ? 'mt-8' : ''}`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-5">
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight text-stone-900 whitespace-pre-line">
-                {block.hero1?.title}
-              </h1>
-              <div className="flex flex-col gap-4">
-                {block.hero1?.buttons?.map((btn: any, i: number) => (
-                  <a key={i} href={btn.link} onClick={(e) => handleAnchorClick && handleAnchorClick(e, btn.link)} className="inline-flex items-center justify-between border-b border-stone-200 pb-3 text-stone-600 hover:text-primary hover:border-primary transition-colors group">
-                    <span className="text-lg font-bold">{btn.text}</span>
-                    <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center">
-              <img src={block.hero1?.image || undefined} alt="" className="w-full h-auto object-contain" />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const containerClass = isSubItem
+    ? `relative rounded-3xl overflow-hidden shadow-sm flex flex-col justify-end min-h-[500px] ${isFirstBlock ? 'mt-8' : ''}`
+    : `relative w-full h-[70vh] min-h-[500px] max-h-[800px] flex flex-col justify-end overflow-hidden ${isFirstBlock ? 'mt-0' : 'mt-20'}`;
 
   return (
-    <section id={block.id} className={`relative pt-24 pb-16 md:pt-20 md:pb-16 overflow-hidden bg-[#FFF9F2] ${isFirstBlock ? 'mt-20' : ''}`}>
-      <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-stone-900 whitespace-pre-line">
-              {block.hero1?.title}
-            </h1>
-            <div className="flex flex-col gap-4">
-              {block.hero1?.buttons?.map((btn: any, i: number) => (
-                <a key={i} href={btn.link} onClick={(e) => handleAnchorClick && handleAnchorClick(e, btn.link)} className="inline-flex items-center justify-between border-b border-stone-200 pb-3 text-stone-600 hover:text-primary hover:border-primary transition-colors group">
-                  <span className="text-lg font-bold">{btn.text}</span>
-                  <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
-                </a>
-              ))}
-            </div>
-          </motion.div>
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[3/2]">
-            <img src={block.hero1?.image || undefined} alt="" className="w-full h-full object-cover" />
+    <section id={block.id} className={containerClass}>
+      <div className="absolute inset-0 z-0">
+        <img src={block.hero1?.image || undefined} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
+      </div>
+
+      <div className={`relative z-10 w-full ${isSubItem ? 'p-8 md:p-12' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-20'}`}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl space-y-6">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white whitespace-pre-line drop-shadow-md">
+            {block.hero1?.title}
+          </h1>
+          
+          <div className="flex flex-col gap-4 pt-4 max-w-md">
+            {block.hero1?.buttons?.map((btn: any, i: number) => (
+              <a 
+                key={i} 
+                href={btn.link} 
+                onClick={(e) => handleAnchorClick && handleAnchorClick(e, btn.link)} 
+                className="inline-flex items-center justify-between border-b border-white/40 pb-3 text-white/90 hover:text-white hover:border-white transition-colors group"
+              >
+                <span className="text-lg font-bold">{btn.text}</span>
+                <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+              </a>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
