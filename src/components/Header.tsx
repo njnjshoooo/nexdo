@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Search, ShoppingCart, ChevronDown, ChevronUp, User as UserIcon, Settings, LogOut, Shield, Package, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase'; // 🎯 引入總水管
 import { navigationService } from '../services/navigationService';
 import { HEADER_ITEMS } from '../data/header';
@@ -28,6 +28,7 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { cartItems } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // 1. 載入網頁 Header 設定（Logo、高度等）
@@ -100,9 +101,15 @@ export default function Header() {
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const serviceCategories = navItems.find(item => item.id === 'nav-services')?.children || [];
+  const isSpecialHeroPage = ['/about', '/consultant', '/blog', '/peace-of-mind'].includes(location.pathname) || location.pathname.startsWith('/blog/');
+  
   const headerBgClass = isServicesOpen 
     ? 'bg-[#4A5D3B] text-white' 
-    : scrolled ? 'bg-warm-bg/90 backdrop-blur-md text-stone-800 shadow-sm' : 'bg-transparent text-stone-800';
+    : scrolled 
+      ? 'bg-warm-bg/90 backdrop-blur-md text-stone-800 shadow-sm' 
+      : isSpecialHeroPage
+        ? 'bg-white/80 backdrop-blur-md text-stone-800 shadow-sm'
+        : 'bg-transparent text-stone-800';
 
   return (
     <>

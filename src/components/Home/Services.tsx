@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, User } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { pageService } from '../../services/pageService';
 import { Card, CardImage, CardImageWrapper } from '../ui/Card';
@@ -44,7 +44,7 @@ export default function Services({ data }: { data?: any }) {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className={`group rounded-[2rem] border-none shadow-xl transition-colors duration-300 ${
+                <Card className={`group rounded-2xl border-none shadow-xl transition-colors duration-300 ${
                   isPrimary ? 'bg-[#516438] text-white' : 'bg-white text-stone-900 hover:bg-[#516438] hover:text-white'
                 }`}>
                   <div className={`flex flex-col lg:flex-row ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
@@ -57,23 +57,6 @@ export default function Services({ data }: { data?: any }) {
                           alt={displayDescription} 
                         />
                       </CardImageWrapper>
-                      
-                      {/* Testimonial Caption */}
-                      {service.testimonial && (
-                        <div className={`mt-4 p-4 rounded-xl flex items-start gap-3 transition-colors duration-300 ${
-                          isPrimary ? 'bg-[#43522d] text-white/90' : 'bg-[#FFF9F2] text-stone-600 group-hover:bg-[#43522d] group-hover:text-white/90'
-                        }`}>
-                          <div className="mt-1 flex-shrink-0">
-                            <User size={16} className={`transition-colors duration-300 ${isPrimary ? 'text-white' : 'text-[#885200] group-hover:text-white'}`} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium mb-1">{service.testimonial.text}</p>
-                            <p className={`text-xs opacity-75`}>
-                              {service.testimonial.author}
-                            </p>
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     {/* Content Section */}

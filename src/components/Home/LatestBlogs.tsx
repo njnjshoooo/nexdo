@@ -29,7 +29,7 @@ export default function LatestBlogs({ data }: { data: any }) {
     <section className="py-24 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-stone-900 tracking-tight mb-6">{title}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-stone-900 tracking-tight mb-6">{title}</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
@@ -43,7 +43,7 @@ export default function LatestBlogs({ data }: { data: any }) {
             >
               <Link 
                 to={`/blog/${article.slug || article.id}`}
-                className="group flex flex-col h-full bg-white rounded-[2rem] border border-stone-200 overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="group flex flex-col h-full bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
                   {article.coverImage ? (

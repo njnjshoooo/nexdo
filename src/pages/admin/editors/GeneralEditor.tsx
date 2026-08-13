@@ -153,6 +153,7 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                   )}
                   {blockType === 'TEXT_LIST' && (
                     <div className="space-y-4">
+                      <input {...register(`content.general.blocks.${index}.textList.eyebrow`)} placeholder="標題上方的眉標 (選填)" className={InputClass} />
                       <input {...register(`content.general.blocks.${index}.textList.title`)} placeholder="標題 (如：常見問題)" className={InputClass} />
                       <div className="space-y-2">
                         {(watch(`content.general.blocks.${index}.textList.items`) || []).map((_: any, idx: number) => (
@@ -177,6 +178,14 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                   )}
                   {blockType === 'GRID' && (
                     <div className="space-y-4">
+                      <div>
+
+                        <FieldLabel>眉標</FieldLabel>
+
+                        <input className={InputClass} {...register(`content.general.blocks.${index}.grid.eyebrow`)} placeholder="標題上方的眉標 (選填)" />
+
+                      </div>
+
                       <div>
                         <FieldLabel>區塊標題</FieldLabel>
                         <input className={InputClass} {...register(`content.general.blocks.${index}.grid.title`)} placeholder="例如：服務項目" />
@@ -277,6 +286,14 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                         <Controller control={control} name={`content.general.blocks.${index}.imageTextGrid.image`} render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />} />
                       </div>
                       <div>
+
+                        <FieldLabel>眉標</FieldLabel>
+
+                        <input className={InputClass} {...register(`content.general.blocks.${index}.imageTextGrid.eyebrow`)} placeholder="標題上方的眉標 (選填)" />
+
+                      </div>
+
+                      <div>
                         <FieldLabel>標題</FieldLabel>
                         <input className={InputClass} {...register(`content.general.blocks.${index}.imageTextGrid.title`)} placeholder="標題" />
                       </div>
@@ -297,6 +314,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
 
                   {blockType === 'HERO_1' && (
                     <div className="space-y-4">
+                      <FieldLabel>眉標</FieldLabel>
+
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.hero1.eyebrow`)} placeholder="標題上方的眉標 (選填)" />
+
                       <FieldLabel>標題</FieldLabel>
                       <input className={InputClass} {...register(`content.general.blocks.${index}.hero1.title`)} placeholder="標題" />
                       <FieldLabel>背景圖片</FieldLabel>
@@ -305,6 +326,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                   )}
                   {blockType === 'HERO_2' && (
                     <div className="space-y-4">
+                      <FieldLabel>眉標</FieldLabel>
+
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.eyebrow`)} placeholder="標題上方的眉標 (選填)" />
+
                       <FieldLabel>標題</FieldLabel>
                       <input className={InputClass} {...register(`content.general.blocks.${index}.hero2.title`)} placeholder="標題" />
                       <FieldLabel>描述</FieldLabel>
@@ -349,6 +374,10 @@ export default function GeneralEditor({ control, register, activeTab, watch, set
                   )}
                   {blockType === 'COMPARISON' && (
                     <div className="space-y-4">
+                      <FieldLabel>眉標</FieldLabel>
+
+                      <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.eyebrow`)} placeholder="標題上方的眉標 (選填)" />
+
                       <FieldLabel>標題</FieldLabel>
                       <input className={InputClass} {...register(`content.general.blocks.${index}.comparison.title`)} placeholder="標題" />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -331,12 +331,14 @@ export interface GeneralBlock {
   // Payload for different types
   hero1?: {
     subtitle?: string;
+    eyebrow?: string;
     title: string;
     image: string;
     buttons: HomeHeroButton[];
     imageTestimonial?: { text: string; author: string; };
   };
   hero2?: {
+    eyebrow?: string;
     title: string;
     description: string;
     backgroundImage: string;
@@ -377,12 +379,14 @@ export interface GeneralBlock {
   items?: HomeTestimonial[]; // For direct items in block
   enabled?: boolean;
   grid?: {
+    eyebrow?: string;
     title: string;
     columns?: 2 | 3 | 4 | 5 | 6;
     showCarousel?: boolean;
     items: any[];
   };
 comparison?: {
+    eyebrow?: string;
     title: string;
     beforeImage: string;
     afterImage: string;
@@ -390,6 +394,7 @@ comparison?: {
     afterLabel: string;
   };
   textList?: {
+    eyebrow?: string;
     title: string;
     items: { id: string; title: string; text: string; }[];
   };
@@ -427,6 +432,7 @@ comparison?: {
   };
   imageTextGrid?: {
     layout: 'imageLeft' | 'imageRight';
+    eyebrow?: string;
     image: string;
     title: string;
     content: string;

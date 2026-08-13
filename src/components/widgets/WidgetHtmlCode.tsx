@@ -17,6 +17,14 @@ function HtmlBlock({ html }: { html: string }) {
   }, []);
   
   const injectedHtml = `
+    <style>
+      /* Hide scrollbars inside the iframe to prevent double scrolling */
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden !important;
+      }
+    </style>
     ${html}
     <script>
       const sendHeight = () => {
@@ -34,7 +42,8 @@ function HtmlBlock({ html }: { html: string }) {
     <iframe 
       ref={iframeRef}
       srcDoc={injectedHtml}
-      className="w-full border-0 transition-all duration-300"
+      className="w-full border-0 transition-all duration-300 overflow-hidden block"
+      scrolling="no"
       title="Custom Code"
       sandbox="allow-scripts allow-popups allow-forms allow-same-origin"
     />

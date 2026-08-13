@@ -75,7 +75,7 @@ export default function AdditionalServices({ data }: { data?: { title?: string; 
   return (
     <section className="py-16 bg-[#FFF9F2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#FDF2E9] rounded-[3rem] p-8 md:p-16 relative overflow-visible">
+        <div className="bg-[#FDF2E9] rounded-3xl p-8 md:p-16 relative overflow-visible">
           {title && <h2 className="text-3xl font-bold text-center text-[#4A3B32] mb-12">{title}</h2>}
           
           <div className="relative group">

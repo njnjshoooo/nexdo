@@ -1,10 +1,11 @@
 import { motion } from 'motion/react';
+import { Eyebrow } from './Eyebrow';
 import { WidgetProps } from './WidgetProps';
 
 export function WidgetHero2({ block, isFirstBlock, isSubItem, handleAnchorClick }: WidgetProps) {
   const containerClass = isSubItem 
     ? `relative rounded-3xl overflow-hidden shadow-sm flex flex-col justify-end min-h-[500px] ${isFirstBlock ? 'mt-8' : ''}`
-    : `relative w-full h-[70vh] min-h-[500px] max-h-[800px] flex flex-col justify-end overflow-hidden ${isFirstBlock ? 'mt-0' : 'mt-20'}`;
+    : `relative w-full h-[80vh] min-h-[600px] max-h-[1000px] flex flex-col justify-end overflow-hidden ${isFirstBlock ? 'mt-0' : 'mt-20'}`;
 
   return (
     <section id={block.id} className={containerClass}>
@@ -26,6 +27,7 @@ export function WidgetHero2({ block, isFirstBlock, isSubItem, handleAnchorClick 
           transition={{ duration: 0.8 }}
           className="max-w-4xl space-y-6"
         >
+          <Eyebrow text={block.hero2.eyebrow} />
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white whitespace-pre-line drop-shadow-md">
             {block.hero2?.title}
           </h1>

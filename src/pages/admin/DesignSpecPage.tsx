@@ -199,8 +199,10 @@ function SpacingSpec() {
     { class: "rounded", value: "0.25rem (4px)", desc: "一般按鈕、輸入框" },
     { class: "rounded-lg", value: "0.5rem (8px)", desc: "大按鈕、小卡片" },
     { class: "rounded-xl", value: "0.75rem (12px)", desc: "中型卡片、圖片" },
-    { class: "rounded-2xl", value: "1rem (16px)", desc: "大型卡片、區塊背景" },
-    { class: "rounded-[1.5rem]", value: "1.5rem (24px)", desc: "特殊卡片設計" },
+    { class: "rounded-2xl", value: "1rem (16px)", desc: "標準卡片、區塊背景 (全站統一 R角)" },
+    { class: "rounded-[1.5rem]", value: "1.5rem (24px)", desc: "已停用 (改為 rounded-2xl)" },
+    { class: "rounded-[2rem]", value: "2rem (32px)", desc: "已停用 (改為 rounded-2xl)" },
+    { class: "rounded-[3rem]", value: "3rem (48px)", desc: "首頁大型區塊背景 (例：滿版卡片底色)" },
     { class: "rounded-full", value: "9999px", desc: "藥丸按鈕、頭像" },
   ];
 

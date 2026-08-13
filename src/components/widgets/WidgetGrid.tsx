@@ -1,4 +1,5 @@
 import Markdown from 'react-markdown';
+import { Eyebrow } from './Eyebrow';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { WidgetProps } from './WidgetProps';
@@ -19,6 +20,7 @@ export function WidgetGrid({ block, isFirstBlock, isSubItem }: WidgetProps) {
   return (
     <section id={block.id} className={containerClass}>
       <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
+        <Eyebrow text={block.grid.eyebrow} align="center" />
         {block.grid?.title && <h2 className={`text-3xl font-bold text-center ${isSubItem ? 'mb-10' : 'mb-16'} text-stone-900`}>{block.grid?.title}</h2>}
         <div className={`grid ${gridClass} gap-8`}>
           {block.grid?.items?.map((item: any, i: number) => {

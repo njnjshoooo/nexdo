@@ -108,27 +108,14 @@ export default function Blog() {
   }, [blogConfig.recommendedServiceIds]);
 
   return (
-    <div className="pt-20"> {/* Add pt-20 to avoid overlapping with Header */}
-      {/* Hero Section */}
-      <div className="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src={blogConfig.heroImage || undefined} 
-            alt="Blog Hero" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-stone-900/40" />
-        </div>
-        <div className="relative z-10 text-center px-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{blogConfig.heroTitle}</h1>
-        </div>
-      </div>
+    <div className="pt-32 pb-20"> {/* Add pt-32 to clear Header */}
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Simple Title Section */}
+        <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-8 md:mb-10">{blogConfig.heroTitle}</h1>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Category Pill Navigation */}
         {blogConfig.showCategoryNav && categories.length > 1 && (
-          <div className="flex gap-3 mb-12 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex flex-wrap gap-3 mb-12">
             {categories.map((cat) => (
               <button 
                 key={cat} 

@@ -8,7 +8,7 @@ function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, p
   return (
     <section key={blockId} id={blockId} className="py-16 bg-[#FDF8F3]">
       <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl">
+        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl">
           <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
         </div>
       </div>

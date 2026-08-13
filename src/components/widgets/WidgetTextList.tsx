@@ -1,4 +1,5 @@
 import { WidgetProps } from './WidgetProps';
+import { Eyebrow } from './Eyebrow';
 
 export function WidgetTextList({ block, isSubItem }: WidgetProps) {
   const containerClass = isSubItem
@@ -8,6 +9,7 @@ export function WidgetTextList({ block, isSubItem }: WidgetProps) {
   return (
     <section id={block.id} className={containerClass}>
       <div className={isSubItem ? "w-full" : "max-w-3xl mx-auto px-4"}>
+        <Eyebrow text={block.textList.eyebrow} align="center" />
         {block.textList?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.textList.title}</h2>}
         <div className="space-y-6">
           {block.textList?.items?.map((item: any, idx: number) => (

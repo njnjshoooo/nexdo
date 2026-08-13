@@ -84,7 +84,7 @@ case 'TESTIMONIALS': {
       {showForm && selectedForm && (
         <div className="py-20 bg-stone-50">
           <div className="max-w-3xl mx-auto px-4">
-            <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
+            <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-stone-100">
               <DynamicForm 
                 form={selectedForm} 
                 pageSlug={page?.slug || 'home'} 

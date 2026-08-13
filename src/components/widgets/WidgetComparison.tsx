@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Eyebrow } from './Eyebrow';
 import { WidgetProps } from './WidgetProps';
 import { ArrowLeftRight } from 'lucide-react';
 
@@ -57,6 +58,7 @@ export function WidgetComparison({ block, isSubItem }: WidgetProps) {
   return (
     <section id={block.id} className={containerClass}>
       <div className={isSubItem ? "w-full" : "max-w-7xl mx-auto px-4"}>
+        <Eyebrow text={block.comparison.eyebrow} align="center" />
         {block.comparison?.title && <h2 className="text-3xl font-bold text-stone-900 mb-12 text-center">{block.comparison.title}</h2>}
         <div className="max-w-4xl mx-auto">
           <div 
