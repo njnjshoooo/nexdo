@@ -78,7 +78,7 @@ export default function PeaceCard() {
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              className="relative z-10 w-72 h-44 bg-gradient-to-br from-primary to-[#A06000] rounded-2xl shadow-2xl flex flex-col items-center justify-center text-white transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500"
+              className="relative z-10 w-72 h-44 bg-gradient-to-br from-primary to-[#A06000] rounded-full shadow-2xl flex flex-col items-center justify-center text-white transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500"
             >
               <div className="absolute top-4 left-4 flex items-center gap-2">
                 <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold">好</div>

@@ -84,7 +84,7 @@ export default function VendorLogin() {
             <span className="font-medium hidden sm:inline">返回首頁</span>
           </Link>
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 w-full justify-center sm:w-auto">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
               好
             </div>
             <span className="text-lg font-bold text-stone-900 truncate">好齡居 NEXDO</span>
@@ -252,7 +252,7 @@ export default function VendorLogin() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? '送出中...' : '送出申請'}
               </button>
@@ -294,7 +294,7 @@ export default function VendorLogin() {
 
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
               >
                 登入
               </button>

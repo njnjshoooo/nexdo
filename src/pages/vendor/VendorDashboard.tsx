@@ -154,7 +154,7 @@ export default function VendorDashboard() {
         <div className="p-4 border-t border-stone-100">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-stone-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-stone-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
           >
             <LogOut size={20} />
             登出系統

@@ -68,7 +68,7 @@ export default function Partners() {
 
             <div className="space-y-8">
               <div className="flex items-center gap-6 group">
-                <div className="bg-secondary p-4 rounded-xl text-white transition-transform group-hover:rotate-12 shadow-lg shadow-secondary/20">
+                <div className="bg-secondary p-4 rounded-full text-white transition-transform group-hover:rotate-12 shadow-lg shadow-secondary/20">
                   <Award size={32} />
                 </div>
                 <div>
@@ -78,7 +78,7 @@ export default function Partners() {
               </div>
 
               <div className="flex items-center gap-6 group">
-                <div className="bg-primary p-4 rounded-xl text-white transition-transform group-hover:-rotate-12 shadow-lg shadow-primary/20">
+                <div className="bg-primary p-4 rounded-full text-white transition-transform group-hover:-rotate-12 shadow-lg shadow-primary/20">
                   <ShieldCheck size={32} />
                 </div>
                 <div>

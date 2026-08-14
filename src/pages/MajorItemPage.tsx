@@ -26,7 +26,7 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-stone-50">
         <h1 className="text-2xl font-bold text-stone-900">找不到頁面</h1>
         <p className="text-stone-500">此頁面可能尚未建立或路徑不正確 (Slug: {currentSlug})。</p>
-        <a href="/" className="px-6 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors">
+        <a href="/" className="px-6 py-2 bg-stone-800 text-white rounded-full hover:bg-stone-700 transition-colors">
           回到首頁
         </a>
       </div>

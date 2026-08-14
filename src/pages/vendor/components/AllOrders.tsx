@@ -299,7 +299,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
                       <div className="flex flex-col gap-3">
                         <button 
                           onClick={() => setShowQRCode(!showQRCode)}
-                          className="w-full py-3 bg-white border border-primary text-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
+                          className="w-full py-3 bg-white border border-primary text-primary rounded-full font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
                         >
                           <QrCode size={20} />
                           {showQRCode ? '隱藏收款 QR Code' : '顯示收款 QR Code'}
@@ -323,7 +323,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
                             navigator.clipboard.writeText(url);
                             setFeedback({ type: 'success', message: '支付連結已複製！' });
                           }}
-                          className="w-full py-3 bg-stone-100 text-stone-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-stone-200 transition-colors"
+                          className="w-full py-3 bg-stone-100 text-stone-600 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-stone-200 transition-colors"
                         >
                           <Copy size={20} />
                           複製支付連結
@@ -506,7 +506,7 @@ export default function AllOrders({ vendor }: AllOrdersProps) {
           </div>
         ))}
         {paginatedOrders.length === 0 && (
-          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
             找不到符合條件的訂單
           </div>
         )}

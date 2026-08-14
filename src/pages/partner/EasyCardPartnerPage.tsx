@@ -64,7 +64,7 @@ const EasyCardPartnerPage: React.FC = () => {
             {/* 好齡居 Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm group-hover:scale-105 transition-transform"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-sm group-hover:scale-105 transition-transform"
                 style={{ backgroundColor: '#885200' }}
               >
                 好
@@ -83,7 +83,7 @@ const EasyCardPartnerPage: React.FC = () => {
             {/* 悠遊卡 Logo */}
             <div className="flex items-center gap-2">
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold shadow-sm"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm"
                 style={{
                   background: `linear-gradient(135deg, ${EASYCARD_TEAL} 0%, ${EASYCARD_TEAL_DARK} 100%)`,
                 }}
@@ -323,7 +323,7 @@ const EasyCardPartnerPage: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div
-                  className="w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
                   style={{ backgroundColor: '#B36B00' }}
                 >
                   好
@@ -333,7 +333,7 @@ const EasyCardPartnerPage: React.FC = () => {
               <span className="text-stone-500">×</span>
               <div className="flex items-center gap-2">
                 <div
-                  className="w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-[9px]"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[9px]"
                   style={{
                     background: `linear-gradient(135deg, ${EASYCARD_TEAL} 0%, ${EASYCARD_TEAL_DARK} 100%)`,
                   }}

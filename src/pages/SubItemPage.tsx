@@ -92,7 +92,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-stone-50">
         <h1 className="text-2xl font-bold text-stone-900">找不到頁面</h1>
         <p className="text-stone-500">此頁面可能尚未建立或路徑不正確 (Slug: {currentSlug})。</p>
-        <a href="/" className="px-6 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors">
+        <a href="/" className="px-6 py-2 bg-stone-800 text-white rounded-full hover:bg-stone-700 transition-colors">
           回到首頁
         </a>
       </div>
@@ -544,7 +544,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       }
                     }
                   }}
-                  className="block w-full bg-[#885200] hover:bg-[#663D00] text-white text-center font-bold py-3 md:py-3.5 text-sm md:text-base rounded-xl transition-colors shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all"
+                  className="block w-full bg-[#885200] hover:bg-[#663D00] text-white text-center font-bold py-3 md:py-3.5 text-sm md:text-base rounded-full transition-colors shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all"
                 >
                   {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
                   {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}
@@ -953,7 +953,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       }
                     }
               }
-              className="w-full bg-[#885200] hover:bg-[#663D00] text-white font-bold py-4 rounded-xl shadow-lg transition-colors"
+              className="w-full bg-[#885200] hover:bg-[#663D00] text-white font-bold py-4 rounded-full shadow-lg transition-colors"
             >
               {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
               {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}

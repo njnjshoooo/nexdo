@@ -91,7 +91,7 @@ export default function LatestBlogs({ data }: { data: any }) {
         <div className="flex justify-center">
           <Link 
             to="/blog"
-            className="inline-flex items-center gap-3 bg-stone-900 text-white px-8 py-4 rounded-full font-bold hover:bg-stone-800 transition-all shadow-sm hover:shadow-md"
+            className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
           >
             前往好齡居誌
             <ArrowRight size={20} />

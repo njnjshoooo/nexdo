@@ -10,7 +10,7 @@ export const Eyebrow: React.FC<EyebrowProps> = ({ text, align = 'left' }) => {
 
   return (
     <div 
-      className={`text-[18px] tracking-widest text-[#885200] font-light mb-5 flex items-center gap-2 ${
+      className={`text-[18px] tracking-widest text-[#885200] font-extralight mb-5 flex items-center gap-2 ${
         align === 'center' ? 'justify-center' : ''
       }`}
     >

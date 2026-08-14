@@ -52,7 +52,7 @@ export default function GeneralPage({ page: propPage }: { page?: Page | null }) 
         <p className="text-stone-500">此頁面可能尚未建立或路徑不正確 (Slug: {currentSlug})。</p>
         <button 
           onClick={() => navigate('/')}
-          className="px-6 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors"
+          className="px-6 py-2 bg-stone-800 text-white rounded-full hover:bg-stone-700 transition-colors"
         >
           回到首頁
         </button>

@@ -329,7 +329,7 @@ export default function NewOrders({ vendor }: NewOrdersProps) {
             </div>
           ))}
           {orders.length === 0 && (
-            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
               目前沒有新派案
             </div>
           )}

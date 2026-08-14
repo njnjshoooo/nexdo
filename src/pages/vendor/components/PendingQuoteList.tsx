@@ -149,7 +149,7 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
               {Object.entries(formData).filter(([key, value]) => 
                 key === 'photos' || key === '照片' || (typeof value === 'string' && value.startsWith('http') && (value.match(/\.(jpg|jpeg|png|gif|webp)$/i)))
               ).length === 0 && (
-                <div className="col-span-2 py-8 text-center text-stone-400 bg-stone-50 rounded-xl border border-dashed border-stone-200">
+                <div className="col-span-2 py-8 text-center text-stone-400 bg-stone-50 rounded-full border border-dashed border-stone-200">
                   無照片附件
                 </div>
               )}
@@ -233,7 +233,7 @@ export default function PendingQuoteList({ vendor }: PendingQuoteListProps) {
           </div>
         ))}
         {paginatedOrders.length === 0 && (
-          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
             目前沒有待報價的需求單
           </div>
         )}

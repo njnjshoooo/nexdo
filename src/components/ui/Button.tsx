@@ -4,7 +4,7 @@ import { cn } from "../../lib/utils"
 import { Loader2 } from "lucide-react"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 disabled:pointer-events-none disabled:opacity-50 active:translate-y-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 disabled:pointer-events-none disabled:opacity-50 active:translate-y-0",
   {
     variants: {
       variant: {
@@ -24,9 +24,9 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-6 py-2 min-w-[120px]",
-        sm: "h-9 rounded-lg px-3 text-sm min-w-[80px]",
-        lg: "h-11 rounded-xl px-8 text-lg min-w-[140px]",
-        icon: "h-10 w-10 min-w-[40px] rounded-xl",
+        sm: "h-9 rounded-full px-3 text-sm min-w-[80px]",
+        lg: "h-11 rounded-full px-8 text-lg min-w-[140px]",
+        icon: "h-10 w-10 min-w-[40px] rounded-full",
       },
     },
     defaultVariants: {

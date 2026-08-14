@@ -37,7 +37,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg text-stone-500 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-full text-stone-500 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft size={20} />
       </button>
@@ -67,7 +67,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg text-stone-500 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-full text-stone-500 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight size={20} />
       </button>

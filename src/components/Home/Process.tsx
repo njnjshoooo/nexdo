@@ -65,7 +65,7 @@ export default function Process({ data }: { data?: any }) {
         <div className="mt-16 text-center">
           <a
             href="#contact"
-            className="inline-flex items-center justify-center gap-2 bg-[#885200] hover:bg-[#704300] text-white px-8 py-4 rounded-xl text-lg font-medium transition-all shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-[#885200] hover:bg-[#704300] text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg"
           >
             <MessageCircle size={20} />
             {content.buttonText}

@@ -134,7 +134,7 @@ export default function PendingClosureOrders({ vendor }: PendingClosureOrdersPro
       </div>
 
       {months.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-12 text-center text-stone-500">
+        <div className="bg-white rounded-full shadow-sm border border-stone-200 p-12 text-center text-stone-500">
           目前沒有任何月份的結算資料
         </div>
       ) : (
@@ -166,7 +166,7 @@ export default function PendingClosureOrders({ vendor }: PendingClosureOrdersPro
               {hasPayoutRequest ? (
                 <button
                   onClick={() => handleRequestPayout(activeMonth, currentOrders)}
-                  className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+                  className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary/90 transition-colors shadow-sm"
                 >
                   一鍵申請 {activeMonth.split('-')[1]} 月份撥款
                 </button>
@@ -181,7 +181,7 @@ export default function PendingClosureOrders({ vendor }: PendingClosureOrdersPro
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
               {currentOrders.length === 0 ? (
-                <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+                <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
                   本月尚無結算資料
                 </div>
               ) : (

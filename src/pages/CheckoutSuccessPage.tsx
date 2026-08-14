@@ -159,7 +159,7 @@ export default function CheckoutSuccessPage() {
         <div className="space-y-4">
           <button
             onClick={() => navigate('/profile/orders')}
-            className="w-full py-4 bg-stone-900 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all"
+            className="w-full py-4 bg-stone-900 text-white rounded-full font-bold flex items-center justify-center gap-2 hover:bg-black transition-all"
           >
             <Package size={18} />
             查看我的訂單
@@ -167,7 +167,7 @@ export default function CheckoutSuccessPage() {
 
           <button
             onClick={() => navigate('/')}
-            className="w-full py-4 bg-white text-stone-600 border border-stone-200 rounded-2xl font-bold hover:bg-stone-50 transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-white text-stone-600 border border-stone-200 rounded-full font-bold hover:bg-stone-50 transition-all flex items-center justify-center gap-2"
           >
             <Home size={18} />
             回到首頁

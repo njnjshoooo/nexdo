@@ -125,7 +125,7 @@ export default function Billing({ vendor }: BillingProps) {
               <div className="pt-2 border-t border-stone-50">
                 <button
                   onClick={() => alert('下載結算明細')}
-                  className="w-full py-2 flex items-center justify-center gap-2 text-primary bg-primary/5 hover:bg-primary/10 rounded-lg font-bold transition-colors"
+                  className="w-full py-2 flex items-center justify-center gap-2 text-primary bg-primary/5 hover:bg-primary/10 rounded-full font-bold transition-colors"
                 >
                   <Download size={18} />
                   下載明細
@@ -134,7 +134,7 @@ export default function Billing({ vendor }: BillingProps) {
             </div>
           ))}
           {paginatedOrders.length === 0 && (
-            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+            <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
               尚無相關結算紀錄
             </div>
           )}

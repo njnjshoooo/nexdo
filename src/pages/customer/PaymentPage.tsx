@@ -219,7 +219,7 @@ export default function PaymentPage() {
           <p className="text-stone-500 mb-6">找不到此訂單資訊，或該連結已過期。請聯繫客服人員。</p>
           <button 
             onClick={() => navigate('/')}
-            className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold hover:bg-stone-800 transition-colors"
+            className="w-full py-3 bg-stone-900 text-white rounded-full font-bold hover:bg-stone-800 transition-colors"
           >
             返回首頁
           </button>
@@ -254,7 +254,7 @@ export default function PaymentPage() {
           </div>
           <button 
             onClick={() => navigate('/')}
-            className="w-full mt-8 py-3 bg-stone-900 text-white rounded-xl font-bold hover:bg-stone-800 transition-colors"
+            className="w-full mt-8 py-3 bg-stone-900 text-white rounded-full font-bold hover:bg-stone-800 transition-colors"
           >
             返回首頁
           </button>
@@ -449,7 +449,7 @@ export default function PaymentPage() {
               <button 
                 onClick={handlePayment}
                 disabled={isPaying}
-                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                className="w-full py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 {isPaying ? (
                   <>

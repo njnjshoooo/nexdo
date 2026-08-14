@@ -19,7 +19,7 @@ export default function CartPage() {
           <p className="text-stone-500 mb-10">快去探索我們的優質服務吧！</p>
           <button 
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 bg-stone-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all"
+            className="inline-flex items-center gap-2 bg-stone-900 text-white px-8 py-4 rounded-full font-bold hover:bg-black transition-all"
           >
             <ArrowLeft size={18} />
             回到首頁
@@ -90,7 +90,7 @@ export default function CartPage() {
                   </p>
                   <button 
                     onClick={() => removeFromCart(item.id)}
-                    className="p-2 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-2 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
                   >
                     <Trash2 size={20} />
                   </button>
@@ -119,7 +119,7 @@ export default function CartPage() {
 
               <button 
                 onClick={() => navigate('/checkout')}
-                className="w-full py-4 bg-primary text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
+                className="w-full py-4 bg-primary text-white rounded-full font-bold flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
               >
                 前往結帳
                 <ArrowRight size={18} />
@@ -127,7 +127,7 @@ export default function CartPage() {
               
               <button 
                 onClick={() => navigate('/')}
-                className="w-full mt-4 py-4 bg-stone-50 text-stone-600 rounded-2xl font-bold hover:bg-stone-100 transition-all"
+                className="w-full mt-4 py-4 bg-stone-50 text-stone-600 rounded-full font-bold hover:bg-stone-100 transition-all"
               >
                 繼續購物
               </button>

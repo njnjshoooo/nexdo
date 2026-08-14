@@ -53,7 +53,7 @@ export default function DynamicPage() {
         <p className="text-stone-500 mt-2">嘗試搜尋的 Slug: {urlSlug || 'home'}</p>
         <button 
           onClick={() => window.location.href = '/'}
-          className="mt-6 px-4 py-2 bg-orange-500 text-white rounded-lg"
+          className="mt-6 px-4 py-2 bg-orange-500 text-white rounded-full"
         >
           回到首頁
         </button>

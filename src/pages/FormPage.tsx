@@ -23,7 +23,7 @@ export default function FormPage() {
           <p className="text-stone-600 mb-8">抱歉，您所連結的表單可能已移除或網址不正確。</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors font-bold"
+            className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/90 transition-colors font-bold"
           >
             <Home size={20} />
             回首頁

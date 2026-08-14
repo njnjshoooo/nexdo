@@ -207,7 +207,7 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
               setSelectedStaff(null);
               setFormData({});
             }}
-            className="px-6 py-2 border border-stone-200 text-stone-600 rounded-xl font-bold hover:bg-stone-50 transition-colors"
+            className="px-6 py-2 border border-stone-200 text-stone-600 rounded-full font-bold hover:bg-stone-50 transition-colors"
           >
             取消
           </button>
@@ -255,11 +255,11 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
                   <span className="font-bold text-stone-900 text-lg block">{staff.name}</span>
                   <div className="flex items-center gap-2 mt-1">
                     {staff.hasPoliceRecord ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg text-xs font-bold">
+                      <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-bold">
                         <ShieldCheck size={12} /> 已提供
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg text-xs font-bold">
+                      <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full text-xs font-bold">
                         <ShieldAlert size={12} /> 未提供
                       </span>
                     )}
@@ -289,7 +289,7 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
           </div>
         ))}
         {paginatedStaff.length === 0 && (
-          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-xl border border-stone-100">
+          <div className="text-center py-8 text-stone-400 text-sm bg-white rounded-full border border-stone-100">
             找不到符合條件的服務人員
           </div>
         )}
@@ -331,11 +331,11 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
                 </AdminTable.Td>
                 <AdminTable.Td>
                   {staff.hasPoliceRecord ? (
-                    <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold">
+                    <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full text-xs font-bold">
                       <ShieldCheck size={14} /> 已提供
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-lg text-xs font-bold">
+                    <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-bold">
                       <ShieldAlert size={14} /> 未提供
                     </span>
                   )}
@@ -408,7 +408,7 @@ export default function StaffManagement({ vendor }: StaffManagementProps) {
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-bold shadow-sm"
+                className="px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-bold shadow-sm"
               >
                 確認刪除
               </button>

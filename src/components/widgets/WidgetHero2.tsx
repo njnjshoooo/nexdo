@@ -39,7 +39,7 @@ export function WidgetHero2({ block, isFirstBlock, isSubItem, handleAnchorClick 
               <a 
                 href={block.hero2.mainButton.value || '#'} 
                 onClick={(e) => handleAnchorClick && handleAnchorClick(e, block.hero2?.mainButton.value, block.hero2?.mainButton.type)}
-                className="px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors shadow-lg"
+                className="px-8 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-colors shadow-lg"
               >
                 {block.hero2.mainButton.text || '預約諮詢'}
               </a>
@@ -48,7 +48,7 @@ export function WidgetHero2({ block, isFirstBlock, isSubItem, handleAnchorClick 
               <a 
                 href={block.hero2.secondaryButton.value || '#'} 
                 onClick={(e) => handleAnchorClick && handleAnchorClick(e, block.hero2?.secondaryButton.value, block.hero2?.secondaryButton.type)}
-                className="px-8 py-4 bg-black/30 backdrop-blur-sm border-2 border-white/80 text-white rounded-xl font-bold hover:bg-white/20 transition-colors shadow-lg"
+                className="px-8 py-4 bg-black/30 backdrop-blur-sm border-2 border-white/80 text-white rounded-full font-bold hover:bg-white/20 transition-colors shadow-lg"
               >
                 {block.hero2.secondaryButton.text || '查看案例'}
               </a>

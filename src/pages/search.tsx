@@ -57,7 +57,7 @@ export default function SearchPage() {
       ) : (
         <div className="text-center py-16">
           <p className="text-stone-500 mb-6">抱歉，找不到符合「{query}」的結果。</p>
-          <Link to="/" className="px-6 py-3 bg-primary text-white rounded-lg font-medium">返回首頁</Link>
+          <Link to="/" className="px-6 py-3 bg-primary text-white rounded-full font-medium">返回首頁</Link>
         </div>
       )}
     </div>
