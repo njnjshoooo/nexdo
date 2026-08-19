@@ -48,6 +48,7 @@ import OrderDetail from './pages/admin/OrderDetail';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import PermissionEditor from './pages/admin/editors/PermissionEditor';
 import SystemSettings from './pages/admin/SystemSettings';
+import SeoSettings from './pages/admin/SeoSettings';
 import DesignSpecPage from './pages/admin/DesignSpecPage';
 import EmailManagement from './pages/admin/EmailManagement';
 import EmailEditor from './pages/admin/editors/EmailEditor';
@@ -80,10 +81,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PaymentPage from './pages/customer/PaymentPage';
 import EasyCardPartnerPage from './pages/partner/EasyCardPartnerPage';
 
+import SeoMeta from './components/SeoMeta';
+
 export default function App() {
   return (
-    <Routes>
-      {/* 1. 後台管理：保持高優先權 */}
+    <>
+      <SeoMeta />
+      <Routes>
+        {/* 1. 後台管理：保持高優先權 */}
       <Route path="/admin" element={
         <ProtectedRoute requireAdmin>
           <AdminLayout />
@@ -122,6 +127,7 @@ export default function App() {
         <Route path="bookings" element={<PermissionGuard permission="forms"><FormSubmissions /></PermissionGuard>} />
         <Route path="media" element={<PermissionGuard permission="media"><MediaLibrary /></PermissionGuard>} />
         <Route path="settings" element={<PermissionGuard permission="settings"><SystemSettings /></PermissionGuard>} />
+        <Route path="seo-settings" element={<PermissionGuard permission="settings"><SeoSettings /></PermissionGuard>} />
         <Route path="design-spec" element={<PermissionGuard permission="settings"><DesignSpecPage /></PermissionGuard>} />
         <Route path="emails" element={<PermissionGuard permission="emails"><EmailManagement /></PermissionGuard>} />
         <Route path="emails/:id" element={<PermissionGuard permission="emails"><EmailEditor /></PermissionGuard>} />
@@ -159,5 +165,6 @@ export default function App() {
         <Route path="/:category/:slug" element={<DynamicPage />} />
       </Route>
     </Routes>
+    </>
   );
 }
