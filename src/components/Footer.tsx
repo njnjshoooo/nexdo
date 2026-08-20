@@ -6,31 +6,39 @@ export default function Footer() {
   const [data, setData] = useState(footerData);
 
   useEffect(() => {
-    // 先讀 localStorage 即時 render
-    const saved = localStorage.getItem('siteSettings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved).footer;
-        if (parsed?.menuGroups && parsed.menuGroups.length < footerData.menuGroups.length) {
-          parsed.menuGroups = [
-            ...parsed.menuGroups,
-            ...footerData.menuGroups.slice(parsed.menuGroups.length)
-          ];
-        }
-        if (parsed) setData(parsed);
-      } catch {}
-    }
-    // 再從 Supabase 拉最新
+    const loadFooterSettings = () => {
+      const saved = localStorage.getItem('siteSettings');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved).footer;
+          if (parsed?.menuGroups) {
+            setData(parsed);
+          }
+        } catch {}
+      }
+    };
+
+    // 1. 先讀 localStorage 即時 render
+    loadFooterSettings();
+
+    // 2. 監聽同分頁或跨分頁的更新事件
+    const handleUpdate = () => loadFooterSettings();
+    window.addEventListener('siteSettingsUpdated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    // 3. 再從 Supabase 拉最新
     import('../services/siteSettingsService').then(({ siteSettingsService }) => {
       siteSettingsService.load().then((remote: any) => {
-        if (!remote?.footer) return;
-        const f = remote.footer;
-        if (f.menuGroups && f.menuGroups.length < footerData.menuGroups.length) {
-          f.menuGroups = [...f.menuGroups, ...footerData.menuGroups.slice(f.menuGroups.length)];
+        if (remote?.footer?.menuGroups) {
+          setData(remote.footer);
         }
-        setData(f);
       }).catch(() => {});
     });
+
+    return () => {
+      window.removeEventListener('siteSettingsUpdated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   return (
@@ -59,12 +67,16 @@ export default function Footer() {
 
           {/* Middle: Custom Links */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:col-span-2">
-            {data.menuGroups.map((group: any) => (
-              <div key={group.title}>
+            {data.menuGroups?.map((group: any, gIdx: number) => (
+              <div key={group.title || gIdx}>
                 <h3 className="text-white font-bold mb-4">{group.title}</h3>
                 <ul className="space-y-2 text-sm">
-                  {group.links.map((link: any) => (
-                    <li key={link.label}><a href={link.url} className="hover:text-primary transition-colors">{link.label}</a></li>
+                  {group.links?.map((link: any, lIdx: number) => (
+                    <li key={`${link.label}-${link.url}-${lIdx}`}>
+                      <a href={link.url} className="hover:text-primary transition-colors">
+                        {link.label}
+                      </a>
+                    </li>
                   ))}
                 </ul>
               </div>

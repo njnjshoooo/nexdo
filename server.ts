@@ -33,6 +33,28 @@ async function startServer() {
   app.all('/api/admin/create-user', createUserHandler);
   app.get('/sitemap.xml', sitemapHandler);
 
+  // ====== Minigame Redirect ======
+  // The minigame uses HashRouter. Ensure it's served correctly.
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/minigame')) return next();
+    
+    const subPath = req.path.slice('/minigame'.length); // e.g. "", "/", "/safety", "/assets/foo.js"
+    
+    // If it's the root of the minigame, rewrite to index.html so Vite serves the right file
+    if (subPath === '' || subPath === '/') {
+      req.url = '/minigame/index.html';
+      return next();
+    }
+    
+    // If it's a file request (like .js, .css), let Vite handle it
+    if (subPath.includes('.')) {
+      return next();
+    }
+    
+    // Otherwise, it's a deep link, redirect to hash router format
+    return res.redirect(`/minigame/#${subPath}`);
+  });
+
   // ====== Vite Middleware for Web App ======
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

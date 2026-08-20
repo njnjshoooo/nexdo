@@ -33,16 +33,32 @@ export default function Header() {
 
   // 1. 載入網頁 Header 設定（Logo、高度等）
   useEffect(() => {
-    const saved = localStorage.getItem('siteSettings');
-    if (saved) {
-      try { setSettings(JSON.parse(saved).header); } catch {}
-    }
+    const loadHeaderSettings = () => {
+      const saved = localStorage.getItem('siteSettings');
+      if (saved) {
+        try { 
+          const parsed = JSON.parse(saved).header;
+          if (parsed) setSettings(parsed);
+        } catch {}
+      }
+    };
+
+    loadHeaderSettings();
+
+    const handleUpdate = () => loadHeaderSettings();
+    window.addEventListener('siteSettingsUpdated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
     
     import('../services/siteSettingsService').then(({ siteSettingsService }) => {
       siteSettingsService.load().then((remote: any) => {
         if (remote?.header) setSettings(remote.header);
       }).catch(() => {});
     });
+
+    return () => {
+      window.removeEventListener('siteSettingsUpdated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   // 2. 點擊空白處關閉會員選單 & 監聽滾動樣式
