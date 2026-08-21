@@ -2,6 +2,7 @@ import Markdown from 'react-markdown';
 import { Eyebrow } from './Eyebrow';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import { customMarkdownComponents, preprocessMarkdown } from '../MarkdownLink';
 import { ArrowUpRight } from 'lucide-react';
 import { WidgetProps } from './WidgetProps';
 
@@ -47,7 +48,12 @@ export function WidgetImageTextGrid({ block, isSubItem }: WidgetProps) {
               </>
             )}
             <div className={`prose prose-stone ${block.imageTextGrid?.cta?.text ? 'mb-8' : ''}`}>
-              <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{block.imageTextGrid?.content || ''}</Markdown>
+              <Markdown 
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={customMarkdownComponents}
+              >
+                {preprocessMarkdown(block.imageTextGrid?.content || '')}
+              </Markdown>
             </div>
             {block.imageTextGrid?.cta?.text && (
               <a href={block.imageTextGrid.cta.link} className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-all">

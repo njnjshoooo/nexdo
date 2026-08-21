@@ -9,15 +9,32 @@ import { CartProvider } from './contexts/CartContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 
-// 全域攔截器：強制所有指向 /minigame 的連結都在新分頁開啟
+// 全域攔截器：強制所有指向小遊戲與外連的連結都在新分頁開啟，並容錯處理常見格式
 window.addEventListener('click', (e) => {
   const target = e.target as HTMLElement;
-  const anchor = target.closest('a');
+  const anchor = target?.closest('a');
   
   if (anchor) {
-    const href = anchor.getAttribute('href');
-    // 如果連結包含 /minigame，強制加上 target="_blank"
-    if (href && href.startsWith('/minigame')) {
+    let href = anchor.getAttribute('href');
+    if (!href) return;
+
+    // 清理 url: 前綴（Markdown 常見誤植）
+    if (/^url:/i.test(href)) {
+      href = href.replace(/^url:/i, '').trim();
+      anchor.setAttribute('href', href);
+    }
+
+    // 自動補齊 /minigame 斜線
+    if (/^minigame(\/|#|$)/i.test(href)) {
+      href = '/' + href;
+      anchor.setAttribute('href', href);
+    }
+
+    // 只要包含 minigame 或 http/https 外部連結，強制開新分頁
+    const isMinigame = href.includes('minigame');
+    const isExternal = href.startsWith('http://') || href.startsWith('https://');
+
+    if (isMinigame || isExternal) {
       anchor.setAttribute('target', '_blank');
       anchor.setAttribute('rel', 'noopener noreferrer');
     }

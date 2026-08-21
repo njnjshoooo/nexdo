@@ -161,3 +161,34 @@ CREATE POLICY "Enable full access for authenticated users"
   TO authenticated
   USING (true)
   WITH CHECK (true);
+
+-- ==========================================
+-- Submissions Table (Form Records)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS submissions (
+  id TEXT PRIMARY KEY,
+  form_id TEXT NOT NULL,
+  user_id TEXT,
+  page_slug TEXT,
+  page_title TEXT,
+  data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  status TEXT NOT NULL DEFAULT 'PENDING',
+  booking_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for submissions
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+
+-- Allow public insert access
+CREATE POLICY "Enable public insert access for submissions"
+  ON submissions FOR INSERT
+  WITH CHECK (true);
+
+-- Allow authenticated admins to do everything
+CREATE POLICY "Enable full access for authenticated users to submissions"
+  ON submissions FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);

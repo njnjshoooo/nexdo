@@ -11,6 +11,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import { customMarkdownComponents, preprocessMarkdown } from '../components/MarkdownLink';
 import DynamicForm from '../components/form/DynamicForm';
 import { useForm } from '../hooks/useForm';
 import { useCart } from '../contexts/CartContext';
@@ -688,7 +689,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             } flex flex-col justify-center py-0`}>
                               <h3 className="text-2xl md:text-4xl font-bold text-stone-900 mb-5 tracking-tight">{subItem.serviceIntro.blockB.title}</h3>
                               <div className="markdown-body text-stone-600 leading-relaxed text-lg lg:text-xl">
-                                <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{subItem.serviceIntro.blockB.content}</Markdown>
+                                <Markdown 
+                                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                                  components={customMarkdownComponents}
+                                >
+                                  {preprocessMarkdown(subItem.serviceIntro.blockB.content)}
+                                </Markdown>
                               </div>
                             </div>
                           )}
@@ -739,7 +745,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                       <div>
                         <h3 className="text-lg font-bold text-stone-900 mb-2">{partner.title}</h3>
                         <div className="markdown-body text-stone-600 text-sm md:text-base leading-relaxed">
-                          <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{partner.description}</Markdown>
+                          <Markdown 
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                            components={customMarkdownComponents}
+                          >
+                            {preprocessMarkdown(partner.description)}
+                          </Markdown>
                         </div>
                       </div>
                     </div>
@@ -785,7 +796,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                             {item.title}
                           </h3>
                           <div className="markdown-body text-stone-600 text-sm leading-relaxed">
-                            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{item.description}</Markdown>
+                            <Markdown 
+                              remarkPlugins={[remarkGfm, remarkBreaks]}
+                              components={customMarkdownComponents}
+                            >
+                              {preprocessMarkdown(item.description)}
+                            </Markdown>
                           </div>
                         </div>
                       </motion.div>
@@ -830,7 +846,12 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                         <div className="flex-1 bg-white p-6 md:p-8 rounded-[1.5rem] shadow-sm border border-stone-100 group-hover:shadow-md group-hover:border-[#8B5E34]/20 transition-all duration-300">
                           <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-[#8B5E34] transition-colors">{service.title}</h3>
                           <div className="markdown-body text-stone-600 leading-relaxed text-sm md:text-base">
-                            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{service.content}</Markdown>
+                            <Markdown 
+                              remarkPlugins={[remarkGfm, remarkBreaks]}
+                              components={customMarkdownComponents}
+                            >
+                              {preprocessMarkdown(service.content)}
+                            </Markdown>
                           </div>
                         </div>
                       </motion.div>
@@ -1151,7 +1172,12 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
             className="overflow-hidden"
           >
             <div className="markdown-body px-6 pb-5 text-stone-600 leading-relaxed">
-              <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{answer}</Markdown>
+              <Markdown 
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={customMarkdownComponents}
+              >
+                {preprocessMarkdown(answer)}
+              </Markdown>
             </div>
           </motion.div>
         )}

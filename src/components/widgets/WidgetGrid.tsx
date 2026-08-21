@@ -2,6 +2,7 @@ import Markdown from 'react-markdown';
 import { Eyebrow } from './Eyebrow';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import { customMarkdownComponents, preprocessMarkdown } from '../MarkdownLink';
 import { WidgetProps } from './WidgetProps';
 
 export function WidgetGrid({ block, isFirstBlock, isSubItem }: WidgetProps) {
@@ -47,7 +48,12 @@ export function WidgetGrid({ block, isFirstBlock, isSubItem }: WidgetProps) {
                 <div className="p-6 flex flex-col flex-1">
                   {item.title && <h3 className={`text-xl font-bold mb-3 ${isLink ? 'text-stone-900 group-hover:text-primary transition-colors' : 'text-stone-900'}`}>{item.title}</h3>}
                   <div className="text-stone-600 leading-relaxed prose prose-stone prose-sm max-w-none">
-                    <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{item.description}</Markdown>
+                    <Markdown 
+                      remarkPlugins={[remarkGfm, remarkBreaks]}
+                      components={customMarkdownComponents}
+                    >
+                      {preprocessMarkdown(item.description || '')}
+                    </Markdown>
                   </div>
                 </div>
               </Wrapper>

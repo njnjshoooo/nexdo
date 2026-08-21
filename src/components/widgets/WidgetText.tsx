@@ -2,6 +2,7 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { WidgetProps } from './WidgetProps';
+import { customMarkdownComponents, preprocessMarkdown } from '../MarkdownLink';
 
 export function WidgetText({ block, isFirstBlock, isSubItem }: WidgetProps) {
   const containerClass = isSubItem
@@ -21,7 +22,12 @@ export function WidgetText({ block, isFirstBlock, isSubItem }: WidgetProps) {
           block.text?.alignment === 'center' ? 'text-center' : 
           block.text?.alignment === 'right' ? 'text-right' : ''
         }`}>
-          <Markdown remarkPlugins={[remarkGfm, remarkBreaks]}>{block.text?.content || ''}</Markdown>
+          <Markdown 
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            components={customMarkdownComponents}
+          >
+            {preprocessMarkdown(block.text?.content || '')}
+          </Markdown>
         </div>
       </div>
     </section>
