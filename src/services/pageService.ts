@@ -107,10 +107,10 @@ class PageService {
           this.pages = JSON.parse(storedPages);
         } catch (e) {
           console.error('Failed to parse cached pages', e);
-          this.pages = [];
+          this.pages = [...allInitialPages];
         }
       } else {
-        this.pages = [];
+        this.pages = [...allInitialPages];
       }
       return;
     }

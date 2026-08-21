@@ -1,9 +1,20 @@
 import { Request, Response } from 'express';
-import { getSupabaseAdmin } from './_lib/supabase-admin.js';
+import { createClient } from '@supabase/supabase-js';
 
 export default async function sitemapHandler(req: Request, res: Response) {
   try {
-    const supabase = getSupabaseAdmin();
+    const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+    // Prefer anon key for public data, fallback to service role if needed
+    const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    
+    if (!url || !key) {
+      throw new Error('Missing Supabase URL or Key');
+    }
+
+    const supabase = createClient(url, key, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host || 'www.nexdo.tw';
     const baseUrl = `${protocol}://${host}`;
@@ -46,8 +57,7 @@ export default async function sitemapHandler(req: Request, res: Response) {
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${allUrls.map(u => `
-  <url>
+  ${allUrls.map(u => `  <url>
     <loc>${u.url}</loc>${u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ''}
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
