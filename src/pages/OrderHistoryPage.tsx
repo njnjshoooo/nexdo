@@ -105,7 +105,7 @@ export default function OrderHistoryPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {filteredOrders.map((order) => {
               const isExpanded = expandedOrderId === order.id;
               const paidAmount = getPaidAmount(order);
@@ -168,7 +168,7 @@ export default function OrderHistoryPage() {
                     <div className="px-6 pb-6 border-t border-stone-50 pt-6 bg-stone-50/30">
                       <div className="space-y-6">
                         {/* Order Items */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 gap-6">
                           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">服務明細</p>
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-stone-100">

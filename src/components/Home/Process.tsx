@@ -17,7 +17,7 @@ export default function Process({ data }: { data?: any }) {
     description: data.description || '',
     steps: data.steps || [],
     footerLabels: data.footerLabels || [],
-    buttonText: data.buttonText || '立即預約免費諮詢'
+    buttonText: data.buttonText || '立即加入官方LINE，預約免費諮詢！'
   };
 
   return (
@@ -64,7 +64,9 @@ export default function Process({ data }: { data?: any }) {
         {/* 底部預約按鈕維持原樣或也可改成動態 */}
         <div className="mt-16 text-center">
           <a
-            href="#contact"
+            href="https://lin.ee/S1V5OdV"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-[#885200] hover:bg-[#704300] text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg"
           >
             <MessageCircle size={20} />
