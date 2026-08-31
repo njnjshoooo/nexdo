@@ -186,35 +186,70 @@ class ProductService {
       updatedAt: new Date().toISOString()
     } as Product;
 
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from(TABLE_NAME).insert(this.toRow(newProduct));
-      if (error) throw new Error(`新增失敗: ${error.message}`);
-    }
-
     this.products.unshift(newProduct);
     this.saveCache();
+
+    if (isSupabaseConfigured) {
+      const { data: insData, error } = await supabase
+        .from(TABLE_NAME)
+        .insert(this.toRow(newProduct))
+        .select();
+      if (error) {
+        this.products = this.products.filter(p => p.id !== newProduct.id);
+        this.saveCache();
+        throw new Error(`新增失敗: ${error.message}`);
+      }
+      if (!insData || insData.length === 0) {
+        this.products = this.products.filter(p => p.id !== newProduct.id);
+        this.saveCache();
+        throw new Error('新增失敗：Supabase 回傳 0 筆寫入。可能因 RLS 權限被擋，請重新登入後再試。');
+      }
+    }
+
     return newProduct;
   }
 
   async update(id: string, data: Partial<Product>): Promise<Product> {
-    const updatedData = { ...data, updatedAt: new Date().toISOString() };
-    
-    if (isSupabaseConfigured) {
-      const { error } = await supabase.from(TABLE_NAME).update(this.toRow(updatedData)).eq('id', id);
-      if (error) throw new Error(`更新失敗: ${error.message}`);
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) {
+      throw new Error(`找不到產品 (id: ${id})`);
     }
 
-    const index = this.products.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.products[index] = { ...this.products[index], ...updatedData };
-      this.saveCache();
-      return this.products[index];
-    } else {
-      if (isSupabaseConfigured) await this.refresh(true);
-      const p = this.products.find(x => x.id === id);
-      if (!p) throw new Error('產品不存在');
-      return p;
+    const currentProduct = this.products[index];
+    const updatedData = { ...data };
+    const newProduct = { ...currentProduct, ...updatedData, updatedAt: new Date().toISOString() };
+    const oldId = currentProduct.id;
+
+    // Optimistically update local cache
+    this.products[index] = newProduct;
+    this.saveCache();
+
+    if (isSupabaseConfigured) {
+      const idChanged = updatedData.id !== undefined && updatedData.id !== oldId;
+
+      if (idChanged) {
+        const { error: delErr } = await supabase.from(TABLE_NAME).delete().eq('id', oldId);
+        if (delErr) throw new Error(`更新失敗 (刪除舊記錄): ${delErr.message}`);
+
+        const { data: insData, error: insErr } = await supabase
+          .from(TABLE_NAME)
+          .upsert(this.toRow(newProduct), { onConflict: 'id' })
+          .select();
+        
+        if (insErr) throw new Error(`更新失敗 (寫入新記錄): ${insErr.message}`);
+        if (!insData || insData.length === 0) throw new Error('儲存失敗：Supabase 回傳 0 筆寫入。請重新整理後再試。');
+      } else {
+        const { data: updData, error: updErr } = await supabase
+          .from(TABLE_NAME)
+          .upsert(this.toRow(newProduct), { onConflict: 'id' })
+          .select();
+          
+        if (updErr) throw new Error(`更新失敗: ${updErr.message}`);
+        if (!updData || updData.length === 0) throw new Error('儲存失敗：Supabase 回傳 0 筆寫入。請重新整理後再試。');
+      }
     }
+
+    return newProduct;
   }
 
   async delete(id: string): Promise<boolean> {
