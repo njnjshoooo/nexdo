@@ -46,7 +46,7 @@ export const supabase: SupabaseClient = createClient(
       persistSession: isSupabaseConfigured,
       autoRefreshToken: isSupabaseConfigured,
       detectSessionInUrl: false,
-      lock: memoryLock,
+       // lock: memoryLock, 
     },
   }
 );

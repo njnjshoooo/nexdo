@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { articleService } from '../services/articleService';
 import { pageService } from '../services/pageService';
 import { productService } from '../services/productService';
 import { useForm } from '../hooks/useForm';
+import { useAuth } from '../contexts/AuthContext';
 import { Article } from '../types/article';
 import { Page } from '../types/admin';
 import { Form } from '../types/form';
@@ -17,15 +19,17 @@ import DynamicForm from '../components/form/DynamicForm';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [article, setArticle] = useState<Article | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [loadedRelatedServices, setLoadedRelatedServices] = useState<any[]>([]);
 
   useEffect(() => {
     const loadRelated = async () => {
       if (slug) {
         const foundArticle = articleService.getBySlug(slug);
-        if (foundArticle && foundArticle.isPublished) {
+        if (foundArticle && (foundArticle.isPublished || user?.role === 'admin')) {
           setArticle(foundArticle);
           
           // Fetch related services
@@ -58,14 +62,34 @@ export default function BlogPostPage() {
             setLoadedRelatedServices([]);
           }
         } else {
-          navigate('/blog');
+          setNotFound(true);
         }
       }
     };
     loadRelated();
-  }, [slug, navigate]);
+  }, [slug, navigate, user]);
 
   const ctaForm = useForm(article?.showForm ? article?.formId : null);
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 px-4 text-center">
+        <Helmet>
+          <title>404 找不到文章 | 好齡居</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <h1 className="text-4xl font-bold text-stone-800 mb-4">404</h1>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">找不到文章</h2>
+        <p className="text-stone-500 text-lg mb-8">抱歉，您尋找的文章可能已被移除或尚未發布。</p>
+        <button 
+          onClick={() => navigate('/blog')}
+          className="px-8 py-3 bg-[#8B5E34] hover:bg-[#7a522d] transition-colors text-white rounded-full font-medium"
+        >
+          返回好齡居誌
+        </button>
+      </div>
+    );
+  }
 
   if (!article) return <div className="p-20 text-center">載入中...</div>;
 

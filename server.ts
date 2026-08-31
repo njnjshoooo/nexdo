@@ -38,7 +38,8 @@ async function startServer() {
   // ====== Removed Pages (HTTP 410 Gone) ======
   const removedPages = [
     '/collections/homecare',
-    '/products/premium-moving'
+    '/products/premium-moving',
+    '/decluttering-and-intentional-tossing-acknowledging-inner-needs-to-free-up-home-space'
   ];
   removedPages.forEach(pagePath => {
     app.all(pagePath, (req, res) => {

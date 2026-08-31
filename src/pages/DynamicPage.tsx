@@ -6,13 +6,15 @@ import { Page } from '../types/admin';
 import SubItemPage from './SubItemPage';
 import MajorItemPage from './MajorItemPage';
 import GeneralPage from './GeneralPage';
-import Home from './HomePage'; // 
+import Home from './HomePage';
+import { useAuth } from '../contexts/AuthContext'; // 
 import Blog from './Blog'; // 
 
 export default function DynamicPage() {
   const { slug: urlSlug, category } = useParams<{ slug: string, category: string }>();
   const [pageData, setPageData] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadPage = () => {
@@ -58,7 +60,7 @@ export default function DynamicPage() {
   if (loading) return <div className="h-screen flex items-center justify-center text-stone-400">載入中...</div>;
 
   // 3. 如果沒找到資料，顯示 404 畫面
-  if (!pageData) {
+  if (!pageData || (!pageData.isPublished && user?.role !== 'admin')) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 px-4 text-center">
         <Helmet>

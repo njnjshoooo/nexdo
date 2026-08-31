@@ -1,3 +1,4 @@
+import { useAuth } from "./contexts/AuthContext";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -70,9 +71,10 @@ const HomePageWrapper = () => {
   // 優先從 pageService 抓取資料
   const allPages = pageService.getAll();
   const dynamicHomeData = allPages.find(p => p.template === 'HOME');
+  const { user } = useAuth();
   
   // 如果後台有存過首頁資料就用後台的，否則用預設的靜態檔
-  return <HomePage page={dynamicHomeData || homePage} />;
+  return <HomePage page={(dynamicHomeData && (dynamicHomeData.isPublished || user?.role === 'admin')) ? dynamicHomeData : homePage} />;
 };
 
 import FormPage from './pages/FormPage';
