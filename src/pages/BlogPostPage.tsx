@@ -140,12 +140,12 @@ export default function BlogPostPage() {
       {loadedRelatedServices.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 mb-20 relative z-20">
           <h2 className="text-2xl font-bold text-stone-900 mb-8 text-center text-[#4A5D3B]">相關服務推薦</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-6 -mx-6 px-6 md:mx-0 md:px-0 snap-x snap-mandatory touch-pan-x [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {loadedRelatedServices.map(service => (
               <Link 
                 key={service.id} 
                 to={`/${service.slug}`}
-                className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#8B5E34]/30"
+                className="group flex-none w-[85%] sm:w-[60%] md:w-auto flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-lg transition-all md:hover:-translate-y-1 hover:border-[#8B5E34]/30 snap-center"
               >
                 <div className="relative aspect-[16/9] overflow-hidden">
                   <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
@@ -166,18 +166,20 @@ export default function BlogPostPage() {
 
       {/* CTA Form Section */}
       {article.showForm && ctaForm && (
-        <div className="max-w-3xl mx-auto px-6 mb-20 relative z-20">
-          <section className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-stone-200">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 mb-20 relative z-20">
+          <section className="bg-white px-5 py-8 sm:p-12 rounded-[2.5rem] shadow-sm border border-stone-200">
             <div className="max-w-xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-2xl font-bold text-stone-900 mb-3">對此主題感興趣嗎？</h2>
                 <p className="text-stone-500">歡迎填寫下方表單，我們將由專人為您提供進一步諮詢服務。</p>
               </div>
-              <DynamicForm 
-                form={ctaForm} 
-                pageSlug={article.slug} 
-                pageTitle={article.title}
-              />
+              <div className="[&>section]:border-none [&>section]:shadow-none [&>section]:p-0">
+                <DynamicForm 
+                  form={ctaForm} 
+                  pageSlug={article.slug} 
+                  pageTitle={article.title}
+                />
+              </div>
             </div>
           </section>
         </div>

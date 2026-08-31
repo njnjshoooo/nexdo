@@ -363,7 +363,7 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
     <section 
       id={form.formId} 
       style={{ scrollMarginTop: '100px' }}
-      className="bg-white rounded-2xl p-8 shadow-sm border border-stone-100"
+      className="bg-white rounded-2xl px-5 py-6 sm:p-8 shadow-sm border border-stone-100"
     >
       <div className="mb-8">
         <h3 className="text-2xl font-bold text-stone-900 mb-2">{form.name}</h3>

@@ -267,13 +267,15 @@ export default function MajorItemPage({ page: propPage }: { page?: Page | null }
       {/* 底部預約表單 */}
       {currentPage.content.showForm && currentPage.content.formId && selectedForm && (
         <div className="py-16 bg-[#FDF8F3]">
-          <div className="max-w-3xl mx-auto px-4">
-            <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
-              <DynamicForm 
-                form={selectedForm} 
-                pageSlug={currentPage.slug} 
-                pageTitle={currentPage.title} 
-              />
+          <div className="max-w-3xl mx-auto px-4 md:px-8">
+            <div className="bg-white px-5 py-8 md:p-12 rounded-[2rem] shadow-xl border border-stone-100">
+              <div className="[&>section]:border-none [&>section]:shadow-none [&>section]:p-0">
+                <DynamicForm 
+                  form={selectedForm} 
+                  pageSlug={currentPage.slug} 
+                  pageTitle={currentPage.title} 
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -83,13 +83,15 @@ case 'TESTIMONIALS': {
       {/* 6. 底部預約表單 */}
       {showForm && selectedForm && (
         <div className="py-20 bg-stone-50">
-          <div className="max-w-3xl mx-auto px-4">
-            <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-stone-100">
-              <DynamicForm 
-                form={selectedForm} 
-                pageSlug={page?.slug || 'home'} 
-                pageTitle={page?.title || '首頁'} 
-              />
+          <div className="max-w-3xl mx-auto px-4 md:px-8">
+            <div className="bg-white px-5 py-8 md:p-12 rounded-2xl shadow-xl border border-stone-100">
+              <div className="[&>section]:border-none [&>section]:shadow-none [&>section]:p-0">
+                <DynamicForm 
+                  form={selectedForm} 
+                  pageSlug={page?.slug || 'home'} 
+                  pageTitle={page?.title || '首頁'} 
+                />
+              </div>
             </div>
           </div>
         </div>

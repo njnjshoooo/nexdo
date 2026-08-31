@@ -35,6 +35,17 @@ async function startServer() {
   app.all('/api/forms', formsHandler);
   app.get('/sitemap.xml', sitemapHandler);
 
+  // ====== Removed Pages (HTTP 410 Gone) ======
+  const removedPages = [
+    '/collections/homecare',
+    '/products/premium-moving'
+  ];
+  removedPages.forEach(pagePath => {
+    app.all(pagePath, (req, res) => {
+      res.status(410).send('410 Gone: The requested page has been permanently removed.');
+    });
+  });
+
   // ====== Minigame Redirect ======
   // The minigame uses HashRouter. Ensure it's served correctly.
   app.use((req, res, next) => {

@@ -7,9 +7,11 @@ function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, p
   if (!form) return null;
   return (
     <section key={blockId} id={blockId} className="py-16 bg-[#FDF8F3]">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl">
-          <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+      <div className="max-w-3xl mx-auto px-4 md:px-8">
+        <div className="bg-white px-5 py-8 md:p-12 rounded-2xl shadow-xl">
+          <div className="[&>section]:border-none [&>section]:shadow-none [&>section]:p-0">
+            <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+          </div>
         </div>
       </div>
     </section>

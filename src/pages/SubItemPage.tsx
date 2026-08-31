@@ -63,9 +63,11 @@ function FormBlock({ formId, pageSlug, pageTitle, blockId }: { formId: string, p
   if (!form) return null;
   return (
     <section key={blockId} id={blockId} className="py-8 md:py-12">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white p-6 md:p-10 rounded-3xl shadow-xl">
-          <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+      <div className="max-w-3xl mx-auto px-4 md:px-8">
+        <div className="bg-white px-5 py-8 md:p-10 rounded-3xl shadow-xl">
+          <div className="[&>section]:border-none [&>section]:shadow-none [&>section]:p-0">
+            <DynamicForm form={form} pageSlug={pageSlug} pageTitle={pageTitle} />
+          </div>
         </div>
       </div>
     </section>
@@ -984,7 +986,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
       {/* Form Section */}
       {showForm && selectedForm && (
         <div className="py-20 bg-stone-50 mt-12">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto px-4 md:px-8">
             <DynamicForm 
               form={selectedForm} 
               pageSlug={currentPage.slug} 
