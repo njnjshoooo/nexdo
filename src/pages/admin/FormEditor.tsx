@@ -25,11 +25,18 @@ export default function FormEditor() {
 
   useEffect(() => {
     if (isEditing && id) {
-      const existingForm = formService.getById(id);
+      const existingForm = formService.getById(id) || formService.getByFormId(id);
       if (existingForm) {
         setForm(existingForm);
       } else {
-        navigate('/admin/forms');
+        formService.refresh(true).then(() => {
+          const f = formService.getById(id) || formService.getByFormId(id);
+          if (f) {
+            setForm(f);
+          } else {
+            navigate('/admin/forms');
+          }
+        });
       }
     }
   }, [id, isEditing, navigate]);
@@ -47,17 +54,15 @@ export default function FormEditor() {
     setSaveStatus('saving');
     try {
       if (isEditing && id) {
-        formService.update(id, form as any);
+        await formService.update(id, form as any);
       } else {
-        formService.create(form as any);
+        await formService.create(form as any);
       }
       
-      // Simulate delay for feedback
-      await new Promise(resolve => setTimeout(resolve, 800));
       setSaveStatus('saved');
       
       setTimeout(() => {
-        alert('表單已儲存');
+        alert('表單已成功儲存！');
         navigate('/admin/forms');
       }, 500);
     } catch (error: any) {

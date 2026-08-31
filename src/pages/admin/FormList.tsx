@@ -29,11 +29,20 @@ export default function FormList() {
 
   useEffect(() => {
     setForms(formService.getAll());
+    formService.refresh(true).then(() => {
+      setForms(formService.getAll());
+    });
     loadSubmissions();
 
-    // Listen for storage changes from other tabs
+    // Listen for storage changes from other tabs and refresh events
     window.addEventListener('storage', loadSubmissions);
-    return () => window.removeEventListener('storage', loadSubmissions);
+    const onFormsRefreshed = () => setForms(formService.getAll());
+    window.addEventListener('forms_refreshed', onFormsRefreshed);
+
+    return () => {
+      window.removeEventListener('storage', loadSubmissions);
+      window.removeEventListener('forms_refreshed', onFormsRefreshed);
+    };
   }, []);
 
   const loadSubmissions = async () => {
@@ -65,10 +74,16 @@ export default function FormList() {
     setDeleteModal({ isOpen: true, id });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteModal.id) {
-      formService.delete(deleteModal.id);
-      setForms(formService.getAll());
+      try {
+        await formService.delete(deleteModal.id);
+        setForms(formService.getAll());
+      } catch (err: any) {
+        alert(err.message || '刪除失敗');
+      } finally {
+        setDeleteModal({ isOpen: false, id: null });
+      }
     }
   };
 

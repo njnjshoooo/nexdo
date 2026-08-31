@@ -18,13 +18,13 @@ class FormService {
   private mapRow(row: any): Form {
     return {
       id: row.id,
-      formId: row.form_id,
+      formId: row.form_id || row.formId,
       name: row.name,
       description: row.description ?? '',
       purpose: row.purpose,
       fields: Array.isArray(row.fields) ? row.fields : [],
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+      updatedAt: row.updated_at || row.updatedAt || new Date().toISOString(),
     };
   }
 
@@ -36,6 +36,8 @@ class FormService {
     if (form.description !== undefined) row.description = form.description;
     if (form.purpose !== undefined) row.purpose = form.purpose;
     if (form.fields !== undefined) row.fields = form.fields;
+    if (form.createdAt !== undefined) row.created_at = form.createdAt;
+    if (form.updatedAt !== undefined) row.updated_at = form.updatedAt;
     return row;
   }
 
@@ -59,9 +61,9 @@ class FormService {
   private refreshPromise: Promise<void> | null = null;
   private lastFetchTime = 0;
 
-  /** 從 Supabase 拉最新並更新快取 */
+  /** 從 Supabase / API 拉最新並更新快取 */
   async refresh(force = false): Promise<void> {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured && !window.location) return;
 
     if (!force && Date.now() - this.lastFetchTime < 300000) {
       if (this.refreshPromise) return this.refreshPromise;
@@ -72,13 +74,40 @@ class FormService {
 
     this.refreshPromise = (async () => {
       try {
-        const { data, error } = await supabase
-          .from(TABLE_NAME)
-          .select('*')
-          .order('updated_at', { ascending: false });
-        if (error) throw error;
-        this.forms = (data ?? []).map(row => this.mapRow(row));
-        this.saveCache();
+        let loadedForms: Form[] | null = null;
+
+        // 優先嘗試透過後端 API 取得
+        try {
+          const res = await fetch('/api/forms');
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data)) {
+              loadedForms = json.data.map((row: any) => this.mapRow(row));
+            }
+          }
+        } catch (apiErr) {
+          console.warn('[formService] API fetch failed, fallback to client Supabase', apiErr);
+        }
+
+        // 若 API 未回應或非 fullstack，直接使用 Supabase Client 讀取
+        if (!loadedForms && isSupabaseConfigured) {
+          const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .select('*')
+            .order('updated_at', { ascending: false });
+
+          if (error) throw error;
+          loadedForms = (data ?? []).map(row => this.mapRow(row));
+        }
+
+        if (loadedForms && loadedForms.length > 0) {
+          this.forms = loadedForms;
+          this.saveCache();
+        } else if (this.forms.length === 0) {
+          this.forms = this.getDefaultForms();
+          this.saveCache();
+        }
+
         this.lastFetchTime = Date.now();
         window.dispatchEvent(new CustomEvent('forms_refreshed'));
       } catch (e) {
@@ -150,14 +179,15 @@ class FormService {
   }
 
   getByFormId(formId: string): Form | undefined {
+    if (!formId) return undefined;
     const normalizedId = formId.toLowerCase();
-    return this.forms.find(f => f.formId.toLowerCase() === normalizedId);
+    return this.forms.find(f => f.formId?.toLowerCase() === normalizedId);
   }
 
-  create(form: Omit<Form, 'id' | 'createdAt' | 'updatedAt'>): Form {
+  async create(form: Omit<Form, 'id' | 'createdAt' | 'updatedAt'>): Promise<Form> {
     const formId = form.formId || `form_${Math.random().toString(36).substr(2, 9)}`;
     if (this.forms.some(f => f.formId === formId)) {
-      throw new Error('Form ID already exists');
+      throw new Error('表單 ID (formId) 已存在，請使用其他代碼');
     }
     const now = new Date().toISOString();
     const newForm: Form = {
@@ -172,55 +202,121 @@ class FormService {
     this.forms.push(newForm);
     this.saveCache();
 
-    // 2. Background Supabase write
-    if (isSupabaseConfigured) {
-      supabase.from(TABLE_NAME).insert(this.toRow(newForm))
-        .then(({ error }) => {
-          if (error) console.error('[formService] create failed in Supabase', error);
-        });
+    // 2. Persist to Backend API / Supabase
+    let persisted = false;
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create', form: newForm }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) persisted = true;
+      }
+    } catch (e) {
+      console.warn('[formService] API create failed, trying client Supabase', e);
+    }
+
+    if (!persisted && isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).insert(this.toRow(newForm));
+      if (error) {
+        console.error('[formService] create failed in Supabase', error);
+        throw new Error(`表單建立失敗：${error.message}`);
+      }
     }
 
     return newForm;
   }
 
-  update(id: string, updates: Partial<Omit<Form, 'id' | 'createdAt' | 'updatedAt'>>): Form | undefined {
-    const index = this.forms.findIndex(f => f.id === id);
-    if (index === -1) return undefined;
+  async update(id: string, updates: Partial<Omit<Form, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Form> {
+    const index = this.forms.findIndex(f => f.id === id || f.formId === id);
+    if (index === -1) {
+      throw new Error('找不到欲更新的表單');
+    }
 
-    if (updates.formId && this.forms.some(f => f.formId === updates.formId && f.id !== id)) {
-      throw new Error('Form ID already exists');
+    const currentForm = this.forms[index];
+    const actualId = currentForm.id;
+
+    if (updates.formId && this.forms.some(f => f.formId === updates.formId && f.id !== actualId)) {
+      throw new Error('表單 ID (formId) 已被其他表單使用');
     }
 
     const updated: Form = {
-      ...this.forms[index],
+      ...currentForm,
       ...updates,
       updatedAt: new Date().toISOString(),
     };
     this.forms[index] = updated;
     this.saveCache();
 
-    if (isSupabaseConfigured) {
-      supabase.from(TABLE_NAME).update(this.toRow({ ...updates, updatedAt: updated.updatedAt }))
-        .eq('id', id)
-        .then(({ error }) => {
-          if (error) console.error('[formService] update failed in Supabase', error);
-        });
+    // Persist to Backend API / Supabase
+    let persisted = false;
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update',
+          id: actualId,
+          updates: {
+            ...updates,
+            updatedAt: updated.updatedAt,
+          },
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) persisted = true;
+      }
+    } catch (e) {
+      console.warn('[formService] API update failed, trying client Supabase', e);
+    }
+
+    if (!persisted && isSupabaseConfigured) {
+      const { error } = await supabase
+        .from(TABLE_NAME)
+        .update(this.toRow({ ...updates, updatedAt: updated.updatedAt }))
+        .eq('id', actualId);
+
+      if (error) {
+        console.error('[formService] update failed in Supabase', error);
+        throw new Error(`表單更新失敗：${error.message}`);
+      }
     }
 
     return updated;
   }
 
-  delete(id: string): boolean {
-    const initialLength = this.forms.length;
-    this.forms = this.forms.filter(f => f.id !== id);
-    if (this.forms.length === initialLength) return false;
+  async delete(id: string): Promise<boolean> {
+    const target = this.forms.find(f => f.id === id || f.formId === id);
+    if (!target) return false;
+
+    const actualId = target.id;
+    this.forms = this.forms.filter(f => f.id !== actualId);
     this.saveCache();
 
-    if (isSupabaseConfigured) {
-      supabase.from(TABLE_NAME).delete().eq('id', id)
-        .then(({ error }) => {
-          if (error) console.error('[formService] delete failed in Supabase', error);
-        });
+    let deleted = false;
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id: actualId }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) deleted = true;
+      }
+    } catch (e) {
+      console.warn('[formService] API delete failed, trying client Supabase', e);
+    }
+
+    if (!deleted && isSupabaseConfigured) {
+      const { error } = await supabase.from(TABLE_NAME).delete().eq('id', actualId);
+      if (error) {
+        console.error('[formService] delete failed in Supabase', error);
+        throw new Error(`表單刪除失敗：${error.message}`);
+      }
     }
 
     return true;

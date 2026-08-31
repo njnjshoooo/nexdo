@@ -192,3 +192,33 @@ CREATE POLICY "Enable full access for authenticated users to submissions"
   TO authenticated
   USING (true)
   WITH CHECK (true);
+
+-- ==========================================
+-- Forms Table (Form Templates & Settings)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS forms (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  form_id TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  purpose TEXT DEFAULT 'CONSULTATION',
+  fields JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for forms
+ALTER TABLE forms ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to forms
+CREATE POLICY "Enable public read access for forms"
+  ON forms FOR SELECT
+  USING (true);
+
+-- Allow authenticated admins to manage forms
+CREATE POLICY "Enable full access for authenticated users to forms"
+  ON forms FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
