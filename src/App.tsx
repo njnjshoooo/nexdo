@@ -54,15 +54,18 @@ import EmailManagement from './pages/admin/EmailManagement';
 import EmailEditor from './pages/admin/editors/EmailEditor';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import PermissionGuard from './components/PermissionGuard';
+import ChatWidget from './components/ChatWidget';
 
 // 前台佈局
 const MainLayout = () => (
   <div className="flex flex-col min-h-screen">
-    <Header /> 
+    <Header />
     <main className="flex-grow">
-      <Outlet /> 
+      <Outlet />
     </main>
     <Footer />
+    {/* 好好 · AI 聊天助理（右下角浮動） */}
+    <ChatWidget />
   </div>
 );
 
