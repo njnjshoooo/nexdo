@@ -207,7 +207,7 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (error) {
       console.error('Form submission error:', error);
-      alert('送出失敗，請稍後再試。');
+      alert('這次資料未能送出，請再試一次；若仍無法送出，可以透過官方聯絡方式告訴我們');
     } finally {
       setIsSubmitting(false);
     }
@@ -391,7 +391,7 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
             isLoading={isSubmitting}
             className="w-full py-6 text-lg mt-8"
           >
-            {isSubmitting ? '處理中...' : '送出表單'}
+            {isSubmitting ? '處理中...' : '送出需求'}
           </Button>
           <p className="mt-4 text-center tracking-wider text-sm text-stone-500 font-medium">
             將有專人立即為您服務

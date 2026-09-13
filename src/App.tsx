@@ -1,10 +1,12 @@
+import { OrganizingSection, ServiceGroupPage } from './components/Home/RetirementHome';
+import './public-site.css';
 import { useAuth } from "./contexts/AuthContext";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import Header from './components/Header'; 
 import Footer from './components/Footer';
@@ -58,7 +60,7 @@ import ChatWidget from './components/ChatWidget';
 
 // 前台佈局
 const MainLayout = () => (
-  <div className="flex flex-col min-h-screen">
+  <div className="public-site flex flex-col min-h-screen">
     <Header />
     <main className="flex-grow">
       <Outlet />
@@ -72,7 +74,12 @@ const MainLayout = () => (
 // 💡 建立一個包裝組件，確保首頁能讀取到後台儲存的資料
 const HomePageWrapper = () => {
   // 優先從 pageService 抓取資料
-  const allPages = pageService.getAll();
+  const [allPages, setAllPages] = useState(() => pageService.getAll());
+  useEffect(() => {
+    const update = () => setAllPages(pageService.getAll());
+    window.addEventListener('pages_refreshed', update);
+    return () => window.removeEventListener('pages_refreshed', update);
+  }, []);
   const dynamicHomeData = allPages.find(p => p.template === 'HOME');
   const { user } = useAuth();
   
@@ -163,6 +170,9 @@ export default function App() {
         <Route path="/profile/settings" element={<ProfileSettingsPage />} />
         
         <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/services/health" element={<ServiceGroupPage kind="health" />} />
+        <Route path="/services/rental" element={<ServiceGroupPage kind="rental" />} />
+        <Route path="/services/organizing" element={<OrganizingSection standalone />} />
         <Route path="/search" element={<SearchPage />} />
 
         <Route path="/:slug" element={<DynamicPage />} />

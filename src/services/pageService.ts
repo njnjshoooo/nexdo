@@ -9,7 +9,7 @@ const TABLE_NAME = 'pages';
 
 class PageService {
   private pages: Page[] = [];
-  private readonly VERSION = '1.0.13';
+  private readonly VERSION = '1.0.14';
 
   constructor() {
     this.loadCache();

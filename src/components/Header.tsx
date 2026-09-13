@@ -78,11 +78,31 @@ export default function Header() {
     };
   }, []);
 
-  // 3. 獲取動態導覽列選單
+  // Preserve the CMS navigation while exposing the new public service groups.
   useEffect(() => {
-    const pages = pageService.getAll();
-    const resolvedSettings = navigationService.getResolvedSettings(pages);
-    setNavItems(resolvedSettings.items?.length ? resolvedSettings.items : HEADER_ITEMS);
+    const update = () => {
+      const resolved = navigationService.getResolvedSettings(pageService.getAll());
+      const items = [...(resolved.items?.length ? resolved.items : HEADER_ITEMS)];
+      if (!items.some(item => item.url === '/services/organizing')) {
+        items.splice(Math.max(0, items.findIndex(item => item.url === '/blog')), 0, {
+          id: 'nav-organizing', label: '老前整理', url: '/services/organizing', openInNewWindow: false,
+        });
+      }
+      const normalize = (item: NavItem): NavItem => ({
+        ...item,
+        label: item.url === '/consultant' ? '安心顧問諮詢' : item.label,
+        url: item.url === '/health' ? '/services/health' : item.url === '/rent-and-move' ? '/services/rental' : item.url,
+        children: item.children?.map(normalize),
+      });
+      setNavItems(items.map(normalize));
+    };
+    update();
+    window.addEventListener('navigation_refreshed', update);
+    window.addEventListener('pages_refreshed', update);
+    return () => {
+      window.removeEventListener('navigation_refreshed', update);
+      window.removeEventListener('pages_refreshed', update);
+    };
   }, []);
 
   // 4. 🎯 新的管理員權限判定：只看 admin_permission 表格
@@ -115,6 +135,14 @@ export default function Header() {
     checkAdminPermission();
   }, [user, isAuthenticated]);
 
+  useEffect(() => {
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setIsMenuOpen(false); setIsServicesOpen(false); setIsUserMenuOpen(false); }
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, []);
+
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const serviceCategories = navItems.find(item => item.id === 'nav-services')?.children || [];
   const isSpecialHeroPage = ['/about', '/consultant', '/blog', '/peace-of-mind'].includes(location.pathname) || location.pathname.startsWith('/blog/');
@@ -135,20 +163,27 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center gap-[8px]" onClick={() => { window.scrollTo(0, 0); setIsServicesOpen(false); }}>
             {isServicesOpen && settings.whiteLogo ? (
-              <img src={settings.whiteLogo} alt="Logo" className="object-contain" style={{ height: settings.logoHeight ? `${settings.logoHeight}px` : '48px' }} />
+              <img src={settings.whiteLogo} alt="好齡居 NEXDO" className="object-contain" style={{ height: settings.logoHeight ? `${settings.logoHeight}px` : '48px' }} />
             ) : settings.logo ? (
-              <img src={settings.logo} alt="Logo" className="object-contain" style={{ height: settings.logoHeight ? `${settings.logoHeight}px` : '48px' }} />
+              <img src={settings.logo} alt="好齡居 NEXDO" className="object-contain" style={{ height: settings.logoHeight ? `${settings.logoHeight}px` : '48px' }} />
             ) : (
               <>
                 <div className={`w-[48px] h-[48px] rounded-lg flex items-center justify-center font-bold text-[20px] leading-[28px] ${isServicesOpen ? 'bg-white text-[#4A5D3B]' : 'bg-primary text-white'}`}>好</div>
-                <span className={`text-[20px] leading-[28px] font-bold tracking-wide ${isServicesOpen ? 'text-white' : 'text-primary'}`}>好好齡居 NEXDO</span>
+                <span className={`text-[20px] leading-[28px] font-bold tracking-wide ${isServicesOpen ? 'text-white' : 'text-primary'}`}>好齡居 NEXDO</span>
               </>
             )}
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-[16px] lg:space-x-[32px]">
-            {navItems.map((item) => (
+            {[
+              { id: 'home-safety', label: '居住安全', url: '/home-safety' },
+              { id: 'renovation', label: '居家裝潢', url: '/renovation' },
+              { id: 'cleaning', label: '收納清潔', url: '/cleaning' },
+              { id: 'health', label: '樂齡健康', url: '/services/health' },
+              { id: 'organizing', label: '老前整理', url: '/services/organizing' },
+              { id: 'blog', label: '好齡居誌', url: '/blog' },
+            ].map((item: NavItem) => (
               <div key={item.id} className="relative group">
                 {item.children?.length ? (
                   <button onClick={() => setIsServicesOpen(!isServicesOpen)} className={`flex items-center gap-1 font-medium text-[14px] leading-[20px] lg:text-[16px] lg:leading-[24px] ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>
@@ -162,11 +197,12 @@ export default function Header() {
             ))}
           </nav>
 
+          <Link to="/consultant" className="brand-button header-consultation" onClick={() => { setIsMenuOpen(false); setIsServicesOpen(false); }}>安心顧問諮詢</Link>
           {/* Right Actions */}
-          <div className="hidden md:flex items-center gap-[12px] lg:gap-[20px]">
+          <div className="header-account-actions hidden">
             <div className="relative">
               <input 
-                type="text" placeholder="搜尋..." 
+                type="text" aria-label="搜尋服務與文章" placeholder="搜尋..."
                 className={`w-[96px] focus:w-[144px] transition-all duration-300 pl-3 pr-8 py-1 rounded-full border text-[14px] leading-[20px] ${isServicesOpen ? 'bg-white/10 border-white/20 text-white' : 'bg-stone-100 border-transparent'}`}
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -182,7 +218,7 @@ export default function Header() {
             
             <FontSizeControl isDark={isServicesOpen} />
             
-            <Link to="/cart" onClick={() => setIsServicesOpen(false)} className={`relative ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>
+            <Link to="/cart" aria-label="購物車" onClick={() => setIsServicesOpen(false)} className={`relative ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>
               <ShoppingCart size={20} />
               {cartItemCount > 0 && <span className="absolute -top-[8px] -right-[8px] bg-primary text-white text-[10px] leading-[14px] font-bold w-[16px] h-[16px] rounded-full flex items-center justify-center">{cartItemCount}</span>}
             </Link>
@@ -222,8 +258,8 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button onClick={() => { setIsMenuOpen(!isMenuOpen); if (isMenuOpen) setActiveSubMenu(null); }} className={`p-2 ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>{isMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
+          <div className="flex items-center">
+            <button aria-label={isMenuOpen ? "關閉選單" : "開啟選單"} aria-expanded={isMenuOpen} onClick={() => { setIsMenuOpen(!isMenuOpen); if (isMenuOpen) setActiveSubMenu(null); }} className={`p-2 ${isServicesOpen ? 'text-white' : 'text-stone-600'}`}>{isMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
           </div>
         </div>
       </div>
@@ -263,11 +299,16 @@ export default function Header() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="md:hidden bg-white border-t border-stone-100 overflow-hidden shadow-xl">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="header-menu bg-white border-t border-stone-100 overflow-hidden shadow-xl">
             <div className="relative overflow-hidden min-h-[400px]">
               <AnimatePresence mode="wait">
                 {!activeSubMenu ? (
                   <motion.div key="main-menu" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -100, opacity: 0 }} transition={{ type: 'tween', duration: 0.3 }} className="px-[16px] pt-2 pb-6 space-y-1">
+                    <Link to="/cart" className="block px-3 py-4" onClick={() => setIsMenuOpen(false)}>購物車（{cartItemCount}）</Link>
+                    <form className="flex gap-2 px-3" onSubmit={e => { e.preventDefault(); if (searchQuery.trim()) { navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); setIsMenuOpen(false); } }}>
+                      <input aria-label="搜尋服務與文章" placeholder="搜尋服務與文章" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="min-w-0 flex-1 border rounded-xl px-3" />
+                      <button type="submit" aria-label="搜尋"><Search size={20} /></button>
+                    </form>
                     {navItems.map((item) => (
                       <div key={`nav-item-${item.id}`}>
                         {item.children?.length ? (

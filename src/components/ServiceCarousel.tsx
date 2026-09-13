@@ -50,8 +50,10 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
         if (productData && !item.price) {
           if (productData.orderMode === 'FIXED' && productData.fixedConfig) {
             calculatedPrice = `NT$ ${productData.fixedConfig.price?.toLocaleString() || 0} / ${productData.fixedConfig.unit || '次'}`;
-          } else if (productData.orderMode === 'INTERNAL_FORM' && (productData as any).quoteConfig?.priceText) {
-            calculatedPrice = productData.quoteConfig.priceText;
+          } else if (productData.orderMode === 'INTERNAL_FORM') {
+            calculatedPrice = productData.internalFormConfig?.priceText || '依需求報價';
+          } else if (productData.orderMode === 'EXTERNAL_LINK') {
+            calculatedPrice = productData.externalLinkConfig?.priceText || '依需求報價';
           }
         }
         
@@ -105,7 +107,7 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
           {loadedServices.map((item, index) => {
             const CardContent = (
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-stone-100 h-full flex flex-col">
-                <div className="h-56 overflow-hidden relative">
+                {item.displayImage && <div className="h-56 overflow-hidden relative">
                   <img 
                     src={item.displayImage || undefined} 
                     alt={item.displayTitle} 
@@ -113,10 +115,10 @@ export default function ServiceCarousel({ services, desktopColumns = 3 }: Servic
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
-                </div>
+                </div>}
                 <div className="p-8 flex-grow flex flex-col">
                   <h3 className="text-2xl font-bold text-[#4A5D3B] mb-3">{item.displayTitle}</h3>
-                  <p className="text-stone-600 mb-6 leading-relaxed h-20 line-clamp-3">{item.displayDescription}</p>
+                  <p className="text-stone-600 mb-6 leading-relaxed ">{item.displayDescription}</p>
                   
                   <div className="space-y-3 mb-8 flex-grow">
                     {item.displayChecklist.map((subItem: string, i: number) => (

@@ -1,3 +1,4 @@
+import { organizingProducts } from '../data/organizingCatalog';
 import { Product } from '../types/admin';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -10,6 +11,9 @@ class ProductService {
 
   constructor() {
     this.loadCache();
+    if (!isSupabaseConfigured) {
+      this.products = [...this.products, ...organizingProducts.filter(p => !this.products.some(existing => existing.id === p.id))];
+    }
     if (isSupabaseConfigured) {
       this.refresh().catch(err => console.error('[productService] init refresh failed', err));
     }

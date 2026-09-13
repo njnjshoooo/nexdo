@@ -1,3 +1,5 @@
+import { Helmet } from 'react-helmet-async';
+import { LINE_QUOTE_URL } from '../data/organizingCatalog';
 import { WidgetRenderer } from '../components/widgets';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -16,6 +18,14 @@ import DynamicForm from '../components/form/DynamicForm';
 import { useForm } from '../hooks/useForm';
 import { useCart } from '../contexts/CartContext';
 import ServiceCarousel from '../components/ServiceCarousel';
+
+function ServiceAction({ quote, disabled, onClick, children, className }: {
+  quote: boolean; disabled: boolean; onClick: () => void; children: React.ReactNode; className: string;
+}) {
+  return quote
+    ? <a href={LINE_QUOTE_URL} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
+    : <button type="button" disabled={disabled} onClick={onClick} className={className}>{children}</button>;
+}
 
 // Helper component to load form data using the hook
 
@@ -117,7 +127,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   });
 
   // Fetch product data using productId
-  const [productData, setProductData] = useState<Product | null>(null);
+  const [loadedProductData, setProductData] = useState<Product | null>(null);
+  const productData = loadedProductData?.id === subItem.productId ? loadedProductData : null;
 
   useEffect(() => {
     if (!subItem.productId) {
@@ -254,8 +265,32 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   const relatedPages = subItem.additionalServices
     ? subItem.additionalServices
         .map(id => pageService.getById(id))
-        .filter((p): p is Page => !!p && p.template === 'SUB_ITEM')
+        .filter((p): p is Page => !!p && p.isPublished && p.template === 'SUB_ITEM')
     : [];
+
+  const primaryActionText = productData
+    ? orderMode === 'FIXED' ? '立即下單' : 'Line 報價預約'
+    : subItem.productId ? '服務資料載入中' : subItem.button?.text || '安心顧問諮詢';
+
+  const handlePrimaryAction = () => {
+    if (productData) {
+      if (orderMode === 'FIXED') handleAddToCart();
+      else window.open(LINE_QUOTE_URL, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (subItem.productId) return;
+    const button = subItem.button;
+    if (button?.type === 'FORM') {
+      const form = formService.getById(button.value) || formService.getByFormId(button.value);
+      if (form) navigate(`/forms/${form.formId || form.id}`);
+    } else if (button?.value.startsWith('#')) {
+      document.getElementById(button.value.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+    } else if (button?.value.startsWith('/')) {
+      navigate(button.value);
+    } else if (button?.value.startsWith('https://')) {
+      window.open(button.value, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // Related products state
   const [relatedProducts, setRelatedProducts] = useState<Record<string, Product>>({});
@@ -276,7 +311,8 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
   }, [relatedPages]);
 
   return (
-    <div className="min-h-screen bg-stone-50 pt-20 pb-20">
+    <div className="service-detail min-h-screen bg-stone-50 pt-20 pb-20">
+      <Helmet><title>{currentPage.title} | 好齡居 NEXDO</title><meta name="description" content={productData?.description || currentPage.content.hero.description} /><link rel="canonical" href={`https://www.nexdo.tw/${currentPage.slug}`} /></Helmet>
       <div className="max-w-[1280px] mx-auto px-0 lg:px-6 xl:px-4">
         <div className="flex flex-col lg:flex-row gap-0 lg:gap-10 xl:gap-10">
           
@@ -319,7 +355,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                   
                   {/* Price/Quote Display */}
                   <div className="mb-4 md:mb-5">
-                    {orderMode === 'FIXED' ? (
+                    {!productData ? <span>正在載入服務資料…</span> : orderMode === 'FIXED' ? (
                       <div className="flex items-baseline gap-1">
                         <span className="text-[10px] md:text-xs font-bold text-stone-400">NT$</span>
                         <span className="text-xl md:text-2xl font-black text-primary">
@@ -340,6 +376,7 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
                     )}
                   </div>
 
+                  {orderMode && orderMode !== 'FIXED' && <p className="quote-note">先評估再報價</p>}
                   <p className="text-stone-600 text-xs md:text-sm leading-relaxed mb-4 md:mb-5 line-clamp-3 md:line-clamp-none">
                     {productData?.description}
                   </p>
@@ -501,59 +538,18 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
             <div className="hidden lg:block p-5 md:p-6 pt-4 border-t border-stone-100 bg-white shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] shrink-0 relative z-20">
               {/* CTA 顯示條件：有連動產品時必顯示，或者頁面自己有設 isVisible=true */}
               {(productData || subItem.button?.isVisible) && (
-                <button
+                <ServiceAction quote={!!productData && orderMode !== 'FIXED'}
                   onClick={() => {
-                    // Prioritize subItem.button if it's set to something specific
-                    if (subItem.button?.type === 'FORM' && subItem.button?.value) {
-                      const form = formService.getById(subItem.button.value) || formService.getByFormId(subItem.button.value);
-                      if (form) {
-                        navigate(`/forms/${form.formId || form.id}`);
-                        return;
-                      }
-                    } else if (subItem.button?.type === 'URL' && subItem.button?.value) {
-                      if (subItem.button.value.startsWith('http')) {
-                        window.open(subItem.button.value, '_blank');
-                      } else {
-                        // Handle internal anchor or path
-                        const target = document.querySelector(subItem.button.value);
-                        if (target) {
-                          target.scrollIntoView({ behavior: 'smooth' });
-                        } else {
-                          navigate(subItem.button.value);
-                        }
-                      }
-                      return;
-                    }
-
-                    // Fallback to product-based logic
-                    if (orderMode === 'FIXED') {
-                      handleAddToCart();
-                    } else if (orderMode === 'INTERNAL_FORM') {
-                      if (internalFormConfig?.formId) {
-                        const form = formService.getById(internalFormConfig.formId) || formService.getByFormId(internalFormConfig.formId);
-                        if (form) {
-                          navigate(`/forms/${form.formId || form.id}`);
-                        }
-                      }
-                    } else if (orderMode === 'EXTERNAL_LINK') {
-                      if (externalLinkConfig?.url) {
-                        window.open(externalLinkConfig.url, '_blank');
-                      } else {
-                        // Default scroll to footer form
-                        const footerForm = document.getElementById('booking-form');
-                        if (footerForm) {
-                          footerForm.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }
-                    }
+                    handlePrimaryAction();
                   }}
+                  disabled={!!subItem.productId && !productData}
                   className="block w-full bg-[#885200] hover:bg-[#663D00] text-white text-center font-bold py-3 md:py-3.5 text-sm md:text-base rounded-full transition-colors shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all"
                 >
                   {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
-                  {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}
-                </button>
+                  {primaryActionText}
+                </ServiceAction>
               )}
-              <div className="pt-2 md:pt-3">
+              <div className="pt-2 md:pt-3"><div className="companion-note"><img src="/images/mascot/haohao-wave-3.png" alt="" width="60" height="60" /><span>先了解您的需求，<br />再一起安排。</span></div>
                 <p className="text-[10px] md:text-xs text-stone-500 text-center flex flex-col gap-0.5 md:gap-1">
                   <span>有任何疑問？歡迎直接聯繫我們</span>
                   <a href="tel:02-7755-0920" className="font-bold hover:text-primary transition-colors">或撥打：02-7755-0920</a>
@@ -946,41 +942,16 @@ export default function SubItemPage({ page: propPage }: { page?: Page | null }) 
 
       {/* Sticky CTA for Mobile */}
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-white via-white to-white/0 pt-8 lg:hidden">
-        <button
-          onClick={
-                orderMode === 'FIXED' 
-                  ? handleAddToCart 
-                  : () => {
-                      if (orderMode === 'INTERNAL_FORM') {
-                        if (internalFormConfig?.formId) {
-                          const form = formService.getById(internalFormConfig.formId) || formService.getByFormId(internalFormConfig.formId);
-                          if (form) {
-                            navigate(`/forms/${form.formId || form.id}`);
-                          }
-                        }
-                      } else if (orderMode === 'EXTERNAL_LINK') {
-                        if (externalLinkConfig?.url) {
-                          window.open(externalLinkConfig.url, '_blank');
-                        } else {
-                          // Default scroll to footer form
-                          const footerForm = document.getElementById('booking-form');
-                          if (footerForm) {
-                            footerForm.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }
-                      } else if (subItem.button?.type === 'FORM') {
-                        const targetId = formService.getByFormId(subItem.button?.value || '')?.formId || formService.getById(subItem.button?.value || '')?.formId || 'booking-form';
-                        document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-                      } else {
-                        window.open(subItem.button?.value, '_blank');
-                      }
-                    }
-              }
-              className="w-full bg-[#885200] hover:bg-[#663D00] text-white font-bold py-4 rounded-full shadow-lg transition-colors"
+        <ServiceAction quote={!!productData && orderMode !== 'FIXED'}
+          onClick={() => {
+            handlePrimaryAction();
+          }}
+          disabled={!!subItem.productId && !productData}
+              className="block text-center w-full bg-[#885200] hover:bg-[#663D00] text-white font-bold py-4 rounded-full shadow-lg transition-colors"
             >
               {/* 按鈕文字優先順序：1. 產品設定的按鈕文字 2. 頁面設定的按鈕文字 3. 預設文字 */}
-              {(orderMode === 'FIXED' ? fixedConfig?.buttonText : (orderMode === 'INTERNAL_FORM' ? internalFormConfig?.buttonText : externalLinkConfig?.buttonText)) || subItem.button?.text || '立即預約'}
-            </button>
+              {primaryActionText}
+            </ServiceAction>
       </div>
 
       {/* Form Section */}
@@ -1155,7 +1126,7 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
   return (
     <div className="border border-stone-200 rounded-2xl overflow-hidden bg-white mb-4 shadow-sm hover:shadow-md transition-shadow">
       <button 
-        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen} onClick={() => setIsOpen(!isOpen)}
         className="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none"
       >
         <span className="font-bold text-stone-900 pr-4 text-lg">{question}</span>
