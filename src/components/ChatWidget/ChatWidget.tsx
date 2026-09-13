@@ -1,80 +1,105 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { HAOHAO_FAQ, QUICK_PROMPT_IDS, findFAQ, type FAQEntry } from '../../data/haohaoFAQ';
 
 /**
- * 好好 AI 聊天助理 — 右下角浮動視窗
+ * 好好 AI 聊天助理 — 右下角浮動視窗（本地 FAQ 版本）
  *
  * - 全站可見，掛在 App 根層
  * - 使用「好好」IP 圖檔（/images/mascot/haohao-360.png）為頭像
- * - 對話透過 POST /api/chat 送給 Claude，語氣依 CIS 手冊第八章
- * - 訊息只存在元件 state，重新整理後清除（未來可存 Supabase）
+ * - 對話用本地 FAQ 關鍵字比對（不需 API Key、不用月費、瞬間回覆）
+ * - 未來若要升級成 Claude AI 對話，把 sendMessage 換成呼叫 /api/chat 即可
  */
 
 type Role = 'user' | 'assistant';
 interface Message {
   role: Role;
   content: string;
+  followUps?: FAQEntry[]; // 提供給使用者的相關建議
 }
 
 const MASCOT_URL = '/images/mascot/haohao-360.png';
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    role: 'assistant',
-    content: '您好，我是好齡居助理「好好」。想改善家裡的哪個地方呢？可以先跟我聊聊看。',
-  },
-];
+const GREETING: Message = {
+  role: 'assistant',
+  content: '您好，我是好齡居助理「好好」🧡\n想改善家裡的哪個地方，或有什麼想問的？可以先聊聊看。',
+};
 
-const QUICK_PROMPTS = [
-  '想幫爸媽整理房子',
-  '退休後老家想出租',
-  '什麼是老前整理？',
-  '我住在雙北，你們有服務嗎？',
-];
+// 從 FAQ 找出設定為 quick prompt 的項目
+const QUICK_PROMPTS: FAQEntry[] = QUICK_PROMPT_IDS
+  .map(id => HAOHAO_FAQ.find(f => f.id === id))
+  .filter((x): x is FAQEntry => !!x);
+
+// 找不到適合答案時的 fallback
+const FALLBACK_ANSWER =
+  '這個我想再確認一下，不敢隨便回答您。您可以先看看下面的常見問題，或請安心顧問幫您處理：填「預約評估」表單、或寫信到 service@nexdo.tw，我們會盡快聯絡您。';
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 自動捲到底
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, sending]);
 
-  const send = async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || sending) return;
-    setError(null);
-    const next: Message[] = [...messages, { role: 'user', content: trimmed }];
-    setMessages(next);
+  // 直接送 FAQ entry 的答案（quick prompt 或 follow-up 被點時用）
+  const askEntry = (entry: FAQEntry) => {
     setInput('');
     setSending(true);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })) }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || '暫時無法回覆，請稍後再試');
-      setMessages([...next, { role: 'assistant', content: data.reply }]);
-    } catch (e: any) {
-      setError(e?.message || '暫時無法回覆，請稍後再試');
-    } finally {
+    setMessages(prev => [
+      ...prev,
+      { role: 'user', content: entry.question },
+    ]);
+    // 模擬短暫思考感（100ms），提升「有人在回話」的體感
+    setTimeout(() => {
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: entry.answer,
+          followUps: HAOHAO_FAQ.filter(f => f.id !== entry.id && f.category === entry.category).slice(0, 2),
+        },
+      ]);
       setSending(false);
-    }
+    }, 250);
+  };
+
+  // 使用者自由輸入 → 用關鍵字比對找 FAQ
+  const askFreeText = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || sending) return;
+    setInput('');
+    setSending(true);
+    setMessages(prev => [...prev, { role: 'user', content: trimmed }]);
+
+    setTimeout(() => {
+      const { entry, alternatives } = findFAQ(trimmed);
+      const reply: Message = entry
+        ? {
+            role: 'assistant',
+            content: entry.answer,
+            followUps: alternatives.slice(0, 2),
+          }
+        : {
+            role: 'assistant',
+            content: FALLBACK_ANSWER,
+            followUps: alternatives.slice(0, 3),
+          };
+      setMessages(prev => [...prev, reply]);
+      setSending(false);
+    }, 250);
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    send(input);
+    askFreeText(input);
   };
+
+  const showInitialPrompts = messages.length === 1 && !sending;
 
   return (
     <>
@@ -122,7 +147,7 @@ export default function ChatWidget() {
               <div className="font-bold text-[15px]">好齡居助理｜好好</div>
               <div className="text-[11px] opacity-85 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                安心顧問線上支援
+                線上支援
               </div>
             </div>
             <button
@@ -137,11 +162,34 @@ export default function ChatWidget() {
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3" style={{ backgroundColor: '#FFF9EF' }}>
             {messages.map((m, i) => (
-              <MessageBubble key={i} role={m.role} content={m.content} />
+              <div key={i} className="space-y-2">
+                <MessageBubble role={m.role} content={m.content} />
+                {m.role === 'assistant' && m.followUps && m.followUps.length > 0 && (
+                  <div className="ml-9 flex flex-col gap-1.5">
+                    <div className="text-[10px] uppercase tracking-wider text-stone-400 font-medium">
+                      您也可以問
+                    </div>
+                    {m.followUps.map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => askEntry(f)}
+                        className="text-left text-[12px] px-3 py-2 rounded-xl border border-stone-200 bg-white hover:border-[#00464B] hover:bg-[#00464B]/5 text-[#00464B] transition-colors"
+                      >
+                        {f.question}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             {sending && (
               <div className="flex items-end gap-2 max-w-[85%]">
-                <img src={MASCOT_URL} alt="" className="w-7 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: '#EB5514', padding: 2 }} />
+                <img
+                  src={MASCOT_URL}
+                  alt=""
+                  className="w-7 h-7 rounded-full flex-shrink-0 p-0.5"
+                  style={{ backgroundColor: '#EB5514' }}
+                />
                 <div className="px-4 py-2.5 rounded-2xl rounded-bl-sm border border-stone-200 bg-white text-[#00464B] text-sm">
                   <span className="inline-flex gap-1">
                     <span className="w-1.5 h-1.5 bg-[#00464B] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -151,23 +199,21 @@ export default function ChatWidget() {
                 </div>
               </div>
             )}
-            {error && (
-              <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-100">
-                {error}
-              </div>
-            )}
           </div>
 
-          {/* Quick prompts */}
-          {messages.length <= 2 && !sending && (
-            <div className="px-3 py-2 flex gap-1.5 overflow-x-auto border-t border-stone-100" style={{ backgroundColor: '#FFF9EF' }}>
-              {QUICK_PROMPTS.map((p) => (
+          {/* Quick prompts（開場時） */}
+          {showInitialPrompts && (
+            <div className="px-3 py-3 border-t border-stone-100 flex flex-col gap-1.5" style={{ backgroundColor: '#FFF9EF' }}>
+              <div className="text-[10px] uppercase tracking-wider text-stone-500 font-medium px-1 mb-0.5">
+                常見問題
+              </div>
+              {QUICK_PROMPTS.map(p => (
                 <button
-                  key={p}
-                  onClick={() => send(p)}
-                  className="whitespace-nowrap text-[11px] px-3 py-1.5 rounded-full border font-medium text-[#00464B] bg-white border-[#00464B]/40 hover:bg-[#00464B]/5"
+                  key={p.id}
+                  onClick={() => askEntry(p)}
+                  className="text-left text-[12.5px] px-3 py-2 rounded-xl border border-stone-200 bg-white hover:border-[#00464B] hover:bg-[#00464B]/5 text-[#00464B] transition-colors font-medium"
                 >
-                  {p}
+                  {p.question}
                 </button>
               ))}
             </div>
@@ -206,8 +252,8 @@ function MessageBubble({ role, content }: { role: Role; content: string }) {
         <img
           src={MASCOT_URL}
           alt=""
-          className="w-7 h-7 rounded-full flex-shrink-0"
-          style={{ backgroundColor: '#EB5514', padding: 2 }}
+          className="w-7 h-7 rounded-full flex-shrink-0 p-0.5"
+          style={{ backgroundColor: '#EB5514' }}
         />
       )}
       <div
