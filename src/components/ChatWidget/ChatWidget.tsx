@@ -17,7 +17,9 @@ interface Message {
   followUps?: FAQEntry[]; // 提供給使用者的相關建議
 }
 
-const MASCOT_URL = '/images/mascot/haohao-360.png';
+// 透明背景的好好揮手 PNG（品牌 IP 資產）
+const MASCOT_URL = '/images/mascot/haohao-wave-1.png';
+const MASCOT_AVATAR_URL = '/images/mascot/haohao-wave-1.png';
 
 const GREETING: Message = {
   role: 'assistant',
@@ -103,30 +105,30 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — 好好 IP 透明底 PNG，不用橘色圓底、不顯示常駐文字（避免遮擋畫面）*/}
       {!open && (
         <button
           onClick={() => setOpen(true)}
           aria-label="開啟好好聊天助理"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-3 group"
+          className="fixed bottom-4 right-4 z-40 group focus:outline-none"
+          style={{
+            filter: 'drop-shadow(0 6px 16px rgba(0, 70, 75, 0.20)) drop-shadow(0 2px 4px rgba(0, 70, 75, 0.15))',
+          }}
         >
-          <span className="hidden md:inline-block bg-white text-[#00464B] text-sm font-medium px-3 py-2 rounded-2xl rounded-br shadow-lg border border-stone-200 max-w-[200px] group-hover:translate-x-[-4px] transition-transform">
-            您好！想改善家裡的哪個地方呢？
-          </span>
+          <img
+            src={MASCOT_URL}
+            alt="好好"
+            className="w-16 h-16 md:w-20 md:h-20 object-contain transition-transform group-hover:scale-105"
+            draggable={false}
+          />
+          {/* 綠色脈動點暗示可互動 */}
           <span
-            className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center relative overflow-hidden"
-            style={{ backgroundColor: '#EB5514', boxShadow: '0 8px 24px rgba(235,85,20,0.35)' }}
-          >
-            <img
-              src={MASCOT_URL}
-              alt="好好"
-              className="w-14 h-14 object-contain"
-              draggable={false}
-            />
-            <span
-              className="absolute top-1 right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-pulse"
-              aria-hidden="true"
-            />
+            className="absolute top-1 right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-pulse"
+            aria-hidden="true"
+          />
+          {/* 只在 hover 時顯示的提示（不會擋畫面）*/}
+          <span className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2 whitespace-nowrap bg-[#00464B] text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+            找好好聊聊
           </span>
         </button>
       )}
@@ -134,14 +136,14 @@ export default function ChatWidget() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-6 right-6 z-40 w-[min(380px,calc(100vw-32px))] h-[560px] max-h-[calc(100vh-48px)] bg-white rounded-2xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden"
+          className="fixed bottom-4 right-4 z-40 w-[min(380px,calc(100vw-24px))] h-[560px] max-h-[calc(100vh-32px)] bg-white rounded-2xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden"
           role="dialog"
           aria-label="好好聊天助理"
         >
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 text-white" style={{ backgroundColor: '#00464B' }}>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#EB5514' }}>
-              <img src={MASCOT_URL} alt="好好" className="w-9 h-9 object-contain" />
+            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+              <img src={MASCOT_AVATAR_URL} alt="好好" className="w-10 h-10 object-contain" />
             </div>
             <div className="flex-1 leading-tight">
               <div className="font-bold text-[15px]">好齡居助理｜好好</div>
