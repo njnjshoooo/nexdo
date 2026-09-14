@@ -80,11 +80,11 @@ class ArticleService {
 
     // localStorage-only fallback path (with static defaults)
     const storedArticles = localStorage.getItem(STORAGE_KEY);
-    this.articles = ALL_ARTICLES.map(a => ({...a, content: parseContentToMarkdown(a.content)}));
+    this.articles = applyBrandImages(ALL_ARTICLES).map(a => ({...a, content: parseContentToMarkdown(a.content)}));
 
     if (storedArticles) {
       try {
-        const customArticles: Article[] = JSON.parse(storedArticles).map((a: Article) => ({
+        const customArticles: Article[] = applyBrandImages(JSON.parse(storedArticles)).map((a: Article) => ({
           ...a,
           content: parseContentToMarkdown(a.content)
         }));

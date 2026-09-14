@@ -108,10 +108,10 @@ class PageService {
           this.pages = applyBrandImages(JSON.parse(storedPages));
         } catch (e) {
           console.error('Failed to parse cached pages', e);
-          this.pages = [...allInitialPages];
+          this.pages = applyBrandImages([...allInitialPages]);
         }
       } else {
-        this.pages = [...allInitialPages];
+        this.pages = applyBrandImages([...allInitialPages]);
       }
       return;
     }
@@ -149,7 +149,7 @@ class PageService {
         }
       }
 
-      this.pages = [...allInitialPages];
+      this.pages = applyBrandImages([...allInitialPages]);
 
       // Overwrite initial pages with existing ones if they have the same ID
       existingPages.forEach(ep => {

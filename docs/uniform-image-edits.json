@@ -1,0 +1,1524 @@
+[
+  {
+    "id": 7,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777520321891-__1.jpg",
+    "asset": "/images/uniforms/scene-7.webp",
+    "contexts": [
+      "pages/cleaning/content/cases/0/image",
+      "pages/home-reorganization/content/subItem/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 8,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777520321902-__2.jpg",
+    "asset": "/images/uniforms/scene-8.webp",
+    "contexts": [
+      "pages/home-reorganization/content/subItem/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 9,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777520321880-__3.jpg",
+    "asset": "/images/uniforms/scene-9.webp",
+    "contexts": [
+      "pages/cleaning/content/cases/1/image",
+      "pages/home-reorganization/content/subItem/cases/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 10,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777866314810-3__.jpg",
+    "asset": "/images/uniforms/scene-10.webp",
+    "contexts": [
+      "pages/cleaning/content/hero/backgroundImage",
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/0/feature/images/0",
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/0/imageTextGrid/image",
+      "pages/home/content/home/blocks/1/services/items/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 11,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777530739370-__.jpg",
+    "asset": "/images/uniforms/scene-11.webp",
+    "contexts": [
+      "pages/cleaning/content/services/0/image",
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/1/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 12,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785489839487-1__.jpg",
+    "asset": "/images/uniforms/scene-12.webp",
+    "contexts": [
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 14,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777519025069-3.jpg",
+    "asset": "/images/uniforms/scene-14.webp",
+    "contexts": [
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/2/htmlCode/html",
+      "pages/peace-of-mind/content/general/blocks/2/grid/items/1/image"
+    ],
+    "prompt": "Edit original photograph image 1: replace each person's ordinary top with exact supplied Nexdo T-shirts, cream image 2 for woman and dark green image 3 for man. Remove apron/blazer and replace with T-shirt. Preserve original faces, age, hair, poses, hands, all objects and printed text outside clothing, room, lighting, and framing. Exact orange heart 好齡居 chest print and matching back art when visible. Photorealistic, no new people or text outside garment. Output one image.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 15,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785489846776-4-1__.jpg",
+    "asset": "/images/uniforms/scene-15.webp",
+    "contexts": [
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 16,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785489851089-5__.jpg",
+    "asset": "/images/uniforms/scene-16.webp",
+    "contexts": [
+      "pages/home-reorganization/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 23,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779094638232-___2_KV.jpg",
+    "asset": "/images/uniforms/scene-23.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/0/hero2/backgroundImage"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 26,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777875641454-__3.jpg",
+    "asset": "/images/uniforms/scene-26.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/2/grid/items/2/image",
+      "products/safe-moving/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 27,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778577566841-______4.jpg",
+    "asset": "/images/uniforms/scene-27.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/2/grid/items/3/image"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 29,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779085342383-__.jpg",
+    "asset": "/images/uniforms/scene-29.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/4/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 30,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779085342372-__.jpg",
+    "asset": "/images/uniforms/scene-30.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/5/imageTextGrid/image"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 31,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777887975181-____.jpg",
+    "asset": "/images/uniforms/scene-31.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/6/grid/items/0/image",
+      "pages/rental-management/content/subItem/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 32,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777963824839-____.jpg",
+    "asset": "/images/uniforms/scene-32.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/6/grid/items/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 33,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779089571942-____.jpg",
+    "asset": "/images/uniforms/scene-33.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/6/grid/items/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 34,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779092184702-___2___2.jpg",
+    "asset": "/images/uniforms/scene-34.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/7/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 35,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779093015749-___.jpg",
+    "asset": "/images/uniforms/scene-35.webp",
+    "contexts": [
+      "pages/peace-of-mind/content/general/blocks/8/singleImage/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 36,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777887975169-____.jpg",
+    "asset": "/images/uniforms/scene-36.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 37,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777887975157-____.jpg",
+    "asset": "/images/uniforms/scene-37.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/cases/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 39,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1782903898127-___.jpg",
+    "asset": "/images/uniforms/scene-39.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/2/feature/images/0",
+      "pages/rental-management/content/subItem/serviceIntro/sections/2/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 40,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1782903898127-__.jpg",
+    "asset": "/images/uniforms/scene-40.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/3/feature/images/0",
+      "pages/rental-management/content/subItem/serviceIntro/sections/3/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 41,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1784017754448-____.jpg",
+    "asset": "/images/uniforms/scene-41.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/5/htmlCode/html"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 42,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1784017741781-____.jpg",
+    "asset": "/images/uniforms/scene-42.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/5/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 43,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1784017670735-______.jpg",
+    "asset": "/images/uniforms/scene-43.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/5/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 44,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1784017731219-______.jpg",
+    "asset": "/images/uniforms/scene-44.webp",
+    "contexts": [
+      "pages/rental-management/content/subItem/serviceIntro/sections/5/htmlCode/html"
+    ],
+    "prompt": "Edit original photograph image 1: replace each person's ordinary top with exact supplied Nexdo T-shirts, cream image 2 for woman and dark green image 3 for man. Remove apron/blazer and replace with T-shirt. Preserve original faces, age, hair, poses, hands, all objects and printed text outside clothing, room, lighting, and framing. Exact orange heart 好齡居 chest print and matching back art when visible. Photorealistic, no new people or text outside garment. Output one image.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 45,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777952408121-______.jpg",
+    "asset": "/images/uniforms/scene-45.webp",
+    "contexts": [
+      "pages/home-safety/content/hero/backgroundImage",
+      "pages/home/content/home/blocks/1/services/items/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 46,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777371075792-ChatGPT_Image_2026_4_28____06_00_06.png",
+    "asset": "/images/uniforms/scene-46.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/cases/0/image",
+      "pages/home-safety/content/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 47,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777371085480-ChatGPT_Image_2026_4_28____06_01_46.png",
+    "asset": "/images/uniforms/scene-47.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/cases/1/image",
+      "pages/home-safety/content/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 50,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777431515907-____.png",
+    "asset": "/images/uniforms/scene-50.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/serviceIntro/sections/4/feature/images/2",
+      "pages/home-safety/content/services/1/image",
+      "products/home-inspection/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 51,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777963824813-____.jpg",
+    "asset": "/images/uniforms/scene-51.webp",
+    "contexts": [
+      "pages/about/content/general/blocks/0/hero2/backgroundImage",
+      "pages/home/content/home/blocks/0/hero1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 52,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777881514860-__.jpg",
+    "asset": "/images/uniforms/scene-52.webp",
+    "contexts": [
+      "pages/home/content/home/blocks/1/services/items/2/image",
+      "pages/safe-moving/content/subItem/serviceIntro/sections/0/feature/images/0",
+      "pages/safe-moving/content/subItem/serviceIntro/sections/0/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 53,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778581488504-__1.jpg",
+    "asset": "/images/uniforms/scene-53.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 54,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778581488514-__2.jpg",
+    "asset": "/images/uniforms/scene-54.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 55,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778581488486-__3.jpg",
+    "asset": "/images/uniforms/scene-55.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/cases/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 56,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778577566819-______1.jpg",
+    "asset": "/images/uniforms/scene-56.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/0/feature/images/0",
+      "pages/health-fitness/content/subItem/serviceIntro/sections/0/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 57,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778577566893-______8.jpg",
+    "asset": "/images/uniforms/scene-57.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/0/feature/images/1"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 58,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778579704051-______14.jpg",
+    "asset": "/images/uniforms/scene-58.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/0/feature/images/2"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 59,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778579704062-______13.jpg",
+    "asset": "/images/uniforms/scene-59.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/0/feature/images/3"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 60,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785488128968-_____.png",
+    "asset": "/images/uniforms/scene-60.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/1/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 61,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778577566905-______9.jpg",
+    "asset": "/images/uniforms/scene-61.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/2/grid/items/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 62,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778577566806-______10.jpg",
+    "asset": "/images/uniforms/scene-62.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/2/grid/items/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 64,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777955582773-____.jpg",
+    "asset": "/images/uniforms/scene-64.webp",
+    "contexts": [
+      "pages/health-fitness/content/subItem/serviceIntro/sections/2/grid/items/3/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 65,
+    "source": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop",
+    "asset": "/images/uniforms/scene-65.webp",
+    "contexts": [
+      "pages/hobbystudio/content/general/blocks/0/hero2/backgroundImage",
+      "src/data/pages/hobbystudio.ts",
+      "src/services/mediaService.ts"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 81,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778739109957-__1.jpg",
+    "asset": "/images/uniforms/scene-81.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 82,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778739109976-__2.jpg",
+    "asset": "/images/uniforms/scene-82.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 83,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778739109971-__3.jpg",
+    "asset": "/images/uniforms/scene-83.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/cases/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 84,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778732228398-____2.jpg",
+    "asset": "/images/uniforms/scene-84.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/serviceIntro/sections/0/feature/images/0",
+      "pages/home-dentist/content/subItem/serviceIntro/sections/0/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 85,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778732163862-____4.jpg",
+    "asset": "/images/uniforms/scene-85.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/serviceIntro/sections/1/feature/images/0",
+      "pages/home-dentist/content/subItem/serviceIntro/sections/1/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 86,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778732163872-____2.jpg",
+    "asset": "/images/uniforms/scene-86.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/serviceIntro/sections/2/feature/images/0",
+      "pages/home-dentist/content/subItem/serviceIntro/sections/2/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 89,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778732171346-____.jpg",
+    "asset": "/images/uniforms/scene-89.webp",
+    "contexts": [
+      "pages/home-dentist/content/subItem/serviceIntro/sections/3/grid/items/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 94,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777883547445-__.jpg",
+    "asset": "/images/uniforms/scene-94.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/cases/0/image"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 95,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777881507856-__4.jpg",
+    "asset": "/images/uniforms/scene-95.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/cases/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 96,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777881507849-__3.jpg",
+    "asset": "/images/uniforms/scene-96.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/cases/2/image"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 97,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785472842971-__2.jpg",
+    "asset": "/images/uniforms/scene-97.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/serviceIntro/sections/1/htmlCode/html"
+    ],
+    "prompt": "Correct ONLY the cream T-shirt artwork on the woman at left in image 1. She faces away from the camera: REMOVE small chest logo mistakenly printed on her back. Replace it with the large centered orange heart mascot with open arms and legs and the slogan 好好生活，好好安居。 exactly as the BACK of cream reference shirt in image 2. Keep man's dark green T-shirt design, all people's faces and positions, furniture, cartons, lighting and framing unchanged. Also darken the man's hair to naturally groomed dark-brown with subtle scattered grey, approximately age65. Photorealistic edit, no other change.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ],
+    "refinementPrompt": "Correct ONLY the cream T-shirt artwork on the woman at left in image 1. She faces away from the camera: REMOVE small chest logo mistakenly printed on her back. Replace it with the large centered orange heart mascot with open arms and legs and the slogan 好好生活，好好安居。 exactly as the BACK of cream reference shirt in image 2. Keep man's dark green T-shirt design, all people's faces and positions, furniture, cartons, lighting and framing unchanged. Also darken the man's hair to naturally groomed dark-brown with subtle scattered grey, approximately age65. Photorealistic edit, no other change."
+  },
+  {
+    "id": 98,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785481418186-1____.jpg",
+    "asset": "/images/uniforms/scene-98.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 99,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785481418154-2____.jpg",
+    "asset": "/images/uniforms/scene-99.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 100,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785481418166-3____.jpg",
+    "asset": "/images/uniforms/scene-100.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 101,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785481418177-4____.jpg",
+    "asset": "/images/uniforms/scene-101.webp",
+    "contexts": [
+      "pages/safe-moving/content/subItem/serviceIntro/sections/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 102,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778037398378-____.jpg",
+    "asset": "/images/uniforms/scene-102.webp",
+    "contexts": [
+      "articles/senior-finance-and-subsidies-guide/cover_image",
+      "pages/about/content/general/blocks/1/imageTextGrid/image",
+      "pages/about/content/general/blocks/3/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 103,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1786357631493-____.jpg",
+    "asset": "/images/uniforms/scene-103.webp",
+    "contexts": [
+      "pages/about/content/general/blocks/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 104,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1786357631450-____.jpg",
+    "asset": "/images/uniforms/scene-104.webp",
+    "contexts": [
+      "pages/about/content/general/blocks/2/htmlCode/html"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 113,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777542203703-__-6.jpg",
+    "asset": "/images/uniforms/scene-113.webp",
+    "contexts": [
+      "pages/regular-cleaning/content/subItem/cases/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 115,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777542722160-____.jpg",
+    "asset": "/images/uniforms/scene-115.webp",
+    "contexts": [
+      "pages/cleaning/content/cases/2/image",
+      "pages/regular-cleaning/content/subItem/cases/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 116,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777542180641-__-1.jpg",
+    "asset": "/images/uniforms/scene-116.webp",
+    "contexts": [
+      "pages/regular-cleaning/content/subItem/serviceIntro/sections/0/feature/images/0"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 118,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777542180652-__-3.jpg",
+    "asset": "/images/uniforms/scene-118.webp",
+    "contexts": [
+      "pages/regular-cleaning/content/subItem/serviceIntro/sections/0/feature/images/2"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 119,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777542197208-__-4.jpg",
+    "asset": "/images/uniforms/scene-119.webp",
+    "contexts": [
+      "pages/cleaning/content/services/1/image",
+      "pages/regular-cleaning/content/subItem/serviceIntro/sections/0/feature/images/3",
+      "products/regular-cleaning/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 128,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777451321764-__.png",
+    "asset": "/images/uniforms/scene-128.webp",
+    "contexts": [
+      "pages/home-inspection/content/subItem/serviceIntro/sections/0/feature/images/0",
+      "pages/home-inspection/content/subItem/serviceIntro/sections/0/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 140,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777451363749-____.png",
+    "asset": "/images/uniforms/scene-140.webp",
+    "contexts": [
+      "pages/home-inspection/content/subItem/serviceIntro/sections/1/grid/items/11/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 147,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777962604746-__.jpg",
+    "asset": "/images/uniforms/scene-147.webp",
+    "contexts": [
+      "pages/consultant/content/general/blocks/1/grid/items/0/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 148,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777962604757-__.jpg",
+    "asset": "/images/uniforms/scene-148.webp",
+    "contexts": [
+      "pages/consultant/content/general/blocks/1/grid/items/1/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 149,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778753865903-__2_POLO_.jpg",
+    "asset": "/images/uniforms/scene-149.webp",
+    "contexts": [
+      "pages/consultant/content/general/blocks/1/grid/items/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 159,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777371677275-____.png",
+    "asset": "/images/uniforms/scene-159.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/serviceIntro/sections/2/grid/items/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 164,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777369923725-__.png",
+    "asset": "/images/uniforms/scene-164.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/serviceIntro/sections/4/feature/images/0",
+      "pages/accessible-space/content/subItem/serviceIntro/sections/4/imageTextGrid/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 165,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777369911365-___.png",
+    "asset": "/images/uniforms/scene-165.webp",
+    "contexts": [
+      "pages/accessible-space/content/subItem/serviceIntro/sections/4/feature/images/1"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 174,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1784175896590-_______3.jpg",
+    "asset": "/images/uniforms/scene-174.webp",
+    "contexts": [
+      "pages/light-renovation-works/content/general/blocks/1/imageCarousel/items/2/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 207,
+    "source": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop",
+    "asset": "/images/uniforms/scene-207.webp",
+    "contexts": [
+      "products/safety-assessment/image",
+      "products/short-term-care/image",
+      "src/data/pages/home-dentist.ts",
+      "src/data/pages/home-reorganization.ts",
+      "src/data/pages/regular-cleaning.ts",
+      "src/data/pages/short-term-care.ts",
+      "src/data/products/safety-assessment.ts",
+      "src/data/products/short-term-care.ts",
+      "src/pages/Blog.tsx",
+      "src/pages/BlogPostPage.tsx",
+      "src/pages/SubItemPage.tsx",
+      "src/services/mediaService.ts"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 213,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777890156193-____1.jpg",
+    "asset": "/images/uniforms/scene-213.webp",
+    "contexts": [
+      "products/rental-management/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 214,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778732163837-____3.jpg",
+    "asset": "/images/uniforms/scene-214.webp",
+    "contexts": [
+      "products/home-dentist/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 215,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1778579704037-______12.jpg",
+    "asset": "/images/uniforms/scene-215.webp",
+    "contexts": [
+      "products/health-fitness/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 216,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1777881514850-__.jpg",
+    "asset": "/images/uniforms/scene-216.webp",
+    "contexts": [
+      "products/home-reorganization/image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 334,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1782701984530-2026___.jpg",
+    "asset": "/images/uniforms/scene-334.webp",
+    "contexts": [
+      "articles/assistive-device-2026/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 335,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1779092174382-___2___1.jpg",
+    "asset": "/images/uniforms/scene-335.webp",
+    "contexts": [
+      "articles/peace-of-mind-card-story/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 337,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1783480067442-____.jpg",
+    "asset": "/images/uniforms/scene-337.webp",
+    "contexts": [
+      "articles/rent-out-tips/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 338,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785295481473-20260722_____.jpg",
+    "asset": "/images/uniforms/scene-338.webp",
+    "contexts": [
+      "articles/home-cleaning-tips/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 339,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785295003116-20260729_____.jpg",
+    "asset": "/images/uniforms/scene-339.webp",
+    "contexts": [
+      "articles/death-cleaning/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 340,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785294882225-20260715_____2.jpg",
+    "asset": "/images/uniforms/scene-340.webp",
+    "contexts": [
+      "articles/123/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 342,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785825724018-20260804_____.jpg",
+    "asset": "/images/uniforms/scene-342.webp",
+    "contexts": [
+      "articles/elderly-moving-home/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 343,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1783051140768-20260703_____.jpg",
+    "asset": "/images/uniforms/scene-343.webp",
+    "contexts": [
+      "articles/health-checkup/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 344,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1786342805794-20260810___3.0.jpg",
+    "asset": "/images/uniforms/scene-344.webp",
+    "contexts": [
+      "articles/long-term-care-guide/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 345,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1787112026991-20260819______.jpg",
+    "asset": "/images/uniforms/scene-345.webp",
+    "contexts": [
+      "articles/elderly-living-alone-support/cover_image"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 346,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283645-s18.jpg",
+    "asset": "/images/uniforms/scene-346.webp",
+    "contexts": [
+      "articles/elderly-care-starting/cover_image",
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Use case: identity-preserve clothing edit for Nexdo website. Input 1 is original photograph; input 2 is exact cream Nexdo T-shirt reference; input 3 is exact dark-green Nexdo T-shirt reference. Replace ordinary visible tops of every person with these specific T-shirts: staff dark green, customers cream. No generic polos/aprons/blazers. Match the supplied orange heart mascot, traditional Chinese 好齡居 print, and correct chest placement; use exact large back mascot and slogan when back visible. Preserve all medically necessary PPE (gowns/gloves/masks/caps), and only change ordinary clothes visible outside PPE. Senior customers should look like well-groomed Taiwanese adults about 55–70 years old with cared-for black/dark-brown hair or a little grey, NEVER fully white hair. Keep natural mature facial detail and original identity, no artificial smooth skin. Keep younger staff's age and faces intact. Preserve poses, hands, pants, room, objects, tools, existing poster text and logos, framed-photo contents, lighting and original composition/aspect ratio. No added people, no new text outside garments. Output one photorealistic edited photograph.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 349,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283616-s2.jpg",
+    "asset": "/images/uniforms/scene-349.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 350,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283627-s16.jpg",
+    "asset": "/images/uniforms/scene-350.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 351,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283636-s17.jpg",
+    "asset": "/images/uniforms/scene-351.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 354,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283685-s22.jpg",
+    "asset": "/images/uniforms/scene-354.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 358,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283725-s4.jpg",
+    "asset": "/images/uniforms/scene-358.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 360,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283745-s6.jpg",
+    "asset": "/images/uniforms/scene-360.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 361,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283754-s7.jpg",
+    "asset": "/images/uniforms/scene-361.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 363,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283772-s10.jpg",
+    "asset": "/images/uniforms/scene-363.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 364,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283781-s11.jpg",
+    "asset": "/images/uniforms/scene-364.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 365,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283790-s12.jpg",
+    "asset": "/images/uniforms/scene-365.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 367,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283808-s14.jpg",
+    "asset": "/images/uniforms/scene-367.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 368,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841283817-s15.jpg",
+    "asset": "/images/uniforms/scene-368.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  },
+  {
+    "id": 369,
+    "source": "https://dmuqabrxzoctalflljcz.supabase.co/storage/v1/object/public/media/uploads/1785841652203-s19.jpg",
+    "asset": "/images/uniforms/scene-369.webp",
+    "contexts": [
+      "public/minigame/assets/index-DVvrLl5-.js"
+    ],
+    "prompt": "Edit target photograph image 1 for Nexdo home-safety minigame. Change the visible ordinary shirt/top on the customer to the exact cream Nexdo T-shirt in image 2, including exact orange heart mascot 好齡居 chest mark and back design if facing away. Customer should look approximately 55–70, with neat black/dark brown or lightly grey hair, never full white hair. Keep natural mature face and body. Preserve original body posture, hands, bare feet/slippers, furniture, clutter, obstacles, room, dim lighting, framing and aspect ratio. Do not repair, tidy or alter any hazards shown: these photos illustrate safety problems, so exactly preserve each scenario. Do not add staff. Clothing style reference image 3 dark green is an allowed alternative if better for contrast. No new text outside clothing.",
+    "tool": "Built-in imagegen",
+    "references": [
+      "Nexdo cream T-shirt mockup",
+      "Nexdo dark-green T-shirt mockup"
+    ]
+  }
+]

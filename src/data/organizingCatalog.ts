@@ -119,14 +119,14 @@ export const organizingPages: Page[] = [
     "content": {
       "hero": {
         "title": "老前整理",
-        "description": "在人生的重要時刻，陪您整理空間、保存回憶，安排下一段生活",
-        "backgroundImage": "",
         "mainButton": {
           "text": "安心顧問諮詢",
           "type": "URL",
           "value": "/consultant",
           "isVisible": true
         },
+        "description": "在人生的重要時刻，陪您整理空間、保存回憶，安排下一段生活",
+        "backgroundImage": "",
         "secondaryButton": {
           "text": "",
           "type": "URL",
@@ -134,15 +134,25 @@ export const organizingPages: Page[] = [
           "isVisible": false
         }
       },
-      "services": [],
       "cases": [],
-      "showForm": false,
       "subItem": {
-        "productId": "organizing",
-        "linkedProductId": "organizing",
-        "hideProductMainImage": true,
+        "faqs": [
+          {
+            "id": "organizing-price",
+            "answer": "退休整理、老前整理、遺物整理與搬家整理，都是同一項服務，使用相同計價方式。實際費用依整理範圍、物品量、人力與時程評估，先確認報價再安排。",
+            "question": "不同整理目標，收費方式不同嗎？"
+          }
+        ],
+        "cases": [],
+        "button": {
+          "text": "Line 報價預約",
+          "type": "URL",
+          "value": "https://line.me/R/ti/p/@021souxl",
+          "isVisible": true
+        },
+        "partners": [],
         "mainTitle": "老前整理",
-        "coreServicesSectionTitle": "從了解需求，到一起完成",
+        "productId": "organizing",
         "coreServices": [
           {
             "title": "01 評估",
@@ -161,49 +171,29 @@ export const organizingPages: Page[] = [
             "content": "一起核對整理結果與物品紀錄，討論後續安排。"
           }
         ],
-        "partners": [],
-        "cases": [],
-        "faqs": [
-          {
-            "id": "organizing-0",
-            "question": "需要家人陪同嗎？",
-            "answer": "依您的意願安排。涉及共同物品時，建議先與家人確認，所有處置都會取得本人同意。"
-          },
-          {
-            "id": "organizing-1",
-            "question": "需要多久？",
-            "answer": "依物品數量、空間與您希望的節奏評估。可以分階段進行，第一次到府時一起討論時程。"
-          },
-          {
-            "id": "organizing-2",
-            "question": "物品怎麼處理？",
-            "answer": "先由您決定保留、傳承、贈送或移出。未確認的物品會另外保留，不擅自丟棄。"
-          }
-        ],
-        "additionalServices": [
-          "vacant-property",
-          "removal"
-        ],
-        "button": {
-          "text": "Line 報價預約",
-          "type": "URL",
-          "value": "https://line.me/R/ti/p/@021souxl",
-          "isVisible": true
-        },
         "serviceIntro": {
           "sections": [
             {
               "id": "organizing-intro",
-              "type": "TEXT",
               "text": {
                 "content": "## 可陪您做的事\n\n- 物品分為「留／傳／贈／離」四類\n\n- 重要文件整理，方便日後尋找\n\n- 紀念物拍照建檔，留下您的故事\n\n- 可銜接整戶清空與清運\n\n## 依您的節奏安排\n\n**陪伴型**：慢慢做，與家人一起討論物品和居住安排。\n\n**效率型**：您已決定範圍與物品去留，由我們依約定時程執行。\n\n先評估再報價，第一次到府免費。後續服務範圍與費用，經您確認後才安排。",
-                "alignment": "left",
-                "fontSize": "body"
-              }
+                "fontSize": "body",
+                "alignment": "left"
+              },
+              "type": "TEXT"
             }
           ]
-        }
-      }
+        },
+        "linkedProductId": "organizing",
+        "additionalServices": [
+          "vacant-property",
+          "removal"
+        ],
+        "hideProductMainImage": true,
+        "coreServicesSectionTitle": "從了解需求，到一起完成"
+      },
+      "services": [],
+      "showForm": false
     }
   },
   {

@@ -1,22 +1,26 @@
-# 熟齡人物照片調整
+# 官網制服與整理服務更新
 
-使用內建 imagegen 編輯。人物設定：55–70 歲，黑髮、深咖啡髮或少量灰髮，儀容整潔，保留自然熟齡感與好齡居制服。
+截至 2026-09-14，本次盤點的 106 個人物圖片網址已對應到本地 WebP，涵蓋服務頁、產品、已發布文章及 minigame。重複使用同一來源的地方會一起更新，CMS 原圖保留。
 
-- 網站資產：`public/images/uniforms/scene-27.webp`
-- 網站資產：`public/images/uniforms/scene-41.webp`
-- 網站資產：`public/images/uniforms/scene-94.webp`
-- 網站資產：`public/images/uniforms/scene-96.webp`
+使用內建 imagegen 編輯，依附件奶油白與深綠好齡居 T 恤調整一般上衣；熟齡受眾以 55–70 歲、黑髮／深咖啡髮或少量灰髮為方向，保留自然成熟感。必要防護用品、沐浴毛巾及安全檢測的障礙物與動作情境保留。未使用的素材庫、影片內畫面與照片中的相框內容不在本次人物制服替換範圍。
 
-## 編輯提示
+資產與來源逐項列於 `docs/uniform-image-edits.json`，對應表位於 `src/data/brandImageOverrides.json`。替換適用於 CMS JSON、Markdown、HTML、快取與預設內容；minigame 獨立 bundle 的圖片也已替換並更新檔名以刷新快取。
 
-Edit this Nexdo website photograph. Recast ONLY the senior customer(s) as well-groomed Taiwanese adults aged approximately 55–70, independent and image-conscious. Give them naturally styled dark brown or black hair with at most subtle scattered grey, never a full head of white/silver hair. Natural mature faces with believable fine lines, not 30-year-olds, no beauty-filter skin. Keep their recognizable facial structure and expression. Preserve younger staff entirely. Preserve exact cream and dark green Nexdo T-shirt artwork, body poses, hands, objects, room, lighting and image composition. Professional warm lifestyle photograph. No new text.
+## 整理服務資料庫
 
-本次完成首頁主要熟齡情境 4 張；全站其他制服圖片替換尚未全部完成。
+`202609140002_unified_organizing.sql` 已在 Supabase 執行並透過公開讀取驗證：
 
-## 本批網站整合
+- `organizing` 產品與服務頁已新增並公開。
+- 三個舊階段頁面停止公開，保留產品與歷史紀錄。
+- 三個舊整理產品的報價說明統一為「依整理範圍評估報價」。
+- 空屋整理、清運的相關服務指向 `organizing`。
+- 固定價格商品與其他商品內容比對未變更。
+- 產品保留可公開讀取的來源圖片 URL，新版前台自動使用制服新版圖片，避免部署前出現破圖。
 
-- 首頁八張服務卡統一版型並補齊圖片。
-- 老前整理單一入口，兩題需求選擇及可複製摘要；舊階段網址導向同一服務頁。
-- minigame 的回首頁 Logo 與開啟路由。
-- 熟齡照片 4 張已完成；全站制服盤點仍有其餘圖片待處理。
-- `202609140002_unified_organizing.sql` 尚未在 Supabase 執行，合併上線前須完成此資料遷移。
+舊整理網址由前台導向單一「老前整理」，並預選目標；兩題選擇會進入可複製需求摘要。
+
+## 驗證
+
+圖片逐批目視檢查，修正背面圖案位置；主頁八項服務、整理目標／目的與摘要、舊網址轉向、兩個 minigame 的首頁連結及初始互動均已檢查。TypeScript、production build、106 組圖片映射及 13 張 minigame 圖片路徑檢查通過。建置僅有既有的大型 bundle 與混合 import 提示。
+
+前端更新由 PR 合併部署後上線；資料庫遷移已完成，不需要再次手動新增整理產品。
