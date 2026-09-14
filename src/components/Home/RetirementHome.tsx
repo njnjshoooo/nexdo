@@ -3,9 +3,8 @@ import { productService } from '../../services/productService';
 import type { Product } from '../../types/admin';
 import { Helmet } from 'react-helmet-async';
 import { pageService } from '../../services/pageService';
-import { ArrowRight, House, ShieldCheck, Calculator, MoveRight, Leaf, HeartHandshake, KeyRound, Armchair, Sparkles } from 'lucide-react';
+import { ArrowRight, House, ShieldCheck, Calculator, Leaf, HeartHandshake, KeyRound, Armchair, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { organizingProducts } from '../../data/organizingCatalog';
 import { HAOHAO_FAQ } from '../../data/haohaoFAQ';
 
 export function RetirementHero() {
@@ -33,40 +32,43 @@ export function HomeTools() {
   return <section className="retirement-section tools-section"><div className="retirement-container">
     <div className="section-heading tools-heading"><img src="/images/mascot/haohao-wave-3.png" alt="好好陪您了解居家需求" width="80" height="80" /><p className="eyebrow">先了解，再決定</p><h2>動手看看，先了解您的家</h2><p>不用急著做決定。兩個小工具，幫您找到與顧問聊聊的起點。</p></div>
     <div className="tools-grid">
-      <a className="tool-card" href="https://www.nexdo.tw/minigame/#/safety"><ShieldCheck size={40} strokeWidth={1.3} /><span className="eyebrow">01 ／ 居住安全</span><h3>一分鐘居家安全檢測</h3><p>從每天走的動線、浴室到照明，看看哪些地方值得留意。將觀察帶給顧問，一起討論改善順序。</p><span className="card-link">開始檢測 <ArrowRight size={20} /></span></a>
-      <a className="tool-card" href="https://www.nexdo.tw/minigame/#/relocation"><Calculator size={40} strokeWidth={1.3} /><span className="eyebrow">02 ／ 房屋出租</span><h3>代租代管租金試算</h3><p>試著了解房屋出租的收支安排，為下一步討論做準備。試算僅供參考，實際租金依屋況與出租條件評估。</p><span className="card-link">開始試算 <ArrowRight size={20} /></span></a>
+      <a className="tool-card" href="/minigame/#/safety"><ShieldCheck size={40} strokeWidth={1.3} /><span className="eyebrow">01 ／ 居住安全</span><h3>一分鐘居家安全檢測</h3><p>從每天走的動線、浴室到照明，看看哪些地方值得留意。將觀察帶給顧問，一起討論改善順序。</p><span className="card-link">開始檢測 <ArrowRight size={20} /></span></a>
+      <a className="tool-card" href="/minigame/#/relocation"><Calculator size={40} strokeWidth={1.3} /><span className="eyebrow">02 ／ 房屋出租</span><h3>代租代管租金試算</h3><p>試著了解房屋出租的收支安排，為下一步討論做準備。試算僅供參考，實際租金依屋況與出租條件評估。</p><span className="card-link">開始試算 <ArrowRight size={20} /></span></a>
     </div>
   </div></section>;
 }
 
-export function OrganizingSection({ standalone = false }: { standalone?: boolean }) {
-  return <section id="organizing" className={`retirement-section organizing-section ${standalone ? 'standalone-section' : ''}`}><div className="retirement-container">
-    <div className="section-heading"><p className="eyebrow">老前整理</p>{standalone ? <h1>老前整理，從您希望的節奏開始</h1> : <h2>老前整理，從您希望的節奏開始</h2>}<p>留下重要的，安排接下來的生活。無論是為自己，或與家人一起，都可以慢慢來。</p></div>
-    <div className="organizing-grid">{organizingProducts.slice(0, 3).map((p, i) => <Link key={p.id} to={`/services/${p.id}`} className="organizing-card"><span className="service-number">0{i + 1}</span><h3>{p.name}</h3><p>{p.description}。先與安心顧問確認想整理的範圍，再依您的步調安排。</p><p className="service-price">{p.externalLinkConfig?.priceText}</p><span className="card-link">了解服務 <MoveRight size={22} /></span></Link>)}</div>
-    <div className="pace-note"><div><strong>陪伴型</strong><span>慢慢做，家人一起</span></div><div><strong>效率型</strong><span>您已決定，我們協助執行</span></div><p>先評估再報價，第一次到府免費</p></div>
-    {standalone && <Link to="/consultant" className="brand-button">安心顧問諮詢 <ArrowRight size={20} /></Link>}
-  </div></section>;
+export function OrganizingSection() {
+ const moments = [
+  ['退休，迎接新的日常', '把工作多年的生活節奏放慢，重新安排喜歡的活動，也讓常用物品更順手。'],
+  ['人生下半場，回看一路珍藏', '60 歲前後，給自己一段時間，回看生活軌跡，親手選擇想留下與傳承的物品。'],
+  ['家人離世，讓回憶好好留下', '不急著告別每一件物品。陪家人一起整理，保存與他有關的珍貴回憶。'],
+ ];
+ return <section id="organizing" className="retirement-section organizing-section"><div className="retirement-container">
+  <div className="organizing-story"><div className="section-heading"><p className="eyebrow">老前整理 ・ 一項服務，不同人生時刻</p><h2>留下重要的，<br />為下一段生活留出空間。</h2><p>人的一生，在重要時刻總需要重新整理空間。退休、新生活的開始，或與家人一起整理回憶——起點不同，我們都陪您慢慢安排。</p></div><img src="/images/uniforms/scene-94.webp" alt="好齡居陪長輩整理照片、保存珍貴回憶，情境示意" loading="lazy" /></div>
+  <div className="organizing-grid">{moments.map(([title,text],i)=><article className="organizing-card" key={title}><span className="service-number">0{i+1}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+  <div className="organizing-unified-cta"><div><strong>同一項整理服務，相同計價方式</strong><p>退休整理、老前整理、遺物整理或搬家整理，依實際範圍評估報價。先聊目標，再一起確認安排。</p></div><Link to="/services/organizing" className="brand-button">了解老前整理 <ArrowRight size={20} /></Link></div>
+ </div></section>;
 }
 
 export function ServiceDirectory({ cmsItems = [] }: { cmsItems?: {pageId?: string; title?: string; description?: string; image?: string}[] }) {
  const categories = [
-  { title:'居住安全', to:'/home-safety', icon:ShieldCheck, text:'先了解走道、浴室與日常使用情況。依您的習慣討論扶手、照明與居家改善的順序。' },
-  { title:'居家裝潢', to:'/renovation', icon:Armchair, text:'從現有空間開始，評估修繕與配置需求。先確認範圍與預算，再安排適合的改善方式。' },
-  { title:'收納清潔', to:'/cleaning', icon:Sparkles, text:'從常用的物品與空間著手，整理出方便取用的日常。也可依家庭需求安排清潔服務。' },
-  { title:'樂齡健康', to:'/services/health', icon:HeartHandshake, text:'了解退休後的生活照顧與活動需求。由顧問介紹合適服務，醫療問題交由專業人員判斷。' },
-  { title:'房屋出租', to:'/services/rental', pageId:'rent-and-move', icon:KeyRound, text:'有閒置住宅，可以先評估屋況與出租條件。從空屋整理到代租代管，分階段討論安排。' },
-  { title:'安心顧問諮詢', to:'/consultant', icon:Leaf, text:'還不確定從哪裡開始，也可以先聊聊。顧問會聽您說明需求，再介紹合適的服務。' },
+  { image:'/images/uniforms/scene-41.webp', title:'居住安全', to:'/home-safety', icon:ShieldCheck, text:'先了解走道、浴室與日常使用情況。依您的習慣討論扶手、照明與居家改善的順序。' },
+  { image:'/images/services/renovation.webp', title:'居家裝潢', to:'/renovation', icon:Armchair, text:'從現有空間開始，評估修繕與配置需求。先確認範圍與預算，再安排適合的改善方式。' },
+  { image:'/images/uniforms/scene-98.webp', title:'收納清潔', to:'/cleaning', icon:Sparkles, text:'從常用的物品與空間著手，整理出方便取用的日常。也可依家庭需求安排清潔服務。' },
+  { image:'/images/uniforms/scene-27.webp', title:'樂齡健康', to:'/services/health', icon:HeartHandshake, text:'了解退休後的生活照顧與活動需求。由顧問介紹合適服務，醫療問題交由專業人員判斷。' },
+  { image:'/images/services/rental.webp', title:'房屋出租', to:'/services/rental', pageId:'rent-and-move', icon:KeyRound, text:'有閒置住宅，可以先評估屋況與出租條件。從空屋整理到代租代管，分階段討論安排。' },
+  { image:'/images/uniforms/scene-96.webp', title:'安心顧問諮詢', to:'/consultant', icon:Leaf, text:'還不確定從哪裡開始，也可以先聊聊。顧問會聽您說明需求，再介紹合適的服務。' },
  ];
  const entries = categories.map(category => {
    const item = cmsItems.find(item => item.pageId === (category.pageId || category.to.slice(1)));
-   return { ...category, title: item?.title || category.title, text: item?.description || category.text, image: item?.image };
+   return { ...category, title: item?.title || category.title, text: item?.description || category.text, image: category.image };
  });
- for (const item of cmsItems) {
-   if (!item.pageId || entries.some(c => c.to === '/' + item.pageId)) continue;
-   const page = pageService.getById(item.pageId);
-   if (page?.isPublished) entries.push({ title: item.title || page.title, to: '/' + page.slug, icon:House, text:item.description || '先與安心顧問聊聊您的需求。確認服務範圍與費用後，再一起安排。', image:item.image });
- }
- return <section id="services" className="retirement-section"><div className="retirement-container"><div className="section-heading"><p className="eyebrow">依需求，找到合適的協助</p><h2>把生活的每一件事，慢慢安排好</h2><p>所有服務都從安心顧問了解需求開始，您可以先看，再聊聊。</p></div><div className="service-directory">{entries.map(c=><Link key={c.to} to={c.to}>{c.image ? <img className="directory-image" src={c.image} alt="" loading="lazy" /> : <c.icon size={32} strokeWidth={1.4}/>}<h3>{c.title}</h3><p>{c.text}</p><span className="card-link">查看服務 <ArrowRight size={20}/></span></Link>)}</div><div className="rental-extension">{organizingProducts.slice(3).map(p=><Link to={`/services/${p.id}`} key={p.id}><span><strong>{p.name}</strong><span>{p.description}。先確認現場條件，選擇需要的服務範圍。</span></span><ArrowRight size={24}/></Link>)}</div></div></section>;
+ entries.push(
+   { title:'空屋整理', to:'/services/vacant-property', icon:House, text:'為空下來的家安排下一步。依需求確認整理、修繕與清潔範圍，讓出租或重新入住更有方向。', image:'/images/services/vacant.webp' },
+   { title:'清運', to:'/services/removal', icon:House, text:'把已決定不再保留的物品妥善處理。先確認物品、搬運動線與車次，說明費用後再安排。', image:'/images/uniforms/scene-100.webp' },
+ );
+ return <section id="services" className="retirement-section"><div className="retirement-container"><div className="section-heading"><p className="eyebrow">依需求，找到合適的協助</p><h2>把生活的每一件事，慢慢安排好</h2><p>所有服務都從安心顧問了解需求開始，您可以先看，再聊聊。</p></div><div className="service-directory">{entries.map(c=><Link key={c.to} to={c.to}>{c.image ? <img className="directory-image" src={c.image} alt="" loading="lazy" /> : <c.icon size={32} strokeWidth={1.4}/>}<h3>{c.title}</h3><p>{c.text}</p><span className="card-link">查看服務 <ArrowRight size={20}/></span></Link>)}</div></div></section>;
 }
 
 export function HomeFAQ() {

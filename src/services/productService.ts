@@ -1,3 +1,4 @@
+import { applyBrandImages } from '../lib/brandImages';
 import { organizingProducts } from '../data/organizingCatalog';
 import { Product } from '../types/admin';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,7 +29,7 @@ class ProductService {
       return val;
     };
 
-    return {
+    return applyBrandImages({
       id: row.id,
       name: row.name,
       category: row.category,
@@ -48,7 +49,7 @@ class ProductService {
       externalLinkConfig: getJson(row.external_link_config, undefined),
       createdAt: row.created_at || row.createdAt,
       updatedAt: row.updated_at || row.updatedAt
-    };
+    });
   }
 
   private toRow(product: Partial<Product>): any {
@@ -80,7 +81,7 @@ class ProductService {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          this.products = JSON.parse(stored);
+          this.products = applyBrandImages(JSON.parse(stored));
         } catch (e) {
           console.error('Failed to parse cached products', e);
           this.products = [];

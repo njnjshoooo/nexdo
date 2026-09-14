@@ -1,3 +1,4 @@
+import { applyBrandImages } from '../lib/brandImages';
 import { Article } from '../types/article';
 import { v4 as uuidv4 } from 'uuid';
 import { ALL_ARTICLES } from '../data/articles';
@@ -18,7 +19,7 @@ class ArticleService {
   }
 
   private mapRow(row: any): Article {
-    return {
+    return applyBrandImages({
       id: row.id,
       slug: row.slug,
       title: row.title,
@@ -34,7 +35,7 @@ class ArticleService {
       isRecommended: !!row.is_recommended,
       publishedAt: row.published_at,
       updatedAt: row.updated_at,
-    };
+    });
   }
 
   private toRow(a: Partial<Article>): any {
@@ -63,7 +64,7 @@ class ArticleService {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         try {
-          this.articles = JSON.parse(cached).map((a: Article) => ({
+          this.articles = applyBrandImages(JSON.parse(cached)).map((a: Article) => ({
             ...a,
             content: parseContentToMarkdown(a.content)
           }));

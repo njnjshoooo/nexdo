@@ -3,19 +3,19 @@ import type { Page, Product } from '../types/admin';
 export const LINE_QUOTE_URL = 'https://line.me/R/ti/p/@021souxl';
 export const organizingProducts: Product[] = [
   {
-    "id": "life-organizing",
-    "name": "生前整理",
+    "id": "organizing",
+    "name": "老前整理",
     "category": "老前整理",
-    "description": "在還能自主的時候，親手選擇留下什麼",
+    "description": "在人生的重要時刻，陪您整理空間、保存回憶，安排下一段生活",
     "orderMode": "EXTERNAL_LINK",
-    "orderCode": "LIFE",
+    "orderCode": "ORGA",
     "fixedConfig": {
       "price": 0,
       "unit": "次",
       "buttonText": ""
     },
     "externalLinkConfig": {
-      "priceText": "NT$ 8,000 – 30,000（依範圍）",
+      "priceText": "依整理範圍評估報價",
       "buttonText": "Line 報價預約",
       "url": "https://line.me/R/ti/p/@021souxl"
     },
@@ -34,75 +34,8 @@ export const organizingProducts: Product[] = [
       }
     ],
     "createdAt": "2026-09-14T00:00:00.000Z",
-    "updatedAt": "2026-09-14T00:00:00.000Z"
-  },
-  {
-    "id": "retirement-organizing",
-    "name": "退休整理",
-    "category": "老前整理",
-    "description": "退休後重新配置日常，讓每天更順",
-    "orderMode": "EXTERNAL_LINK",
-    "orderCode": "RETI",
-    "fixedConfig": {
-      "price": 0,
-      "unit": "次",
-      "buttonText": ""
-    },
-    "externalLinkConfig": {
-      "priceText": "NT$ 6,000 – 25,000",
-      "buttonText": "Line 報價預約",
-      "url": "https://line.me/R/ti/p/@021souxl"
-    },
-    "checklist": [
-      {
-        "text": "走道與收納重新配置"
-      },
-      {
-        "text": "衣物與日常用品分類"
-      },
-      {
-        "text": "書房、廚房或陽台專項整理"
-      },
-      {
-        "text": "扶手與燈光改善建議，可搭配居家修繕"
-      }
-    ],
-    "createdAt": "2026-09-14T00:00:00.000Z",
-    "updatedAt": "2026-09-14T00:00:00.000Z"
-  },
-  {
-    "id": "estate-organizing",
-    "name": "遺物整理",
-    "category": "老前整理",
-    "description": "與家人一起，慢慢整理",
-    "orderMode": "EXTERNAL_LINK",
-    "orderCode": "ESTA",
-    "fixedConfig": {
-      "price": 0,
-      "unit": "次",
-      "buttonText": ""
-    },
-    "externalLinkConfig": {
-      "priceText": "NT$ 15,000 – 80,000（依範圍與時程）",
-      "buttonText": "Line 報價預約",
-      "url": "https://line.me/R/ti/p/@021souxl"
-    },
-    "checklist": [
-      {
-        "text": "陪家人共同分類，不急著做決定"
-      },
-      {
-        "text": "協助尋找重要物品"
-      },
-      {
-        "text": "紀念物挑選、拍照與建檔"
-      },
-      {
-        "text": "安排清運及後續空間規劃"
-      }
-    ],
-    "createdAt": "2026-09-14T00:00:00.000Z",
-    "updatedAt": "2026-09-14T00:00:00.000Z"
+    "updatedAt": "2026-09-14T00:00:00.000Z",
+    "image": "/images/uniforms/scene-94.webp"
   },
   {
     "id": "vacant-property",
@@ -176,17 +109,17 @@ export const organizingProducts: Product[] = [
 
 export const organizingPages: Page[] = [
   {
-    "id": "life-organizing",
-    "slug": "services/life-organizing",
-    "title": "生前整理",
+    "id": "organizing",
+    "slug": "services/organizing",
+    "title": "老前整理",
     "template": "SUB_ITEM",
     "isPublished": true,
     "createdAt": "2026-09-14T00:00:00.000Z",
     "updatedAt": "2026-09-14T00:00:00.000Z",
     "content": {
       "hero": {
-        "title": "生前整理",
-        "description": "在還能自主的時候，親手選擇留下什麼",
+        "title": "老前整理",
+        "description": "在人生的重要時刻，陪您整理空間、保存回憶，安排下一段生活",
         "backgroundImage": "",
         "mainButton": {
           "text": "安心顧問諮詢",
@@ -205,10 +138,10 @@ export const organizingPages: Page[] = [
       "cases": [],
       "showForm": false,
       "subItem": {
-        "productId": "life-organizing",
-        "linkedProductId": "life-organizing",
+        "productId": "organizing",
+        "linkedProductId": "organizing",
         "hideProductMainImage": true,
-        "mainTitle": "在還能自主的時候，親手選擇留下什麼",
+        "mainTitle": "老前整理",
         "coreServicesSectionTitle": "從了解需求，到一起完成",
         "coreServices": [
           {
@@ -232,17 +165,17 @@ export const organizingPages: Page[] = [
         "cases": [],
         "faqs": [
           {
-            "id": "life-organizing-0",
+            "id": "organizing-0",
             "question": "需要家人陪同嗎？",
             "answer": "依您的意願安排。涉及共同物品時，建議先與家人確認，所有處置都會取得本人同意。"
           },
           {
-            "id": "life-organizing-1",
+            "id": "organizing-1",
             "question": "需要多久？",
             "answer": "依物品數量、空間與您希望的節奏評估。可以分階段進行，第一次到府時一起討論時程。"
           },
           {
-            "id": "life-organizing-2",
+            "id": "organizing-2",
             "question": "物品怎麼處理？",
             "answer": "先由您決定保留、傳承、贈送或移出。未確認的物品會另外保留，不擅自丟棄。"
           }
@@ -260,206 +193,10 @@ export const organizingPages: Page[] = [
         "serviceIntro": {
           "sections": [
             {
-              "id": "life-organizing-intro",
+              "id": "organizing-intro",
               "type": "TEXT",
               "text": {
                 "content": "## 可陪您做的事\n\n- 物品分為「留／傳／贈／離」四類\n\n- 重要文件整理，方便日後尋找\n\n- 紀念物拍照建檔，留下您的故事\n\n- 可銜接整戶清空與清運\n\n## 依您的節奏安排\n\n**陪伴型**：慢慢做，與家人一起討論物品和居住安排。\n\n**效率型**：您已決定範圍與物品去留，由我們依約定時程執行。\n\n先評估再報價，第一次到府免費。後續服務範圍與費用，經您確認後才安排。",
-                "alignment": "left",
-                "fontSize": "body"
-              }
-            }
-          ]
-        }
-      }
-    }
-  },
-  {
-    "id": "retirement-organizing",
-    "slug": "services/retirement-organizing",
-    "title": "退休整理",
-    "template": "SUB_ITEM",
-    "isPublished": true,
-    "createdAt": "2026-09-14T00:00:00.000Z",
-    "updatedAt": "2026-09-14T00:00:00.000Z",
-    "content": {
-      "hero": {
-        "title": "退休整理",
-        "description": "退休後重新配置日常，讓每天更順",
-        "backgroundImage": "",
-        "mainButton": {
-          "text": "安心顧問諮詢",
-          "type": "URL",
-          "value": "/consultant",
-          "isVisible": true
-        },
-        "secondaryButton": {
-          "text": "",
-          "type": "URL",
-          "value": "",
-          "isVisible": false
-        }
-      },
-      "services": [],
-      "cases": [],
-      "showForm": false,
-      "subItem": {
-        "productId": "retirement-organizing",
-        "linkedProductId": "retirement-organizing",
-        "hideProductMainImage": true,
-        "mainTitle": "退休後重新配置日常，讓每天更順",
-        "coreServicesSectionTitle": "從了解需求，到一起完成",
-        "coreServices": [
-          {
-            "title": "01 評估",
-            "content": "安心顧問先了解您的需求、空間與希望的節奏。"
-          },
-          {
-            "title": "02 報價",
-            "content": "說明服務範圍、時程與費用，經您確認後安排。"
-          },
-          {
-            "title": "03 整理",
-            "content": "依約定範圍執行；物品處置前先取得同意。"
-          },
-          {
-            "title": "04 交付",
-            "content": "一起核對整理結果與物品紀錄，討論後續安排。"
-          }
-        ],
-        "partners": [],
-        "cases": [],
-        "faqs": [
-          {
-            "id": "retirement-organizing-0",
-            "question": "可以只做一個房間嗎？",
-            "answer": "可以，先從您最想改善的空間開始。顧問會依範圍說明費用，無須一次整理整個家。"
-          },
-          {
-            "id": "retirement-organizing-1",
-            "question": "建議先做哪裡？",
-            "answer": "先了解您的日常習慣，再一起選擇最常使用的動線。可以從玄關、臥室到浴室之間的走道開始討論。"
-          },
-          {
-            "id": "retirement-organizing-2",
-            "question": "要不要買新家具？",
-            "answer": "不一定，會先評估現有家具與收納方式。若需要添購，會先與您討論用途、尺寸及預算。"
-          }
-        ],
-        "additionalServices": [
-          "vacant-property",
-          "removal"
-        ],
-        "button": {
-          "text": "Line 報價預約",
-          "type": "URL",
-          "value": "https://line.me/R/ti/p/@021souxl",
-          "isVisible": true
-        },
-        "serviceIntro": {
-          "sections": [
-            {
-              "id": "retirement-organizing-intro",
-              "type": "TEXT",
-              "text": {
-                "content": "## 可陪您做的事\n\n- 走道與收納重新配置\n\n- 衣物與日常用品分類\n\n- 書房、廚房或陽台專項整理\n\n- 扶手與燈光改善建議，可搭配居家修繕\n\n## 依您的節奏安排\n\n**陪伴型**：慢慢做，與家人一起討論物品和居住安排。\n\n**效率型**：您已決定範圍與物品去留，由我們依約定時程執行。\n\n先評估再報價，第一次到府免費。後續服務範圍與費用，經您確認後才安排。",
-                "alignment": "left",
-                "fontSize": "body"
-              }
-            }
-          ]
-        }
-      }
-    }
-  },
-  {
-    "id": "estate-organizing",
-    "slug": "services/estate-organizing",
-    "title": "遺物整理",
-    "template": "SUB_ITEM",
-    "isPublished": true,
-    "createdAt": "2026-09-14T00:00:00.000Z",
-    "updatedAt": "2026-09-14T00:00:00.000Z",
-    "content": {
-      "hero": {
-        "title": "遺物整理",
-        "description": "與家人一起，慢慢整理",
-        "backgroundImage": "",
-        "mainButton": {
-          "text": "安心顧問諮詢",
-          "type": "URL",
-          "value": "/consultant",
-          "isVisible": true
-        },
-        "secondaryButton": {
-          "text": "",
-          "type": "URL",
-          "value": "",
-          "isVisible": false
-        }
-      },
-      "services": [],
-      "cases": [],
-      "showForm": false,
-      "subItem": {
-        "productId": "estate-organizing",
-        "linkedProductId": "estate-organizing",
-        "hideProductMainImage": true,
-        "mainTitle": "與家人一起，慢慢整理",
-        "coreServicesSectionTitle": "從了解需求，到一起完成",
-        "coreServices": [
-          {
-            "title": "01 評估",
-            "content": "安心顧問先了解您的需求、空間與希望的節奏。"
-          },
-          {
-            "title": "02 報價",
-            "content": "說明服務範圍、時程與費用，經您確認後安排。"
-          },
-          {
-            "title": "03 整理",
-            "content": "依約定範圍執行；物品處置前先取得同意。"
-          },
-          {
-            "title": "04 交付",
-            "content": "一起核對整理結果與物品紀錄，討論後續安排。"
-          }
-        ],
-        "partners": [],
-        "cases": [],
-        "faqs": [
-          {
-            "id": "estate-organizing-0",
-            "question": "需要幾天？",
-            "answer": "依範圍及家人的準備程度安排，可以分次進行。還不確定如何處理的物品，我們會先保留，讓您有時間討論。"
-          },
-          {
-            "id": "estate-organizing-1",
-            "question": "可以家人不在時進行嗎？",
-            "answer": "需先確認委託範圍、授權與交接方式。涉及物品去留時，仍會請有權決定的家人確認。"
-          },
-          {
-            "id": "estate-organizing-2",
-            "question": "貴重物品怎麼處理？",
-            "answer": "發現後會先分開保管、記錄並通知您交接。若涉及繼承或權屬爭議，會暫緩處理並建議轉介法律專業。"
-          }
-        ],
-        "additionalServices": [
-          "vacant-property",
-          "removal"
-        ],
-        "button": {
-          "text": "Line 報價預約",
-          "type": "URL",
-          "value": "https://line.me/R/ti/p/@021souxl",
-          "isVisible": true
-        },
-        "serviceIntro": {
-          "sections": [
-            {
-              "id": "estate-organizing-intro",
-              "type": "TEXT",
-              "text": {
-                "content": "## 可陪您做的事\n\n- 陪家人共同分類，不急著做決定\n\n- 協助尋找重要物品\n\n- 紀念物挑選、拍照與建檔\n\n- 安排清運及後續空間規劃\n\n## 依您的節奏安排\n\n**陪伴型**：慢慢做，與家人一起討論物品和居住安排。\n\n**效率型**：您已決定範圍與物品去留，由我們依約定時程執行。\n\n先評估再報價，第一次到府免費。後續服務範圍與費用，經您確認後才安排。",
                 "alignment": "left",
                 "fontSize": "body"
               }
@@ -543,7 +280,7 @@ export const organizingPages: Page[] = [
         ],
         "additionalServices": [
           "rental-management",
-          "life-organizing"
+          "organizing"
         ],
         "button": {
           "text": "Line 報價預約",
@@ -641,7 +378,7 @@ export const organizingPages: Page[] = [
         ],
         "additionalServices": [
           "rental-management",
-          "life-organizing"
+          "organizing"
         ],
         "button": {
           "text": "Line 報價預約",
