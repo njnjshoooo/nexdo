@@ -67,6 +67,7 @@ export default function DynamicPage() {
           <title>404 找不到頁面 | 好齡居</title>
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
+        <img src="/images/mascot/haohao-wave-3.png" alt="好好陪您找到方向" width="120" height="120" />
         <h1 className="text-4xl font-bold text-stone-800 mb-4">404</h1>
         <h2 className="text-2xl font-bold text-stone-700 mb-4">找不到頁面</h2>
         <p className="text-stone-500 text-lg mb-8">抱歉，您尋找的網頁可能已被移除或網址有誤。</p>

@@ -1,8 +1,24 @@
 {
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/minigame",
+      "destination": "/minigame/index.html"
+    },
+    {
+      "source": "/minigame/",
+      "destination": "/minigame/index.html"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
-

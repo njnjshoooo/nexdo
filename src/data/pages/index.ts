@@ -1,3 +1,4 @@
+import { organizingPages } from '../organizingCatalog';
 import { Page } from '../../types/admin';
 import { homePage } from './home';
 import { homeSafetyPage } from './home-safety';
@@ -32,6 +33,7 @@ import { rentalCustomizationPage } from './rental-customization';
 import { hobbystudioPage } from './hobbystudio';
 
 export const allInitialPages: Page[] = [
+  ...organizingPages,
   homePage,
   homeSafetyPage,
   cleaningPage,

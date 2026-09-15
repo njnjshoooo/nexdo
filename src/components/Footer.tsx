@@ -50,7 +50,7 @@ export default function Footer() {
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               {data.logo ? (
-                <img src={data.logo || undefined} alt="Logo" className="object-contain" style={{ height: data.logoHeight ? `${data.logoHeight}px` : '48px' }} />
+                <img src={data.logo || undefined} alt="好齡居 NEXDO" className="object-contain" style={{ height: data.logoHeight ? `${data.logoHeight}px` : '48px' }} />
               ) : (
                 <>
                   <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-2xl">
@@ -61,7 +61,7 @@ export default function Footer() {
               )}
             </div>
             <p className="text-stone-400 text-sm leading-relaxed">
-              {data.description}
+              把家安排好，退休更自在。好齡居從您的生活習慣出發，陪您分階段安排整理、居家改善與房屋出租需求。
             </p>
           </div>
 

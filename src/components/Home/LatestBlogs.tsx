@@ -12,18 +12,16 @@ export default function LatestBlogs({ data }: { data: any }) {
   const limit = data?.limit || 6;
 
   useEffect(() => {
-    const allArticles = articleService.getAll().filter(a => a.isPublished);
-    // Sort by date descending
-    allArticles.sort((a, b) => new Date(b.publishedAt || b.updatedAt).getTime() - new Date(a.publishedAt || a.updatedAt).getTime());
-    
-    // Prioritize recommended, then latest
-    const recommended = allArticles.filter(a => a.isRecommended);
-    const others = allArticles.filter(a => !a.isRecommended);
-    
-    setArticles([...recommended, ...others].slice(0, limit));
+    const update = () => setArticles(articleService.getAll()
+      .filter(a => a.isPublished && (!a.publishedAt || new Date(a.publishedAt).getTime() <= Date.now()))
+      .sort((a, b) => new Date(b.publishedAt || b.updatedAt).getTime() - new Date(a.publishedAt || a.updatedAt).getTime())
+      .slice(0, limit));
+    update();
+    window.addEventListener('articles_refreshed', update);
+    return () => window.removeEventListener('articles_refreshed', update);
   }, [limit]);
 
-  if (articles.length === 0) return null;
+  if (articles.length === 0) return <section className="retirement-section"><div className="retirement-container"><h2>好齡居誌</h2><p>生活提案正在準備中。您可以先與安心顧問聊聊居家安排。</p><Link className="brand-button secondary" to="/blog">前往好齡居誌 <ArrowRight size={20} /></Link></div></section>;
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
@@ -54,7 +52,7 @@ export default function LatestBlogs({ data }: { data: any }) {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-stone-300">
-                      <span className="font-medium">No Image</span>
+                      <span className="font-medium">好齡居誌</span>
                     </div>
                   )}
                   {article.categoryId && (
@@ -71,10 +69,10 @@ export default function LatestBlogs({ data }: { data: any }) {
                       {new Date(article.publishedAt || article.updatedAt).toLocaleDateString('zh-TW')}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-stone-900 mb-4 group-hover:text-primary transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold text-stone-900 mb-4 group-hover:text-primary transition-colors ">
                     {article.title}
                   </h3>
-                  <p className="text-stone-600 mb-6 line-clamp-3 leading-relaxed">
+                  <p className="text-stone-600 mb-6  leading-relaxed">
                     {article.summary}
                   </p>
                   

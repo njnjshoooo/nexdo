@@ -1,13 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exhibition Interaction App</title>
-    <script type="module" crossorigin src="/minigame/assets/index-DVvrLl5-.js"></script>
+    <title>好齡居｜居家安全檢測與租金試算</title>
+    <script type="module" crossorigin src="/minigame/assets/index-abbcc99461ab.js"></script>
     <link rel="stylesheet" crossorigin href="/minigame/assets/index-CeOUTApn.css">
-  </head>
+  <style>
+      .nexdo-home-bar { height:76px; display:flex; align-items:center; padding:10px 24px; background:#fff9ef; border-bottom:1px solid #00464b26; position:sticky; top:0; z-index:100; }
+      .nexdo-home-link { display:inline-flex; gap:16px; align-items:center; min-height:48px; color:#00464b; text-decoration:none; font:600 16px system-ui,sans-serif; }
+      .nexdo-home-link img { width:164px; height:auto; }
+      .nexdo-home-link:focus-visible { outline:3px solid #eb5514; outline-offset:4px; border-radius:4px; }
+      @media(max-width:480px) { .nexdo-home-bar { height:68px; padding:8px 16px; } .nexdo-home-link img { width:136px; } }
+    </style></head>
   <body>
+    <header class="nexdo-home-bar"><a class="nexdo-home-link" href="/" aria-label="好齡居，回到首頁"><img src="/images/brand/nexdo-logo.png" alt="好齡居 NEXDO" /><span>回首頁</span></a></header>
     <div id="root"></div>
   </body>
 </html>

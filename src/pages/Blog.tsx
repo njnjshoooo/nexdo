@@ -111,6 +111,7 @@ export default function Blog() {
     <div className="pt-32 pb-20"> {/* Add pt-32 to clear Header */}
       <div className="max-w-7xl mx-auto px-6">
         {/* Simple Title Section */}
+        <img src="/images/mascot/haohao-wave-3.png" alt="好好陪您閱讀生活提案" className="float-right object-contain" width="80" height="80" />
         <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-8 md:mb-10">{blogConfig.heroTitle}</h1>
 
         {/* Category Pill Navigation */}
@@ -165,7 +166,7 @@ export default function Blog() {
             <div className="lg:col-span-3">
               <div className="bg-white p-6 rounded-[2rem] border border-stone-200 shadow-sm h-full flex flex-col">
                 <h3 className="font-bold text-stone-900 mb-6 text-xl border-b border-stone-100 pb-4">
-                  你可能有興趣
+                  您可能有興趣
                 </h3>
                 <div className="space-y-6 flex-grow overflow-y-auto pr-2 scrollbar-hide" style={{ maxHeight: 'calc(100% - 60px)' }}>
                   {sidebarPosts.map(post => (

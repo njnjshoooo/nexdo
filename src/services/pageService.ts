@@ -1,3 +1,4 @@
+import { applyBrandImages } from '../lib/brandImages';
 import { Page, TemplateType, DEFAULT_MAJOR_ITEM_TEMPLATE, DEFAULT_SUB_ITEM_TEMPLATE } from '../types/admin';
 import { v4 as uuidv4 } from 'uuid';
 import { allInitialPages } from '../data/pages/index';
@@ -9,7 +10,7 @@ const TABLE_NAME = 'pages';
 
 class PageService {
   private pages: Page[] = [];
-  private readonly VERSION = '1.0.13';
+  private readonly VERSION = '1.0.14';
 
   constructor() {
     this.loadCache();
@@ -66,7 +67,7 @@ class PageService {
   }
 
   private mapRow(row: any): Page {
-    return {
+    return applyBrandImages({
       id: row.id,
       slug: row.slug,
       title: row.title,
@@ -76,7 +77,7 @@ class PageService {
       isPublished: !!row.is_published,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-    };
+    });
   }
 
   private toRow(page: Partial<Page>): any {
@@ -104,20 +105,20 @@ class PageService {
       // Only use localStorage as a temporary cache for instant first render.
       if (storedPages) {
         try {
-          this.pages = JSON.parse(storedPages);
+          this.pages = applyBrandImages(JSON.parse(storedPages));
         } catch (e) {
           console.error('Failed to parse cached pages', e);
-          this.pages = [...allInitialPages];
+          this.pages = applyBrandImages([...allInitialPages]);
         }
       } else {
-        this.pages = [...allInitialPages];
+        this.pages = applyBrandImages([...allInitialPages]);
       }
       return;
     }
 
     // localStorage-only fallback path (original migration logic)
     if (storedPages && storedVersion === this.VERSION) {
-      this.pages = JSON.parse(storedPages);
+      this.pages = applyBrandImages(JSON.parse(storedPages));
 
       // Ensure blog page exists and has correct template
       const blogIndex = this.pages.findIndex(p => p.slug === 'blog');
@@ -142,13 +143,13 @@ class PageService {
       let existingPages: Page[] = [];
       if (storedPages) {
         try {
-          existingPages = JSON.parse(storedPages);
+          existingPages = applyBrandImages(JSON.parse(storedPages));
         } catch (e) {
           console.error('Failed to parse stored pages', e);
         }
       }
 
-      this.pages = [...allInitialPages];
+      this.pages = applyBrandImages([...allInitialPages]);
 
       // Overwrite initial pages with existing ones if they have the same ID
       existingPages.forEach(ep => {
