@@ -11,7 +11,7 @@ export const homePage: Page = {
   content: {
     ...DEFAULT_MAJOR_ITEM_TEMPLATE,
     showForm: true,
-    formId: '0', 
+    formId: 'default-contact',
     home: {
       blocks: [
         {

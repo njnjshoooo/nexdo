@@ -59,6 +59,13 @@ export const consultantPage: Page = {
             ]
           }
         },
+        {
+          id: 'consultation-form',
+          type: 'FORM',
+          form: {
+            formId: 'default-contact'
+          }
+        }
       ]
     }
   }
