@@ -45,7 +45,7 @@ export function OrganizingSection() {
   ['家人離世，讓回憶好好留下', '不急著告別每一件物品。陪家人一起整理，保存與他有關的珍貴回憶。'],
  ];
  return <section id="organizing" className="retirement-section organizing-section"><div className="retirement-container">
-  <div className="organizing-story"><div className="section-heading"><p className="eyebrow">老前整理 ・ 一項服務，不同人生時刻</p><h2>留下重要的，<br />為下一段生活留出空間。</h2><p>人的一生，在重要時刻總需要重新整理空間。退休、新生活的開始，或與家人一起整理回憶——起點不同，我們都陪您慢慢安排。</p></div><img src="/images/uniforms/scene-94.webp" alt="好齡居陪長輩整理照片、保存珍貴回憶，情境示意" loading="lazy" /></div>
+  <div className="organizing-story"><div className="section-heading"><p className="eyebrow">老前整理 ・ 一項服務，不同人生時刻</p><h2>留下重要的，<br />為下一段生活留出空間。</h2><p>人的一生，在重要時刻總需要重新整理空間。退休、新生活的開始，或與家人一起整理回憶——起點不同，我們都陪您慢慢安排。</p></div><img src="/images/customers/scene-94.webp" alt="好齡居陪長輩整理照片、保存珍貴回憶，情境示意" loading="lazy" /></div>
   <div className="organizing-grid">{moments.map(([title,text],i)=><article className="organizing-card" key={title}><span className="service-number">0{i+1}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
   <div className="organizing-unified-cta"><div><strong>同一項整理服務，相同計價方式</strong><p>退休整理、老前整理、遺物整理或搬家整理，依實際範圍評估報價。先聊目標，再一起確認安排。</p></div><Link to="/services/organizing" className="brand-button">了解老前整理 <ArrowRight size={20} /></Link></div>
  </div></section>;
@@ -53,12 +53,12 @@ export function OrganizingSection() {
 
 export function ServiceDirectory({ cmsItems = [] }: { cmsItems?: {pageId?: string; title?: string; description?: string; image?: string}[] }) {
  const categories = [
-  { image:'/images/uniforms/scene-41.webp', title:'居住安全', to:'/home-safety', icon:ShieldCheck, text:'先了解走道、浴室與日常使用情況。依您的習慣討論扶手、照明與居家改善的順序。' },
+  { image:'/images/customers/scene-41.webp', title:'居住安全', to:'/home-safety', icon:ShieldCheck, text:'先了解走道、浴室與日常使用情況。依您的習慣討論扶手、照明與居家改善的順序。' },
   { image:'/images/services/renovation.webp', title:'居家裝潢', to:'/renovation', icon:Armchair, text:'從現有空間開始，評估修繕與配置需求。先確認範圍與預算，再安排適合的改善方式。' },
   { image:'/images/uniforms/scene-98.webp', title:'收納清潔', to:'/cleaning', icon:Sparkles, text:'從常用的物品與空間著手，整理出方便取用的日常。也可依家庭需求安排清潔服務。' },
-  { image:'/images/uniforms/scene-27.webp', title:'樂齡健康', to:'/services/health', icon:HeartHandshake, text:'了解退休後的生活照顧與活動需求。由顧問介紹合適服務，醫療問題交由專業人員判斷。' },
+  { image:'/images/customers/scene-27.webp', title:'樂齡健康', to:'/services/health', icon:HeartHandshake, text:'了解退休後的生活照顧與活動需求。由顧問介紹合適服務，醫療問題交由專業人員判斷。' },
   { image:'/images/services/rental.webp', title:'房屋出租', to:'/services/rental', pageId:'rent-and-move', icon:KeyRound, text:'有閒置住宅，可以先評估屋況與出租條件。從空屋整理到代租代管，分階段討論安排。' },
-  { image:'/images/uniforms/scene-96.webp', title:'安心顧問諮詢', to:'/consultant', icon:Leaf, text:'還不確定從哪裡開始，也可以先聊聊。顧問會聽您說明需求，再介紹合適的服務。' },
+  { image:'/images/customers/scene-96.webp', title:'安心顧問諮詢', to:'/consultant', icon:Leaf, text:'還不確定從哪裡開始，也可以先聊聊。顧問會聽您說明需求，再介紹合適的服務。' },
  ];
  const entries = categories.map(category => {
    const item = cmsItems.find(item => item.pageId === (category.pageId || category.to.slice(1)));

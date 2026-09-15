@@ -35,7 +35,7 @@ export const organizingProducts: Product[] = [
     ],
     "createdAt": "2026-09-14T00:00:00.000Z",
     "updatedAt": "2026-09-14T00:00:00.000Z",
-    "image": "/images/uniforms/scene-94.webp"
+    "image": "/images/customers/scene-94.webp"
   },
   {
     "id": "vacant-property",
