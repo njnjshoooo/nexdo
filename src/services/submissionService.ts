@@ -2,6 +2,43 @@ import { FormSubmission } from '../types/form';
 import { v4 as uuidv4 } from 'uuid';
 import localforage from 'localforage';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { formService } from './formService';
+
+/**
+ * 呼叫後端 /api/notify-submission，觸發 Resend 通知信。
+ * fire-and-forget：不阻塞、失敗不擋 submission 成立。
+ */
+function fireNotifyEmail(submission: FormSubmission): void {
+  try {
+    // 從 formService 拿 form 名稱與欄位 label 映射
+    const form = formService.getByFormId(submission.formId) || formService.getById(submission.formId);
+    const formName = form?.name || submission.formId;
+    const fieldLabels: Record<string, string> = {};
+    if (form && Array.isArray(form.fields)) {
+      form.fields.forEach((f: any) => {
+        if (f?.id) fieldLabels[f.id] = f.label || f.id;
+      });
+    }
+
+    fetch('/api/notify-submission', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId: submission.bookingId,
+        submissionId: submission.id,
+        formName,
+        formId: submission.formId,
+        pageSlug: submission.pageSlug,
+        pageTitle: submission.pageTitle,
+        submittedAt: submission.createdAt,
+        data: submission.data,
+        fieldLabels,
+      }),
+    }).catch(err => console.warn('[submissionService] notify email failed', err));
+  } catch (e) {
+    console.warn('[submissionService] fireNotifyEmail threw', e);
+  }
+}
 
 const STORAGE_KEY = 'haolingju_submissions';
 const TABLE_NAME = 'submissions';
@@ -145,6 +182,10 @@ export const submissionService = {
     all.unshift(newSubmission);
     await saveCache(all);
     window.dispatchEvent(new Event('storage'));
+
+    // 觸發後端寄送通知信（fire-and-forget）
+    fireNotifyEmail(newSubmission);
+
     return newSubmission;
   },
 

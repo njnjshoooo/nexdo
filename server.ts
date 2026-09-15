@@ -12,6 +12,7 @@ import updateUserHandler from './api/admin/update-user.ts';
 import createUserHandler from './api/admin/create-user.ts';
 import sitemapHandler from './api/sitemap.ts';
 import formsHandler from './api/forms.ts';
+import notifySubmissionHandler from './api/notify-submission.ts';
 
 async function startServer() {
   const app = express();
@@ -33,6 +34,7 @@ async function startServer() {
   app.all('/api/admin/update-user', updateUserHandler);
   app.all('/api/admin/create-user', createUserHandler);
   app.all('/api/forms', formsHandler);
+  app.all('/api/notify-submission', notifySubmissionHandler);
   app.get('/sitemap.xml', sitemapHandler);
 
   // ====== Removed Pages (HTTP 410 Gone) ======

@@ -305,6 +305,120 @@ export async function sendWelcomeEmail(ctx: WelcomeEmailContext): Promise<void> 
   }
 }
 
+// ==========================================================================
+// 表單提交通知信（安心顧問諮詢等各種前台表單）
+// ==========================================================================
+
+export interface FormSubmissionEmailContext {
+  bookingId: string;          // 對外預約編號 BK-...
+  submissionId: string;       // 內部 UUID
+  formName: string;           // 表單名稱，如「安心顧問諮詢」
+  formId: string;             // 表單 id
+  pageSlug?: string;          // 客戶填寫時所在頁面 slug
+  pageTitle?: string;         // 頁面標題
+  submittedAt: string;        // ISO 時間
+  fields: Array<{ label: string; value: string }>;   // 使用者填的欄位
+  customerName?: string;      // 從 fields 取出的姓名（若有）
+  customerEmail?: string;     // 從 fields 取出的 email（若有）
+  customerPhone?: string;     // 從 fields 取出的電話（若有）
+}
+
+function fieldsHtml(fields: FormSubmissionEmailContext['fields']): string {
+  return fields
+    .map(f => `<tr>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;color:#4a6b6e;font-size:12px;letter-spacing:0.02em;width:120px;vertical-align:top">${escapeHtml(f.label)}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;color:#00464B;font-size:13px;line-height:1.6">${escapeHtml(f.value || '—')}</td>
+    </tr>`)
+    .join('');
+}
+
+function submissionInternalHtml(ctx: FormSubmissionEmailContext): string {
+  const adminUrl = SITE_URL ? `${SITE_URL}/admin/bookings` : '';
+  return `<!doctype html><html><body style="font-family:system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#00464B;background:#FFF9EF">
+  <div style="background:white;border-radius:16px;padding:28px;border:1px solid #e3ddce">
+    <h2 style="color:#00464B;margin:0 0 6px;font-size:20px">🧡 新的表單提交</h2>
+    <p style="color:#3d5e61;font-size:13px;margin:0 0 20px">來自 ${escapeHtml(ctx.pageTitle || ctx.pageSlug || '網站')} 的<strong>${escapeHtml(ctx.formName)}</strong></p>
+
+    <div style="background:#f2f6f6;border-radius:8px;padding:14px 16px;margin-bottom:20px">
+      <div style="font-size:12px;color:#3d5e61;letter-spacing:0.02em">預約編號</div>
+      <div style="font-size:16px;font-weight:600;color:#00464B;font-family:ui-monospace,monospace">${escapeHtml(ctx.bookingId)}</div>
+      <div style="font-size:11px;color:#7a9296;margin-top:4px">提交時間 ${escapeHtml(ctx.submittedAt)}</div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin:0 0 20px">
+      ${fieldsHtml(ctx.fields)}
+    </table>
+
+    ${adminUrl ? `<p style="margin:24px 0 0"><a href="${adminUrl}" style="display:inline-block;background:#00464B;color:white;padding:10px 18px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:600">前往後台查看</a></p>` : ''}
+  </div>
+  <p style="color:#7a9296;font-size:11px;margin-top:20px;text-align:center">好齡居 NEXDO · 系統自動通知</p>
+  </body></html>`;
+}
+
+function submissionCustomerHtml(ctx: FormSubmissionEmailContext): string {
+  const name = ctx.customerName || '您';
+  return `<!doctype html><html><body style="font-family:system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#00464B;background:#FFF9EF">
+  <div style="background:white;border-radius:16px;padding:32px 28px;border:1px solid #e3ddce">
+    <h2 style="color:#00464B;margin:0 0 8px;font-size:22px">我們收到您的需求了 🧡</h2>
+    <p style="color:#3d5e61;font-size:15px;line-height:1.7;margin:0 0 20px">
+      ${escapeHtml(name)}您好，好齡居已收到您透過<strong>「${escapeHtml(ctx.formName)}」</strong>提交的需求。
+      安心顧問會在 24 小時內主動與您聯繫，先聊聊您想改善的地方，再介紹合適的服務。
+    </p>
+
+    <div style="background:#f2f6f6;border-radius:8px;padding:14px 16px;margin:20px 0">
+      <div style="font-size:11px;color:#3d5e61;letter-spacing:0.02em;margin-bottom:4px">預約編號（追蹤用）</div>
+      <div style="font-size:15px;font-weight:600;color:#00464B;font-family:ui-monospace,monospace">${escapeHtml(ctx.bookingId)}</div>
+    </div>
+
+    <p style="color:#3d5e61;font-size:14px;line-height:1.7;margin:0 0 8px">您本次提交的內容：</p>
+    <table style="width:100%;border-collapse:collapse;margin:0 0 20px">
+      ${fieldsHtml(ctx.fields)}
+    </table>
+
+    <p style="color:#3d5e61;font-size:13px;line-height:1.7;margin:24px 0 0;padding-top:16px;border-top:1px solid #e3ddce">
+      若有任何問題，可以直接回信給我們，或前往 <a href="${CONTACT_URL}" style="color:#00464B;font-weight:600">好齡居官網</a> 與我們聯絡。
+    </p>
+  </div>
+  <p style="color:#7a9296;font-size:11px;margin-top:20px;text-align:center">好齡居 NEXDO · noreply@nexdo.tw</p>
+  </body></html>`;
+}
+
+export async function sendFormSubmissionEmails(ctx: FormSubmissionEmailContext): Promise<void> {
+  const client = getClient();
+  if (!client) {
+    console.warn('[email] RESEND_API_KEY 未設定，略過表單通知 email', ctx.bookingId);
+    return;
+  }
+
+  // 內部通知（給 INTERNAL_NOTIFICATION_EMAIL）
+  if (INTERNAL.length > 0) {
+    try {
+      await client.emails.send({
+        from: FROM,
+        to: INTERNAL,
+        subject: `[新表單] ${ctx.formName} · ${ctx.customerName || ctx.bookingId}`,
+        html: submissionInternalHtml(ctx),
+      });
+    } catch (e) {
+      console.error('[email] internal submission email failed', e);
+    }
+  }
+
+  // 客戶回覆信（若表單有填 email）
+  if (ctx.customerEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.customerEmail)) {
+    try {
+      await client.emails.send({
+        from: FROM,
+        to: ctx.customerEmail,
+        subject: `好齡居 — 我們收到您的「${ctx.formName}」需求`,
+        html: submissionCustomerHtml(ctx),
+      });
+    } catch (e) {
+      console.error('[email] customer submission email failed', e);
+    }
+  }
+}
+
 export async function sendOrderFailedEmails(ctx: OrderFailedEmailContext): Promise<void> {
   const client = getClient();
   if (!client) {

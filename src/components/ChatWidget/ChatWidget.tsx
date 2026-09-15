@@ -40,6 +40,8 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [sending, setSending] = useState(false);
+  // 常見問題預設展開；使用者可折起，避免佔輸入區空間
+  const [promptsCollapsed, setPromptsCollapsed] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -203,21 +205,33 @@ export default function ChatWidget() {
             )}
           </div>
 
-          {/* Quick prompts（開場時） */}
+          {/* Quick prompts（開場時，可收合） */}
           {showInitialPrompts && (
-            <div className="px-3 py-3 border-t border-stone-100 flex flex-col gap-1.5" style={{ backgroundColor: '#FFF9EF' }}>
-              <div className="text-[10px] uppercase tracking-wider text-stone-500 font-medium px-1 mb-0.5">
-                常見問題
-              </div>
-              {QUICK_PROMPTS.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => askEntry(p)}
-                  className="text-left text-[12.5px] px-3 py-2 rounded-xl border border-stone-200 bg-white hover:border-[#00464B] hover:bg-[#00464B]/5 text-[#00464B] transition-colors font-medium"
-                >
-                  {p.question}
-                </button>
-              ))}
+            <div className="border-t border-stone-100" style={{ backgroundColor: '#FFF9EF' }}>
+              <button
+                type="button"
+                onClick={() => setPromptsCollapsed(v => !v)}
+                className="w-full flex items-center justify-between px-3 py-2 text-[10px] uppercase tracking-wider text-stone-500 font-medium hover:bg-stone-100/50"
+                aria-expanded={!promptsCollapsed}
+              >
+                <span>常見問題</span>
+                <span className="text-[11px]">
+                  {promptsCollapsed ? '展開 ▾' : '收起 ▴'}
+                </span>
+              </button>
+              {!promptsCollapsed && (
+                <div className="px-3 pb-3 flex flex-col gap-1.5">
+                  {QUICK_PROMPTS.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => askEntry(p)}
+                      className="text-left text-[12.5px] px-3 py-2 rounded-xl border border-stone-200 bg-white hover:border-[#00464B] hover:bg-[#00464B]/5 text-[#00464B] transition-colors font-medium"
+                    >
+                      {p.question}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
