@@ -140,6 +140,13 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
         }
       }
 
+      if (field.type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim())) {
+        newErrors[field.id] = '電子郵件格式好像不太對，請確認是否像 example@mail.com';
+      }
+      if (field.type === 'tel' && value && String(value).replace(/\D/g, '').length < 8) {
+        newErrors[field.id] = '電話號碼似乎少了幾位，請再確認一下';
+      }
+
       // Additional validation for "期望日期"
       if (field.type === 'date' && field.label.includes('期望日期') && value) {
         if (value < minDate) {
@@ -225,14 +232,19 @@ export default function DynamicForm({ form, pageSlug = '', pageTitle = '', onSub
           {field.label} {field.required && <span className="text-red-500">*</span>}
         </Label>
 
-        {field.type === 'text' && (
+        {(field.type === 'text' || field.type === 'email' || field.type === 'tel') && (
           <Input
-            type="text"
+            type={field.type}
+            inputMode={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : undefined}
+            autoComplete={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : undefined}
             value={value}
             onChange={(e) => handleChange(field.id, e.target.value)}
             placeholder={field.placeholder}
             error={!!error}
           />
+        )}
+        {(field as any).helpText && !error && (
+          <p className="mt-1.5 text-sm text-stone-500">{(field as any).helpText}</p>
         )}
 
         {field.type === 'textarea' && (

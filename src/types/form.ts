@@ -1,6 +1,8 @@
 export type FormFieldType = 
-  | 'text' 
-  | 'textarea' 
+  | 'text'
+  | 'email'
+  | 'tel'
+  | 'textarea'
   | 'radio' 
   | 'checkbox' 
   | 'select' 

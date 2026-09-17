@@ -209,6 +209,8 @@ export default function FormEditor() {
                   className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
                   <option value="text">單行文字</option>
+                  <option value="email">電子郵件</option>
+                  <option value="tel">電話</option>
                   <option value="textarea">多行文字</option>
                   <option value="radio">單選框</option>
                   <option value="checkbox">複選框</option>
