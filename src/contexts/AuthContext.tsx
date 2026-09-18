@@ -1,286 +1,130 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { User } from '../types/auth';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { adminAccess } from '../lib/authAccess';
+import { validateNewPassword } from '../lib/passwordRecovery';
 
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoadingProfile: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: Omit<User, 'id' | 'role'> & { password: string }) => Promise<void>;
+  authError: string;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: Omit<User, 'id' | 'role'> & { password: string }) => Promise<{ needsConfirmation: boolean }>;
   updateProfile: (data: Partial<User> & { password?: string }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/** 將 Supabase auth.user + profiles row 合成前端 User 型別 */
-async function loadProfile(authUserId: string, fallbackEmail: string): Promise<User | null> {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', authUserId)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('[Auth] loadProfile failed (profiles)', error);
-    }
-
-    // Check if user is an admin
-    let role = (data?.role as 'admin' | 'user') || 'user';
-    let permissions: string[] = [];
-
-    const { data: adminData, error: adminError } = await supabase
-      .from('admin_permission')
-      .select('role, permissions')
-      .eq('id', authUserId)
-      .maybeSingle();
-
-    if (!adminError && adminData) {
-      role = 'admin'; // Always grant admin access if present in admin_permission
-      if (adminData.permissions) {
-        permissions = adminData.permissions;
-      }
-      // 呼叫 API 升級 profile role，用 serverless 繞過 RLS
-      if (data && data.role !== 'admin') {
-        supabase.auth.getSession().then(({ data: sessData }) => {
-          if (sessData.session?.access_token) {
-            fetch('/api/auth/sync-admin', {
-              headers: {
-                'Authorization': `Bearer ${sessData.session.access_token}`
-              }
-            }).catch(e => console.error('[Auth] Failed to sync admin role', e));
-          }
-        });
-      }
-    } else if (role === 'admin' || fallbackEmail === 'admin@nexdo.com') {
-      // Legacy super-admin (does not exist in admin_permission table yet)
-      role = 'admin';
-      permissions = ['all'];
-    }
-
-    return {
-      id: authUserId,
-      name: data?.name || fallbackEmail.split('@')[0] || 'User',
-      email: data?.email || fallbackEmail,
-      role: role,
-      permissions: permissions,
-      phone: data?.phone || undefined,
-      address: data?.address || undefined,
-      lineId: data?.line_id || undefined,
-    } as User;
-  } catch (e) {
-    console.warn('[Auth] loadProfile error', e);
-    return {
-      id: authUserId,
-      name: fallbackEmail.split('@')[0] || 'User',
-      email: fallbackEmail,
-      role: 'user',
-    } as User;
-  }
+async function loadProfile(id: string, email: string): Promise<User> {
+  const [profile, admin] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', id).abortSignal(AbortSignal.timeout(15000)).maybeSingle(),
+    supabase.from('admin_permission').select('role, permissions').eq('id', id).abortSignal(AbortSignal.timeout(15000)).maybeSingle(),
+  ]);
+  if (profile.error || admin.error) throw new Error('無法讀取帳號權限，請重新整理後再試；若持續發生請聯繫管理員。');
+  const row = profile.data;
+  return {
+    id, email, name: row?.name || email.split('@')[0], ...adminAccess(admin.data),
+    phone: row?.phone, address: row?.address, lineId: row?.line_id,
+    title: row?.title, nickname: row?.nickname,
+    emergencyContactName: row?.emergency_contact_name,
+    emergencyContactPhone: row?.emergency_contact_phone,
+    specialRequirements: row?.special_requirements,
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // 初始值同步從 localStorage 讀取，避免 ProtectedRoute 在第一次 render 因為 user=null 而誤判未登入
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      return null;
-    }
-  });
-
+  // A browser cache is never evidence of a valid session or administrative access.
+  const [user, setUser] = useState<User | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-
+  const [authError, setAuthError] = useState('');
+  const generation = useRef(0);
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setIsLoadingProfile(false);
-      return;
-    }
-
+    localStorage.removeItem('user');
+    localStorage.removeItem('users');
+    if (!isSupabaseConfigured) { setIsLoadingProfile(false); return; }
     let cancelled = false;
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (session?.user) {
-        const profile = await loadProfile(session.user.id, session.user.email || '');
-        if (!cancelled && profile) {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
+    const timers = new Set<ReturnType<typeof setTimeout>>();
+    // Never await Supabase calls inside its auth callback (the auth lock is still held).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const request = ++generation.current;
+      setAuthError('');
+      setUser(null);
+      if (!session?.user) { setIsLoadingProfile(false); return; }
+      setIsLoadingProfile(true);
+      const timer = setTimeout(async () => {
+        timers.delete(timer);
+        try {
+          const profile = await loadProfile(session.user.id, session.user.email || '');
+          if (!cancelled && request === generation.current) setUser(profile);
+        } catch (error) {
+          if (!cancelled && request === generation.current) setAuthError((error as Error).message);
+        } finally {
+          if (!cancelled && request === generation.current) setIsLoadingProfile(false);
         }
-      } else {
-        // No session found but we are done checking
-        if (!cancelled) {
-          setUser(null);
-          localStorage.removeItem('user');
-        }
-      }
-      if (!cancelled) setIsLoadingProfile(false);
-    })();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        setIsLoadingProfile(true);
-        const profile = await loadProfile(session.user.id, session.user.email || '');
-        if (profile) {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
-        }
-        setIsLoadingProfile(false);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        localStorage.removeItem('user');
-        setIsLoadingProfile(false);
-      }
+      }, 0);
+      timers.add(timer);
     });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
+    return () => { cancelled = true; generation.current++; timers.forEach(clearTimeout); subscription.unsubscribe(); };
   }, []);
 
   const login = async (email: string, password: string) => {
-    // 🎯 拿掉原本寫死 id: '1' 的 if 測試後門，讓所有人一律走 Supabase 驗證
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        throw new Error(error.message || '帳號或密碼錯誤');
-      }
-      if (data.user) {
-        const profile = await loadProfile(data.user.id, data.user.email || email);
-        if (profile) {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
-        }
-      }
-      return;
-    }
-
-    // === 以下為無 Supabase 時的 fallback (本地測試用) ===
-    const storedUsersStr = localStorage.getItem('users');
-    if (storedUsersStr) {
-      try {
-        const users = JSON.parse(storedUsersStr);
-        const foundUser = users.find((u: any) => u.email === email && u.password === password);
-        if (foundUser) {
-          const { password: _, ...userWithoutPassword } = foundUser;
-          setUser(userWithoutPassword);
-          localStorage.setItem('user', JSON.stringify(userWithoutPassword));
-          return;
-        }
-      } catch {}
-    }
-    throw new Error('帳號或密碼錯誤');
+    if (!isSupabaseConfigured) throw new Error('登入服務尚未設定');
+    setIsLoadingProfile(true); setAuthError('');
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error || !data.user || !data.session) throw new Error('登入失敗，請確認帳號、密碼與信箱驗證狀態。');
+      const request = ++generation.current;
+      const profile = await loadProfile(data.user.id, data.user.email || email);
+      if (request === generation.current) setUser(profile);
+      return profile;
+    } finally { setIsLoadingProfile(false); }
   };
-
-  const register = async (data: Omit<User, 'id' | 'role'> & { password: string }) => {
-    if (isSupabaseConfigured) {
-      const { data: signUpData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: { data: { name: data.name } },
-      });
-      if (error) throw new Error(error.message);
-      if (signUpData.user) {
-        const profile = await loadProfile(signUpData.user.id, signUpData.user.email || data.email);
-        if (profile) {
-          setUser(profile);
-          localStorage.setItem('user', JSON.stringify(profile));
-        }
-      }
-      // 觸發品牌歡迎信（失敗不擋註冊流程）
-      fetch('/api/auth/welcome', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, name: data.name }),
-      }).catch(err => console.error('Failed to send welcome email:', err));
-      return;
-    }
-
-    // Fallback
-    const storedUsersStr = localStorage.getItem('users');
-    let users = [];
-    if (storedUsersStr) { try { users = JSON.parse(storedUsersStr); } catch {} }
-    if (users.some((u: any) => u.email === data.email)) {
-      throw new Error('Email already exists');
-    }
-    const newUser = { ...data, id: Date.now().toString(), role: 'user' as const };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    const { password: _, ...userWithoutPassword } = newUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+  const register: AuthContextType['register'] = async data => {
+    if (!isSupabaseConfigured) throw new Error('註冊服務尚未設定');
+    const issue = validateNewPassword(data.password, data.password);
+    if (issue) throw new Error(issue);
+    const { data: result, error } = await supabase.auth.signUp({
+      email: data.email.trim(), password: data.password,
+      options: { data: { name: data.name, phone: data.phone } },
+    });
+    if (error) throw new Error(error.message);
+    // A user object without a session is an unverified registration, not a login.
+    return { needsConfirmation: !result.session };
   };
-
-  const updateProfile = async (data: Partial<User> & { password?: string }) => {
-    if (!user) throw new Error('Not authenticated');
-
-    if (isSupabaseConfigured) {
-      const updates: any = {};
-      if (data.name !== undefined) updates.name = data.name;
-      if (data.phone !== undefined) updates.phone = data.phone;
-      if (data.address !== undefined) updates.address = data.address;
-      if ((data as any).lineId !== undefined) updates.line_id = (data as any).lineId;
-
-      if (Object.keys(updates).length > 0) {
-        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
-        if (error) throw new Error(error.message);
-      }
-      if (data.password) {
-        const { error } = await supabase.auth.updateUser({ password: data.password });
-        if (error) throw new Error(error.message);
-      }
-      const updatedUser = { ...user, ...data };
-      delete (updatedUser as any).password;
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      return;
+  const updateProfile: AuthContextType['updateProfile'] = async data => {
+    if (!user || !isSupabaseConfigured) throw new Error('請先登入');
+    const mapping = { name: 'name', phone: 'phone', address: 'address', lineId: 'line_id' } as const;
+    const updates: Record<string, unknown> = {};
+    for (const [key, column] of Object.entries(mapping)) {
+      const value = data[key as keyof typeof mapping];
+      if (value !== undefined) updates[column] = value;
     }
-
-    // Fallback (local)
-    const storedUsersStr = localStorage.getItem('users');
-    let users = [];
-    if (storedUsersStr) { try { users = JSON.parse(storedUsersStr); } catch {} }
-    const userIndex = users.findIndex((u: any) => u.id === user.id);
-    let updatedUser;
-    if (userIndex !== -1) {
-      const existingUser = users[userIndex];
-      const { password, ...restData } = data;
-      updatedUser = { ...existingUser, ...restData };
-      if (password) updatedUser.password = password;
-      users[userIndex] = updatedUser;
-      localStorage.setItem('users', JSON.stringify(users));
-    } else {
-      const { password, ...restData } = data;
-      updatedUser = { ...user, ...restData };
+    if (data.password) {
+      const issue = validateNewPassword(data.password, data.password);
+      if (issue) throw new Error(issue);
     }
-    const { password: _, ...userWithoutPassword } = updatedUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+    if (Object.keys(updates).length) {
+      const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+      if (error) throw new Error('個人資料儲存失敗，請稍後重試');
+    }
+    if (data.password) {
+      const { error } = await supabase.auth.updateUser({ password: data.password });
+      if (error) throw new Error('密碼更新失敗，請重新登入後再試');
+    }
+    setUser(await loadProfile(user.id, user.email));
   };
-
-  const logout = () => {
+  const logout = async () => {
+    ++generation.current; setUser(null); setAuthError('');
     if (isSupabaseConfigured) {
-      supabase.auth.signOut().catch(err => console.warn('[Auth] signOut failed', err));
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) setAuthError('登出未完成，請重新整理後重試。');
     }
-    setUser(null);
-    localStorage.removeItem('user');
   };
-
-  return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoadingProfile, login, register, updateProfile, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoadingProfile, authError, login, register, updateProfile, logout }}>{children}</AuthContext.Provider>;
 }
-
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 }

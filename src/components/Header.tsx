@@ -105,35 +105,7 @@ export default function Header() {
     };
   }, []);
 
-  // 4. 🎯 新的管理員權限判定：只看 admin_permission 表格
-  useEffect(() => {
-    const checkAdminPermission = async () => {
-      if (!isAuthenticated || !user?.id) {
-        setShowAdminLink(false);
-        return;
-      }
-
-      try {
-        if (user.email === 'admin@nexdo.com') {
-          setShowAdminLink(true);
-          return;
-        }
-
-        const { data } = await supabase
-          .from('admin_permission')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        // 只要能查到資料且角色是 admin，就認定是後台人員
-        setShowAdminLink(!!(data && data.role === 'admin'));
-      } catch (err) {
-        setShowAdminLink(false);
-      }
-    };
-
-    checkAdminPermission();
-  }, [user, isAuthenticated]);
+  useEffect(() => { setShowAdminLink(user?.role === 'admin'); }, [user]);
 
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
@@ -244,6 +216,7 @@ export default function Header() {
                         <Link to="/admin" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-[8px] px-[16px] py-2 text-[14px] leading-[20px] text-stone-700 hover:bg-stone-50 hover:text-primary"><Shield size={16} />進入後台</Link>
                       )}
                       
+                      <Link to="/profile" onClick={() => setIsUserMenuOpen(false)} className="block px-4 py-2 text-sm">會員中心</Link>
                       <Link to="/profile/orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-[8px] px-[16px] py-2 text-[14px] leading-[20px] text-stone-700 hover:bg-stone-50 hover:text-primary"><Package size={16} />我的訂單</Link>
                       <Link to="/profile/reservations" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-[8px] px-[16px] py-2 text-[14px] leading-[20px] text-stone-700 hover:bg-stone-50 hover:text-primary"><Calendar size={16} />我的預約</Link>
                       <Link to="/profile/settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-[8px] px-[16px] py-2 text-[14px] leading-[20px] text-stone-700 hover:bg-stone-50 hover:text-primary"><Settings size={16} />個人設定</Link>
@@ -253,7 +226,7 @@ export default function Header() {
                 </AnimatePresence>
               </div>
             ) : (
-              <button onClick={() => setIsLoginModalOpen(true)} className={`px-[16px] lg:px-[24px] py-[8px] rounded-full font-medium text-[16px] leading-[24px] ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>會員登入</button>
+              <button onClick={() => navigate('/login')} className={`px-[16px] lg:px-[24px] py-[8px] rounded-full font-medium text-[16px] leading-[24px] ${isServicesOpen ? 'bg-[#F5F0EB] text-[#4A5D3B]' : 'bg-primary text-white'}`}>會員登入</button>
             )}
           </div>
 
@@ -336,6 +309,7 @@ export default function Header() {
                             <p className="text-[14px] leading-[20px] font-bold text-stone-800">{user?.name}</p>
                             <p className="text-[12px] leading-[16px] text-stone-500">{user?.email}</p>
                           </div>
+                          <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 font-bold">會員中心</Link>
                           <Link to="/profile/orders" className="w-full flex items-center gap-[12px] px-[16px] py-4 text-stone-700 hover:bg-stone-50 rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}><Package size={20} className="text-stone-400" />我的訂單</Link>
                           <Link to="/profile/reservations" className="w-full flex items-center gap-[12px] px-[16px] py-4 text-stone-700 hover:bg-stone-50 rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}><Calendar size={20} className="text-stone-400" />我的預約</Link>
                           
@@ -348,7 +322,7 @@ export default function Header() {
                           <button onClick={() => { logout(); setIsMenuOpen(false); navigate('/'); }} className="w-full flex items-center gap-[12px] px-[16px] py-4 text-red-600 hover:bg-red-50 rounded-xl font-bold"><LogOut size={20} />登出</button>
                         </div>
                       ) : (
-                        <button onClick={() => { setIsMenuOpen(false); setIsLoginModalOpen(true); }} className="w-full flex items-center justify-center gap-[8px] bg-primary text-white px-[16px] py-[16px] rounded-xl font-bold text-[16px] leading-[24px] shadow-md">會員登入</button>
+                        <button onClick={() => { setIsMenuOpen(false); navigate('/login'); }} className="w-full flex items-center justify-center gap-[8px] bg-primary text-white px-[16px] py-[16px] rounded-xl font-bold text-[16px] leading-[24px] shadow-md">會員登入</button>
                       )}
                     </div>
                   </motion.div>

@@ -8,11 +8,12 @@ import { Label } from './ui/Label';
 
 interface LoginModalProps {
   isOpen: boolean;
+  initialTab?: 'login' | 'register';
   onClose: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'forgot'>('login');
+export default function LoginModal({ isOpen, onClose, initialTab = 'login' }: LoginModalProps) {
+  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'forgot'>(initialTab);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -20,12 +21,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [busy, setBusy] = useState(false);
   const { login, register } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError('');
     setSuccess('');
     
@@ -38,8 +42,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           setError('密碼與確認密碼不一致');
           return;
         }
-        await register({ name, email, phone, password });
-        onClose();
+        const result = await register({ name, email, phone, password });
+        setPassword(''); setConfirmPassword('');
+        if (result.needsConfirmation) setSuccess('請到信箱點擊驗證連結，再回來登入。若已有帳號，請直接登入或重設密碼。');
+        else onClose();
       } else if (activeTab === 'forgot') {
         if (!isSupabaseConfigured) throw new Error('目前無法使用密碼重設');
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
@@ -52,7 +58,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         msg = '登入失敗，請檢查帳號密碼是否正確';
       }
       setError(msg || (activeTab === 'login' ? '登入失敗，請檢查帳號密碼' : '處理失敗'));
-    }
+    } finally { setBusy(false); }
   };
 
   return (
@@ -161,6 +167,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <Button
             type="submit"
+            disabled={busy}
             className="w-full"
           >
             {activeTab === 'login' ? '登入' : activeTab === 'register' ? '註冊' : '重設密碼'}

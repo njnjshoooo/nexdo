@@ -1,3 +1,5 @@
+import MemberLoginPage from './pages/MemberLoginPage';
+import MemberCenterPage from './pages/MemberCenterPage';
 import PasswordRecoveryPage from './pages/PasswordRecoveryPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import { SafetyTool, RentalTool } from './pages/QuickToolsPage';
@@ -104,6 +106,7 @@ export default function App() {
       <SeoMeta />
       <Routes>
         <Route path="/reset-password" element={<PasswordRecoveryPage />} />
+        <Route path="/login" element={<MemberLoginPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         {/* 1. 後台管理：保持高優先權 */}
       <Route path="/admin" element={
@@ -171,9 +174,10 @@ export default function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
-        <Route path="/profile/orders" element={<OrderHistoryPage />} />
-        <Route path="/profile/reservations" element={<MyReservationsPage />} />
-        <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+        <Route path="/profile" element={<ProtectedRoute><MemberCenterPage /></ProtectedRoute>} />
+        <Route path="/profile/orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
+        <Route path="/profile/reservations" element={<ProtectedRoute><MyReservationsPage /></ProtectedRoute>} />
+        <Route path="/profile/settings" element={<ProtectedRoute><ProfileSettingsPage /></ProtectedRoute>} />
         
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/health" element={<ServiceGroupPage kind="health" />} />

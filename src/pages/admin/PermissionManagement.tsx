@@ -227,7 +227,7 @@ export default function PermissionManagement() {
                     </span>
                   </AdminTable.Td>
                   <AdminTable.Td className="text-stone-600 text-sm">
-                    {`${admin.permissions?.length || 0} 個模組`}
+                    {admin.permissions?.includes('all') ? '完整權限' : `${admin.permissions?.length || 0} 個模組`}
                   </AdminTable.Td>
                   <AdminTable.Td className="text-right">
                     <AdminTable.Actions>

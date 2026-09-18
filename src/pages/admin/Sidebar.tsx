@@ -39,7 +39,6 @@ export default function Sidebar() {
 
   const hasPermission = (permission: string) => {
     if (!user) return false;
-    if (user.id === '1') return true; // Legacy super admin
     if (permissions.includes('all')) return true;
     return permissions.includes(permission);
   };
@@ -71,6 +70,7 @@ export default function Sidebar() {
       title: '營運管理',
       icon: Briefcase,
       items: [
+        { title: '表單名單與匯出', path: '/admin/bookings', permission: 'forms' },
         { title: '諮詢紀錄', path: '/admin/consultations', permission: 'consultations' },
         { title: '預約記錄', path: '/admin/appointments', permission: 'appointments', badge: pendingAppointments },
         { title: '訂單管理', path: '/admin/orders', permission: 'orders' },
