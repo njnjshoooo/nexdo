@@ -1,3 +1,5 @@
+import PasswordRecoveryPage from './pages/PasswordRecoveryPage';
+import AdminLoginPage from './pages/AdminLoginPage';
 import { SafetyTool, RentalTool } from './pages/QuickToolsPage';
 import OrganizingPage from './pages/OrganizingPage';
 import { ServiceGroupPage } from './components/Home/RetirementHome';
@@ -101,6 +103,8 @@ export default function App() {
     <>
       <SeoMeta />
       <Routes>
+        <Route path="/reset-password" element={<PasswordRecoveryPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
         {/* 1. 後台管理：保持高優先權 */}
       <Route path="/admin" element={
         <ProtectedRoute requireAdmin>

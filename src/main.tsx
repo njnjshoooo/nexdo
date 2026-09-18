@@ -41,6 +41,13 @@ window.addEventListener('click', (e) => {
   }
 }, true); // 使用 capture 階段，確保在 React Router 攔截之前執行
 
+// Supabase recovery emails may return to the configured Site URL.
+// Route recovery fragments before rendering any marketing components.
+const authFragment = new URLSearchParams(window.location.hash.slice(1));
+if (authFragment.get('type') === 'recovery' || authFragment.get('error_code') === 'otp_expired') {
+  window.history.replaceState(null, '', '/reset-password' + window.location.hash);
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Modal, ModalContent, ModalHeader, ModalTitle } from './ui/Modal';
 import { Button } from './ui/Button';
@@ -40,9 +41,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         await register({ name, email, phone, password });
         onClose();
       } else if (activeTab === 'forgot') {
-        // Implement forgot password
-        setSuccess('已發送重設密碼信件至您的 Email');
-        setTimeout(() => setActiveTab('login'), 3000);
+        if (!isSupabaseConfigured) throw new Error('目前無法使用密碼重設');
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+        if (error) throw error;
+        setSuccess('若此信箱已註冊，你將收到密碼重設信。請檢查收件匣與垃圾郵件。');
       }
     } catch (err: any) {
       let msg = err.message || '';
