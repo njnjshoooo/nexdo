@@ -231,9 +231,7 @@ export default function AdminDashboard() {
             <Clock size={16} className="text-stone-400" />
             最後更新: {new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
           </div>
-          <button className="bg-stone-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-stone-800 transition-all shadow-lg shadow-stone-200">
-            下載報表
-          </button>
+
         </div>
       </div>
 
@@ -272,10 +270,7 @@ export default function AdminDashboard() {
                 <h2 className="text-xl font-bold text-stone-900">營收走勢分析</h2>
                 <p className="text-sm text-stone-500">近七日每日營收變化</p>
               </div>
-              <select className="bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium px-3 py-1.5 outline-none focus:ring-2 focus:ring-stone-200">
-                <option>最近 7 天</option>
-                <option>最近 30 天</option>
-              </select>
+              <span className="text-sm text-stone-500">最近 7 天</span>
             </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">

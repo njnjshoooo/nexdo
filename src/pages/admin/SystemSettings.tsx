@@ -95,17 +95,6 @@ export default function SystemSettings() {
               <ImageUploader value={settings.header.whiteLogo} onChange={(url) => setSettings({...settings, header: {...settings.header, whiteLogo: url}})} aspectRatio="aspect-[21/9]" className="max-w-[320px]" />
             </div>
           </div>
-          <div className="flex gap-6 mt-4">
-            <label className="flex items-center gap-2 text-sm font-medium text-stone-700 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 text-primary border-stone-300 rounded focus:ring-primary" checked={settings.header.showSearch} onChange={(e) => setSettings({...settings, header: {...settings.header, showSearch: e.target.checked}})} /> 顯示搜尋
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium text-stone-700 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 text-primary border-stone-300 rounded focus:ring-primary" checked={settings.header.showCart} onChange={(e) => setSettings({...settings, header: {...settings.header, showCart: e.target.checked}})} /> 顯示購物車
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium text-stone-700 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 text-primary border-stone-300 rounded focus:ring-primary" checked={settings.header.showLogin} onChange={(e) => setSettings({...settings, header: {...settings.header, showLogin: e.target.checked}})} /> 顯示登入
-            </label>
-          </div>
         </div>
       </div>
 
@@ -118,10 +107,7 @@ export default function SystemSettings() {
             <ImageUploader value={settings.footer.logo} onChange={(url) => setSettings({...settings, footer: {...settings.footer, logo: url}})} aspectRatio="aspect-[21/9]" className="max-w-[320px]" />
             <input type="number" className="w-[320px] border border-stone-200 p-3 rounded-xl text-sm focus:border-primary outline-none mt-2 transition-colors" placeholder="Logo 高度 (px)" value={settings.footer.logoHeight || ''} onChange={(e) => setSettings({...settings, footer: {...settings.footer, logoHeight: parseInt(e.target.value)}})} />
           </div>
-          <div>
-            <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">品牌描述</label>
-            <textarea className="w-full border border-stone-200 p-3 rounded-xl text-sm focus:border-primary outline-none transition-colors" rows={3} value={settings.footer.description || ''} onChange={(e) => setSettings({...settings, footer: {...settings.footer, description: e.target.value}})} />
-          </div>
+
           <div>
             <label className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 ml-1">版權文字</label>
             <input className="w-full border border-stone-200 p-3 rounded-xl text-sm focus:border-primary outline-none transition-colors" value={settings.footer.copyright || ''} onChange={(e) => setSettings({...settings, footer: {...settings.footer, copyright: e.target.value}})} />
