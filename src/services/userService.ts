@@ -10,7 +10,6 @@ class UserService {
       return [];
     }
 
-    console.log('📡 [userService] 開始向 Supabase 索取 profiles 資料...');
     const { data, error } = await supabase.from(TABLE_NAME).select('*');
 
     if (error) {
@@ -19,7 +18,6 @@ class UserService {
     }
 
     // 🚨 抓鬼大隊 1：看看 Supabase 到底吐了什麼原始資料
-    console.log('📦 [userService] Supabase 吐出的原始 profiles 資料:', data);
 
     if (!data || data.length === 0) {
       console.warn('⚠️ [userService] 注意：Supabase 回傳了空陣列 []，裡面真的沒資料！');
@@ -29,7 +27,6 @@ class UserService {
     try {
       // 💡 使用箭頭函式確保 this 綁定正確
       const mappedData = data.map(row => this.mapRow(row));
-      console.log('✨ [userService] 轉換成功後的會員資料:', mappedData);
       return mappedData;
     } catch (err) {
       console.error('💥 [userService] 在 mapRow 轉換時崩潰:', err);
@@ -90,7 +87,7 @@ class UserService {
       emergencyContactName: row.emergency_contact_name || row.emergencyContactName,
       emergencyContactPhone: row.emergency_contact_phone || row.emergencyContactPhone,
       specialRequirements: row.special_requirements || row.specialRequirements,
-      role: row.role || 'admin', // 🔥 防呆：如果是後台管理，先給 admin 確保看得到
+      role: row.role || 'user', // 🔥 防呆：如果是後台管理，先給 admin 確保看得到
       permissions: getJson(row.permissions),
       createdAt: row.created_at || row.createdAt,
     };

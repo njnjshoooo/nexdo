@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getSupabaseAdmin } from '../_lib/supabase-admin.js';
 
 export default async function updateUserHandler(req: Request, res: Response) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -18,11 +19,11 @@ export default async function updateUserHandler(req: Request, res: Response) {
 
     const { data: adminPerm } = await adminClient
       .from('admin_permission')
-      .select('role')
+      .select('role, permissions')
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!adminPerm || adminPerm.role !== 'admin') {
+    if (!adminPerm || adminPerm.role !== 'admin' || !Array.isArray(adminPerm.permissions) || !adminPerm.permissions.some((p: string) => p === 'all' || p === 'permissions')) {
       return res.status(403).json({ error: 'Require administrative privileges' });
     }
 

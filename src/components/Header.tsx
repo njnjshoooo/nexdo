@@ -105,35 +105,7 @@ export default function Header() {
     };
   }, []);
 
-  // 4. 🎯 新的管理員權限判定：只看 admin_permission 表格
-  useEffect(() => {
-    const checkAdminPermission = async () => {
-      if (!isAuthenticated || !user?.id) {
-        setShowAdminLink(false);
-        return;
-      }
-
-      try {
-        if (user.email === 'admin@nexdo.com') {
-          setShowAdminLink(true);
-          return;
-        }
-
-        const { data } = await supabase
-          .from('admin_permission')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        // 只要能查到資料且角色是 admin，就認定是後台人員
-        setShowAdminLink(!!(data && data.role === 'admin'));
-      } catch (err) {
-        setShowAdminLink(false);
-      }
-    };
-
-    checkAdminPermission();
-  }, [user, isAuthenticated]);
+  useEffect(() => { setShowAdminLink(user?.role === 'admin'); }, [user]);
 
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
