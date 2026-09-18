@@ -1,3 +1,4 @@
+import { SafetyTool, RentalTool } from './pages/QuickToolsPage';
 import OrganizingPage from './pages/OrganizingPage';
 import { ServiceGroupPage } from './components/Home/RetirementHome';
 import './public-site.css';
@@ -173,6 +174,8 @@ export default function App() {
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/services/health" element={<ServiceGroupPage kind="health" />} />
         <Route path="/services/rental" element={<ServiceGroupPage kind="rental" />} />
+        <Route path="/tools/home-safety" element={<SafetyTool />} />
+        <Route path="/tools/rental" element={<RentalTool />} />
         <Route path="/services/organizing" element={<OrganizingPage />} />
         {[['life-organizing','老前整理'], ['retirement-organizing','退休整理'], ['estate-organizing','遺物整理']].flatMap(([slug,goal]) => [slug, `services/${slug}`].map(path => <Route key={path} path={'/' + path} element={<Navigate replace to={'/services/organizing?goal=' + encodeURIComponent(goal)} />} />))}
         <Route path="/search" element={<SearchPage />} />

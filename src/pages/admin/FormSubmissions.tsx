@@ -1,3 +1,5 @@
+import { ORGANIZING_FORM_ID, ORGANIZING_LABELS } from '../../features/consultation/organizing';
+import { submissionsCsv } from '../../features/consultation/csv';
 import React, { useState, useEffect } from 'react';
 import { PageMainTitle } from '../../components/admin/ui/AdminEditorUI';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -50,6 +52,7 @@ export default function FormSubmissions() {
       const formMap: Record<string, Form> = {};
       allForms.forEach(form => {
         formMap[form.id] = form;
+        formMap[form.formId] = form;
       });
       setForms(formMap);
     } catch (error) {
@@ -57,6 +60,15 @@ export default function FormSubmissions() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadCsv = () => {
+    const csv = submissionsCsv(submissions, (formId, key) => forms[formId]?.fields.find(f => f.id === key)?.label || key);
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a'); link.href = url;
+    link.download = `nexdo-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const clearFilter = () => {
@@ -99,7 +111,7 @@ export default function FormSubmissions() {
   // 渲染詳情彈窗中的動態欄位
   const renderSubmissionData = (submission: FormSubmission) => {
     const form = forms[submission.formId];
-    if (!form) return <div className="text-stone-500 italic">對應表單已刪除或不存在</div>;
+    if (!form) return <dl className="space-y-3">{Object.entries(submission.data).map(([key, value]) => <div key={key}><dt className="text-sm text-stone-500">{submission.formId === ORGANIZING_FORM_ID ? ORGANIZING_LABELS[key] || key : key}</dt><dd className="whitespace-pre-wrap break-words">{typeof value === 'object' ? JSON.stringify(value) : String(value ?? '—')}</dd></div>)}</dl>;
 
     return (
       <div className="space-y-4">
@@ -174,6 +186,10 @@ export default function FormSubmissions() {
         )}
       </div>
 
+      <div className="flex flex-wrap gap-3 mb-5">
+        <button onClick={downloadCsv} disabled={!submissions.length} className="px-4 py-3 bg-primary text-white rounded-lg disabled:opacity-50">下載目前名單 CSV（{submissions.length} 筆）</button>
+        <button onClick={() => setSearchParams({ formId: ORGANIZING_FORM_ID })} className="px-4 py-3 border rounded-lg">只看整理服務需求</button>
+      </div>
       <AdminTable.Container>
         <AdminTable.Main>
           <AdminTable.Head>
@@ -195,7 +211,7 @@ export default function FormSubmissions() {
               submissions.map(submission => {
                 const form = forms[submission.formId];
                 const firstField = form?.fields?.find(f => f.type !== 'hidden');
-                const summary = firstField ? submission.data[firstField.id] : '';
+                const summary = firstField ? submission.data[firstField.id] : submission.data.name || submission.bookingId || '';
                 const isProcessed = submission.status === 'PROCESSED';
 
                 return (
@@ -219,7 +235,7 @@ export default function FormSubmissions() {
                       <div className="text-xs text-stone-500">{submission.pageSlug}</div>
                     </AdminTable.Td>
                     <AdminTable.Td className="text-sm text-stone-900">
-                      {form ? form.name : <span className="text-stone-400 italic">未知表單</span>}
+                      {form ? form.name : submission.formId === ORGANIZING_FORM_ID ? '老前整理線上諮詢' : submission.formId}
                     </AdminTable.Td>
                     <AdminTable.Td className="text-sm text-stone-600 max-w-xs truncate">
                       {Array.isArray(summary) ? summary.join(', ') : summary}

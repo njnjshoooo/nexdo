@@ -466,3 +466,63 @@
  .public-site .service-directory { grid-template-columns:1fr; }
  .public-site .organizing-options label { padding:12px 8px; gap:8px; }
 }
+
+/* 精簡諮詢流程：標準字級、完整標籤與保留觸控尺寸。 */
+.public-site .consultation-form label { display:block; margin:16px 0; font-size:1rem; font-weight:500; }
+.public-site .consultation-form input:not([type=radio]):not([type=checkbox]),
+.public-site .consultation-form textarea { display:block; width:100%; margin-top:8px; padding:12px 14px; min-height:48px; border:1px solid #9aaead; border-radius:10px; background:#fff; color:#00464b; font:inherit; }
+.public-site .consultation-form :is(input,textarea,button):focus-visible,
+.public-site .quick-tool :is(button,a,input):focus-visible { outline:3px solid #cc7d25; outline-offset:3px; }
+.public-site .request-fields { border:0; padding:0; margin:0; min-width:0; }
+.public-site .request-fields fieldset { margin:24px 0; }
+.public-site .request-contact-grid,.public-site .rental-fields { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+.public-site .consultation-form .request-consent { display:flex; align-items:flex-start; gap:12px; font-weight:400; }
+.public-site .request-consent input { width:20px; height:20px; flex-shrink:0; margin-top:4px; }
+.public-site .request-note { font-size:.875rem; line-height:1.7; color:#526566; margin:16px 0; }
+.public-site .request-error { background:#fff0ed; color:#922b21; border-radius:10px; padding:16px; margin-top:16px; }
+.public-site .request-error a { text-decoration:underline; }
+.public-site .form-honeypot { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+.public-site .brand-button:disabled { opacity:.5; cursor:not-allowed; }
+.public-site .request-success h2:focus,.public-site .quick-tool h2:focus { outline:none; }
+.public-site .success-check { display:inline-grid; place-items:center; width:56px; height:56px; border-radius:50%; background:#e8f2eb; color:#236238; font-size:1.75rem; margin-bottom:24px; }
+.public-site .booking-reference { padding:16px; background:#f2f6f6; border-radius:12px; overflow-wrap:anywhere; margin:24px 0; }
+.public-site .booking-reference strong { font-size:.875rem; }
+.public-site .request-success h3 { font-size:1.25rem; margin-bottom:12px; }
+.public-site .line-button { background:#087b37; border-color:#087b37; margin-top:20px; }
+.public-site .request-home-link { display:block; margin-top:20px; text-decoration:underline; }
+.public-site .quick-tool { max-width:800px; padding-top:40px; padding-bottom:80px; }
+.public-site .tool-back { display:inline-block; margin-bottom:24px; text-decoration:underline; }
+.public-site .quick-tool h1 { font-size:clamp(1.75rem,3vw,2.25rem); font-weight:500; line-height:1.4; margin-bottom:16px; }
+.public-site .quick-tool h2 { font-size:1.4rem; line-height:1.6; font-weight:500; margin-bottom:20px; }
+.public-site .quick-tool p { line-height:1.75; }
+.public-site .tool-progress-label { font-size:.875rem; margin:24px 0 8px; }
+.public-site .quick-tool progress { display:block; width:100%; height:8px; border:0; border-radius:8px; overflow:hidden; accent-color:#00464b; margin-bottom:24px; }
+.public-site .quick-tool progress::-webkit-progress-bar { background:#dfe8e5; }
+.public-site .quick-tool progress::-webkit-progress-value { background:#00464b; }
+.public-site .tool-panel { background:#fff; border:1px solid #d7e0dd; border-radius:20px; padding:32px; }
+.public-site .tool-options { display:grid; gap:12px; margin:24px 0; }
+.public-site .tool-options label { display:flex; gap:14px; align-items:center; min-height:58px; padding:16px; border:1px solid #a5b7b3; border-radius:12px; cursor:pointer; }
+.public-site .tool-options label.selected { background:#edf5f1; border-color:#00464b; box-shadow:inset 0 0 0 1px #00464b; }
+.public-site .tool-options input { width:20px; height:20px; accent-color:#00464b; }
+.public-site .tool-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+.public-site .safety-tip { padding:18px 0; border-bottom:1px solid #e1e7e4; }
+.public-site .safety-tip h3 { font-size:1.1rem; margin-bottom:8px; }
+.public-site .tool-assumptions { padding:16px; border-radius:10px; background:#f2f5f2; font-size:.875rem; margin:20px 0; }
+.public-site .tool-next { margin-top:32px; padding-top:24px; border-top:1px solid #d7e0dd; }
+.public-site .number-with-unit { display:flex; align-items:center; gap:8px; }
+.public-site .number-with-unit input { min-width:0; }
+.public-site .number-with-unit span { white-space:nowrap; font-size:.875rem; }
+.public-site .rental-total { font-size:2rem; font-weight:600; color:#00464b; padding:20px 0; }
+.public-site .rental-total span { display:block; font-size:.875rem; font-weight:400; }
+.public-site .rental-breakdown div { display:flex; justify-content:space-between; gap:20px; padding:14px 0; border-bottom:1px solid #e1e7e4; }
+.public-site .rental-breakdown dd { white-space:nowrap; }
+@media(max-width:600px) {
+ .public-site .request-contact-grid,.public-site .rental-fields { grid-template-columns:1fr; }
+ .public-site .tool-panel { padding:24px 18px; }
+ .public-site .quick-tool { padding-top:24px; }
+ .public-site .organizing-product h1 { font-size:1.75rem; }
+ .public-site .tool-actions .brand-button { flex:1; }
+}
+
+.public-site .organizing-jump { margin-top:24px; }
+.public-site #organizing-request { scroll-margin-top:100px; }
