@@ -383,22 +383,24 @@ function submissionCustomerHtml(ctx: FormSubmissionEmailContext): string {
   </body></html>`;
 }
 
-export async function sendFormSubmissionEmails(ctx: FormSubmissionEmailContext): Promise<void> {
+export async function sendFormSubmissionEmails(ctx: FormSubmissionEmailContext): Promise<{ internal: boolean; customer: boolean }> {
+  const result = { internal: false, customer: false };
   const client = getClient();
   if (!client) {
     console.warn('[email] RESEND_API_KEY 未設定，略過表單通知 email', ctx.bookingId);
-    return;
+    return result;
   }
 
   // 內部通知（給 INTERNAL_NOTIFICATION_EMAIL）
   if (INTERNAL.length > 0) {
     try {
-      await client.emails.send({
+      const response = await client.emails.send({
         from: FROM,
         to: INTERNAL,
         subject: `[新表單] ${ctx.formName} · ${ctx.customerName || ctx.bookingId}`,
         html: submissionInternalHtml(ctx),
       });
+      result.internal = !response.error;
     } catch (e) {
       console.error('[email] internal submission email failed', e);
     }
@@ -407,16 +409,18 @@ export async function sendFormSubmissionEmails(ctx: FormSubmissionEmailContext):
   // 客戶回覆信（若表單有填 email）
   if (ctx.customerEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.customerEmail)) {
     try {
-      await client.emails.send({
+      const response = await client.emails.send({
         from: FROM,
         to: ctx.customerEmail,
         subject: `好齡居 — 我們收到您的「${ctx.formName}」需求`,
         html: submissionCustomerHtml(ctx),
       });
+      result.customer = !response.error;
     } catch (e) {
       console.error('[email] customer submission email failed', e);
     }
   }
+  return result;
 }
 
 export async function sendOrderFailedEmails(ctx: OrderFailedEmailContext): Promise<void> {

@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="zh-Hant">
   <head>
+    <script>
+      // 保留舊連結，直接進入新的第一題；其他舊工具仍可使用。
+      const route = location.hash.replace(/^#/, '').split('?')[0];
+      const destinations = { '/safety': '/tools/home-safety', '/relocation': '/tools/rental' };
+      if (destinations[route]) location.replace(destinations[route]);
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>好齡居｜居家安全檢測與租金試算</title>

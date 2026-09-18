@@ -1,49 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Type } from 'lucide-react';
-
+const KEY = 'nexdo-reading-size-v2';
 export default function FontSizeControl({ isDark }: { isDark?: boolean }) {
-  const [fontSize, setFontSize] = useState<'18px' | '20px'>('18px');
-  
+  const [size, setSize] = useState('16px');
   useEffect(() => {
-    const savedFontSize = localStorage.getItem('app-font-size');
-    if (savedFontSize === '18px' || savedFontSize === '20px') {
-      setFontSize(savedFontSize);
-      document.documentElement.style.fontSize = savedFontSize;
-    } else {
-      document.documentElement.style.fontSize = '18px'; // Default
-    }
+    const sync = () => {
+      let next = '16px';
+      try { if (localStorage.getItem(KEY) === '20px') next = '20px'; } catch {}
+      setSize(next); document.documentElement.style.fontSize = next;
+    };
+    sync(); window.addEventListener('nexdo-font-size', sync);
+    return () => window.removeEventListener('nexdo-font-size', sync);
   }, []);
-
-  const changeFontSize = (size: '18px' | '20px') => {
-    setFontSize(size);
-    localStorage.setItem('app-font-size', size);
-    document.documentElement.style.fontSize = size;
-  };
-
-  return (
-    <div className={`flex items-center gap-[4px] rounded-full p-[4px] border transition-colors ${isDark ? 'bg-white/10 border-white/20' : 'bg-stone-100 border-stone-200'}`}>
-      <button
-        onClick={() => changeFontSize('18px')}
-        className={`w-[28px] h-[28px] flex items-center justify-center rounded-full text-[14px] leading-[20px] transition-colors ${
-          fontSize === '18px' 
-            ? isDark ? 'bg-white text-stone-900 font-bold shadow-sm' : 'bg-white text-stone-900 font-bold shadow-sm'
-            : isDark ? 'text-white hover:bg-white/20' : 'text-stone-500 hover:text-stone-900'
-        }`}
-        title="字體：中 (A) - 預設"
-      >
-        A
-      </button>
-      <button
-        onClick={() => changeFontSize('20px')}
-        className={`w-[28px] h-[28px] flex items-center justify-center rounded-full text-[16px] leading-[24px] transition-colors ${
-          fontSize === '20px' 
-            ? isDark ? 'bg-white text-stone-900 font-bold shadow-sm' : 'bg-white text-stone-900 font-bold shadow-sm'
-            : isDark ? 'text-white hover:bg-white/20' : 'text-stone-500 hover:text-stone-900'
-        }`}
-        title="字體：大 (A+)"
-      >
-        A+
-      </button>
-    </div>
-  );
+  function change(next: string) {
+    try { localStorage.setItem(KEY, next); } catch {}
+    setSize(next); document.documentElement.style.fontSize = next;
+    window.dispatchEvent(new Event('nexdo-font-size'));
+  }
+  return <div className={`flex gap-1 rounded-full p-1 border ${isDark ? 'text-white border-white/30' : 'text-stone-700 border-stone-200'}`} aria-label="閱讀字體大小">
+    {[['16px', 'A', '標準字體'], ['20px', 'A+', '放大字體']].map(([value, label, title]) => <button key={value} type="button" onClick={() => change(value)} aria-label={title} aria-pressed={size === value} title={title} className={`min-w-[44px] min-h-[44px] rounded-full text-[16px] ${size === value ? 'bg-white text-stone-900 shadow-sm font-bold' : ''}`}>{label}</button>)}
+  </div>;
 }

@@ -32,8 +32,8 @@ export function HomeTools() {
   return <section className="retirement-section tools-section"><div className="retirement-container">
     <div className="section-heading tools-heading"><img src="/images/mascot/haohao-wave-3.png" alt="好好陪您了解居家需求" width="80" height="80" /><p className="eyebrow">先了解，再決定</p><h2>動手看看，先了解您的家</h2><p>不用急著做決定。兩個小工具，幫您找到與顧問聊聊的起點。</p></div>
     <div className="tools-grid">
-      <a className="tool-card" href="/minigame/#/safety"><ShieldCheck size={40} strokeWidth={1.3} /><span className="eyebrow">01 ／ 居住安全</span><h3>一分鐘居家安全檢測</h3><p>從每天走的動線、浴室到照明，看看哪些地方值得留意。將觀察帶給顧問，一起討論改善順序。</p><span className="card-link">開始檢測 <ArrowRight size={20} /></span></a>
-      <a className="tool-card" href="/minigame/#/relocation"><Calculator size={40} strokeWidth={1.3} /><span className="eyebrow">02 ／ 房屋出租</span><h3>代租代管租金試算</h3><p>試著了解房屋出租的收支安排，為下一步討論做準備。試算僅供參考，實際租金依屋況與出租條件評估。</p><span className="card-link">開始試算 <ArrowRight size={20} /></span></a>
+      <a className="tool-card" href="/tools/home-safety"><ShieldCheck size={40} strokeWidth={1.3} /><span className="eyebrow">01 ／ 居住安全</span><h3>一分鐘居家安全檢測</h3><p>從每天走的動線、浴室到照明，看看哪些地方值得留意。將觀察帶給顧問，一起討論改善順序。</p><span className="card-link">開始檢測 <ArrowRight size={20} /></span></a>
+      <a className="tool-card" href="/tools/rental"><Calculator size={40} strokeWidth={1.3} /><span className="eyebrow">02 ／ 房屋出租</span><h3>代租代管租金試算</h3><p>試著了解房屋出租的收支安排，為下一步討論做準備。試算僅供參考，實際租金依屋況與出租條件評估。</p><span className="card-link">開始試算 <ArrowRight size={20} /></span></a>
     </div>
   </div></section>;
 }
