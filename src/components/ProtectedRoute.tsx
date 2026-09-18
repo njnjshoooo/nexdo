@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   if (!isAuthenticated) {
     // Redirect to home or show a message, but since we have a modal, 
     // maybe just redirect to home and let them open the modal
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to={requireAdmin ? "/admin/login" : "/"} state={{ from: location }} replace />;
   }
 
   if (requireAdmin && user?.role !== 'admin') {
