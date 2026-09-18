@@ -60,7 +60,7 @@ export default function PageEditor() {
   // Update activeTab and content when template changes
   useEffect(() => {
     if (template === 'HOME') {
-      setActiveTab('home_hero');
+      setActiveTab('home_secondary');
       if (urlSlug === 'new') setValue('content', { ...DEFAULT_MAJOR_ITEM_TEMPLATE, home: DEFAULT_HOME_TEMPLATE });
     } else if (template === 'MAJOR_ITEM') {
       setActiveTab('hero');
@@ -98,7 +98,7 @@ export default function PageEditor() {
         reset(page); // 這裡會把 template 設進去，模板才會顯示
 
         // 根據 template 預設 activeTab
-        if (page.template === 'HOME') setActiveTab('home_hero');
+        if (page.template === 'HOME') setActiveTab('home_secondary');
         else if (page.template === 'MAJOR_ITEM') setActiveTab('hero');
         else if (page.template === 'SUB_ITEM') setActiveTab('sub_product');
         else if (page.template === 'GENERAL') setActiveTab('general_blocks');
@@ -251,12 +251,8 @@ export default function PageEditor() {
             <nav className="flex flex-col">
               {template === 'HOME' && (
                 <>
-                  <TabButton active={activeTab === 'home_hero'} label="Hero 區塊" onClick={() => setActiveTab('home_hero')} />
                   <TabButton active={activeTab === 'home_secondary'} label="服務項目" onClick={() => setActiveTab('home_secondary')} />
                   <TabButton active={activeTab === 'home_more_services'} label="我們還提供" onClick={() => setActiveTab('home_more_services')} />
-                  <TabButton active={activeTab === 'home_consultation'} label="預約流程" onClick={() => setActiveTab('home_consultation')} />
-                  <TabButton active={activeTab === 'home_testimonials'} label="客戶心得" onClick={() => setActiveTab('home_testimonials')} />
-                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}
@@ -265,7 +261,6 @@ export default function PageEditor() {
                   <TabButton active={activeTab === 'hero'} label="Hero 區塊" onClick={() => setActiveTab('hero')} />
                   <TabButton active={activeTab === 'services'} label="服務清單" onClick={() => setActiveTab('services')} />
                   <TabButton active={activeTab === 'cases'} label="成功案例" onClick={() => setActiveTab('cases')} />
-                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}
@@ -278,7 +273,6 @@ export default function PageEditor() {
                   <TabButton active={activeTab === 'sub_core_services'} label="服務流程" onClick={() => setActiveTab('sub_core_services')} />
                   <TabButton active={activeTab === 'sub_faqs'} label="常見問題" onClick={() => setActiveTab('sub_faqs')} />
                   <TabButton active={activeTab === 'sub_related'} label="關聯服務" onClick={() => setActiveTab('sub_related')} />
-                  <TabButton active={activeTab === 'home_latest_blogs'} label="好齡居誌" onClick={() => setActiveTab('home_latest_blogs')} />
                   <TabButton active={activeTab === 'home_form'} label="服務表單" onClick={() => setActiveTab('home_form')} />
                 </>
               )}
