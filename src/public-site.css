@@ -528,3 +528,60 @@
 .public-site #organizing-request { scroll-margin-top:100px; }
 .public-site .consultation-form .organizing-options label { display:flex; align-items:center; gap:10px; margin:0; }
 .public-site .consultation-form .organizing-options input { flex-shrink:0; }
+
+/* ==========================================================================
+   Typography scale — 全站統一字級（前台 .public-site 範圍，後台不受影響）
+   以 rem 計算，A / A+ 閱讀字級切換仍會等比例放大。
+   ========================================================================== */
+.public-site {
+  --fs-h1: 2.25rem;     /* 36px 頁面主標 */
+  --fs-h2: 1.75rem;     /* 28px 區塊標題 */
+  --fs-title: 1.5rem;   /* 24px 卡片大標、重點數字 */
+  --fs-h3: 1.25rem;     /* 20px 小標題 */
+  --fs-h4: 1.125rem;    /* 18px 次小標 */
+  --fs-lead: 1.125rem;  /* 18px 導言、副標題 */
+  --fs-body: 1rem;      /* 16px 內文 */
+  --fs-small: 0.875rem; /* 14px 輔助文字、按鈕 */
+  --fs-caption: 0.75rem;/* 12px 註解、標籤（最小字級） */
+  font-size: var(--fs-body);
+}
+@media (max-width: 767px) {
+  .public-site {
+    --fs-h1: 1.75rem;   /* 28px */
+    --fs-h2: 1.5rem;    /* 24px */
+    --fs-title: 1.25rem;/* 20px */
+    --fs-h3: 1.125rem;  /* 18px */
+    --fs-h4: 1.0625rem; /* 17px */
+    --fs-lead: 1.0625rem;
+  }
+}
+
+/* 標題：不論頁面或 CMS 內容，h1–h4 一律套用同一組字級 */
+.public-site h1 { font-size: var(--fs-h1) !important; line-height: 1.35 !important; }
+.public-site h2 { font-size: var(--fs-h2) !important; line-height: 1.4 !important; }
+.public-site h3 { font-size: var(--fs-h3) !important; line-height: 1.5 !important; }
+.public-site h4 { font-size: var(--fs-h4) !important; line-height: 1.5 !important; }
+.public-site p, .public-site li { line-height: 1.75; }
+
+/* 各頁 Tailwind 字級類別對應到同一組字級（含 sm:/md:/lg: 響應式變體） */
+.public-site :is(.text-\[9px\], .text-\[10px\], .text-\[11px\], .text-\[12px\], .text-xs, .sm\:text-xs, .md\:text-xs) { font-size: var(--fs-caption); }
+.public-site :is(.text-sm, .text-\[12\.5px\], .text-\[13px\], .text-\[14px\], .sm\:text-sm, .md\:text-sm) { font-size: var(--fs-small); }
+.public-site :is(.text-base, .text-\[15px\], .text-\[16px\], .lg\:text-\[16px\], .sm\:text-base, .md\:text-base) { font-size: var(--fs-body); }
+.public-site :is(.text-lg, .text-\[18px\], .sm\:text-lg, .md\:text-lg) { font-size: var(--fs-lead); }
+.public-site :is(.text-xl, .text-\[20px\], .md\:text-\[20px\], .md\:text-xl, .lg\:text-xl) { font-size: var(--fs-h3); }
+.public-site :is(.text-2xl, .sm\:text-2xl, .md\:text-2xl) { font-size: var(--fs-title); }
+.public-site :is(.text-3xl, .sm\:text-3xl, .md\:text-3xl) { font-size: var(--fs-h2); }
+.public-site :is(.text-4xl, .text-5xl, .text-6xl, .sm\:text-5xl, .md\:text-4xl, .md\:text-5xl, .lg\:text-4xl, .lg\:text-5xl, .lg\:text-6xl, .md\:text-\[2\.5rem\], .lg\:text-\[2\.75rem\]) { font-size: var(--fs-h1); }
+
+/* 首頁與服務頁自訂元件：改用同一組字級 */
+.public-site .eyebrow, .public-site .hero-note, .public-site .scene-caption, .public-site .scene-label, .public-site .image-note { font-size: var(--fs-caption); }
+.public-site :is(.hero-description, .organizing-lead) { font-size: var(--fs-lead); }
+.public-site :is(.section-heading p:not(.eyebrow), .faq-section summary, .consultation-form label, footer p, .service-detail p, .service-detail li) { font-size: var(--fs-body); }
+.public-site :is(.brand-button, .card-link, .service-price, .pace-note, .hero-principles, .copy-status, .request-note, .booking-reference strong, .tool-progress-label, .tool-assumptions, .number-with-unit span, .rental-total span, .companion-note) { font-size: var(--fs-small); }
+.public-site :is(.rental-extension strong, .organizing-unified-cta strong, .organizing-price strong, .organizing-request legend, .safety-tip h3) { font-size: var(--fs-h4); }
+.public-site :is(.service-number, .rental-total) { font-size: var(--fs-title); }
+.public-site .service-number { margin-bottom: 20px; }
+@media (max-width: 767px) {
+  .public-site header .header-consultation { font-size: var(--fs-small); }
+  .public-site .hero-principles { font-size: var(--fs-caption); }
+}
