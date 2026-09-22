@@ -193,7 +193,7 @@ const sections: Section[] = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="privacy-policy bg-[#FFF9EF] py-12 md:py-16">
+    <div className="privacy-policy bg-[#FFF9EF] pt-28 pb-12 md:pt-32 md:pb-16">
       <Helmet>
         <title>隱私權政策｜好齡居 NEXDO</title>
         <meta name="description" content="好齡居 NEXDO 如何蒐集、處理及利用您的個人資料，以及您依個人資料保護法享有的權利。" />
