@@ -28,6 +28,7 @@ export default async function sitemapHandler(req: Request, res: Response) {
     
     // 首頁
     allUrls.push({ url: `${baseUrl}/`, changefreq: 'daily', priority: 1.0 });
+    allUrls.push({ url: `${baseUrl}/privacy`, changefreq: 'yearly', priority: 0.3 });
 
     if (pages) {
       for (const page of pages) {

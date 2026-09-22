@@ -103,6 +103,7 @@ export default function Footer() {
 
         <div className="border-t border-stone-800 pt-8 text-center text-xs text-stone-500">
           <p>{data.copyright}</p>
+          <p className="mt-2"><a href="/privacy" className="hover:text-primary transition-colors underline-offset-2 hover:underline">隱私權政策</a></p>
         </div>
       </div>
     </footer>

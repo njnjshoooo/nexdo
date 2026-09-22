@@ -4,6 +4,7 @@ import PasswordRecoveryPage from './pages/PasswordRecoveryPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import { SafetyTool, RentalTool } from './pages/QuickToolsPage';
 import OrganizingPage from './pages/OrganizingPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import { ServiceGroupPage } from './components/Home/RetirementHome';
 import './public-site.css';
 import { useAuth } from "./contexts/AuthContext";
@@ -187,6 +188,7 @@ export default function App() {
         <Route path="/services/organizing" element={<OrganizingPage />} />
         {[['life-organizing','老前整理'], ['retirement-organizing','退休整理'], ['estate-organizing','遺物整理']].flatMap(([slug,goal]) => [slug, `services/${slug}`].map(path => <Route key={path} path={'/' + path} element={<Navigate replace to={'/services/organizing?goal=' + encodeURIComponent(goal)} />} />))}
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
         <Route path="/:slug" element={<DynamicPage />} />
         <Route path="/:category/:slug" element={<DynamicPage />} />
