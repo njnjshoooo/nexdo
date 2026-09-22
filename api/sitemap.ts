@@ -65,7 +65,7 @@ export default async function sitemapHandler(req: Request, res: Response) {
   </url>`).join('')}
 </urlset>`;
 
-    res.header('Content-Type', 'application/xml');
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.send(xml);
   } catch (error) {
     console.error('Sitemap error:', error);
