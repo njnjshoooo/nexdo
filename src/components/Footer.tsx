@@ -41,6 +41,16 @@ export default function Footer() {
     };
   }, []);
 
+  // 隱私權政策連結固定出現在「關於我們」（無此分類時放最後一組），不受後台頁尾設定覆蓋
+  const PRIVACY_LINK = { label: '隱私權政策', url: '/privacy' };
+  const menuGroups = (() => {
+    const groups = (data.menuGroups || []).map((g: any) => ({ ...g, links: [...(g.links || [])] }));
+    if (!groups.length || groups.some((g: any) => g.links.some((l: any) => l.url === PRIVACY_LINK.url))) return groups;
+    const target = groups.find((g: any) => g.title === '關於我們') || groups[groups.length - 1];
+    target.links.push(PRIVACY_LINK);
+    return groups;
+  })();
+
   return (
     <footer id="contact" className="bg-stone-900 text-stone-300 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,7 +77,7 @@ export default function Footer() {
 
           {/* Middle: Custom Links */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:col-span-2">
-            {data.menuGroups?.map((group: any, gIdx: number) => (
+            {menuGroups.map((group: any, gIdx: number) => (
               <div key={group.title || gIdx}>
                 <h3 className="text-white font-bold mb-4">{group.title}</h3>
                 <ul className="space-y-2 text-sm">
@@ -103,7 +113,7 @@ export default function Footer() {
 
         <div className="border-t border-stone-800 pt-8 text-center text-xs text-stone-500">
           <p>{data.copyright}</p>
-          <p className="mt-2"><a href="/privacy" className="hover:text-primary transition-colors underline-offset-2 hover:underline">隱私權政策</a></p>
+          <p className="mt-2"><a href="/privacy" className="text-stone-400 hover:text-primary transition-colors underline underline-offset-2">隱私權政策</a></p>
         </div>
       </div>
     </footer>
