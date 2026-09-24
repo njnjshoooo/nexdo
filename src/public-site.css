@@ -612,3 +612,6 @@
  .public-site .organizing-pace-grid,.public-site .organizing-prepare { grid-template-columns:1fr; }
  .public-site .organizing-note-card { padding:24px; }
 }
+.public-site .organizing-card-photo { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:16px; margin-bottom:20px; }
+.public-site .organizing-steps .organizing-card-photo { aspect-ratio:16/10; margin-bottom:16px; }
+.public-site .organizing-steps .service-number { margin-bottom:8px; }
