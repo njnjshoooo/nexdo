@@ -615,3 +615,33 @@
 .public-site .organizing-card-photo { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:16px; margin-bottom:20px; }
 .public-site .organizing-steps .organizing-card-photo { aspect-ratio:16/10; margin-bottom:16px; }
 .public-site .organizing-steps .service-number { margin-bottom:8px; }
+
+/* 老前整理頁：先看懂再填單的版面 */
+.public-site .organizing-hero-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center; }
+.public-site .organizing-hero-figure { margin:0; }
+.public-site .organizing-hero-figure .organizing-product-photo { margin-top:0; }
+.public-site .organizing-promises { list-style:none; padding:0; margin:28px 0; display:grid; gap:12px; }
+.public-site .organizing-promises li { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 12px; padding-left:28px; position:relative; }
+.public-site .organizing-promises li::before { content:'✓'; position:absolute; left:0; top:0; color:#EB5514; font-weight:700; }
+.public-site .organizing-promises strong { color:#00464B; font-weight:500; }
+.public-site .organizing-promises span { color:#00464bcc; font-size:.94rem; }
+.public-site .organizing-hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.public-site .organizing-meta a { color:#00464B; text-decoration:underline; text-underline-offset:2px; }
+.public-site .organizing-form-section { background:#FFF9EF; scroll-margin-top:96px; }
+.public-site .organizing-form-wrap { max-width:780px; }
+.public-site .organizing-form-wrap .section-heading { margin-bottom:24px; }
+.public-site .organizing-form-steps { list-style:none; display:flex; flex-wrap:wrap; gap:12px 24px; padding:0; margin:0 0 24px; }
+.public-site .organizing-form-steps li { display:flex; align-items:center; gap:10px; font-size:.94rem; }
+.public-site .organizing-form-steps strong { display:inline-flex; width:28px; height:28px; border-radius:50%; background:#00464B; color:#fff; align-items:center; justify-content:center; font-size:.89rem; }
+.public-site .organizing-form-wrap .organizing-footnote a { color:#00464B; text-decoration:underline; text-underline-offset:2px; }
+.public-site .organizing-sticky-cta { display:none; }
+@media(max-width:900px) {
+ .public-site .organizing-hero-grid { grid-template-columns:1fr; gap:28px; }
+ /* 右側留白避開好好聊天按鈕 */
+ .public-site .organizing-sticky-cta { visibility:hidden; opacity:0; transform:translateY(100%); transition:opacity .2s, transform .2s, visibility .2s; position:fixed; inset:auto 0 0; z-index:30; display:flex; gap:8px; padding:10px 84px calc(10px + env(safe-area-inset-bottom)) 16px; background:#fffffff2; border-top:1px solid #00464B25; backdrop-filter:blur(8px); }
+ .public-site .organizing-sticky-cta.is-visible { visibility:visible; opacity:1; transform:none; }
+ .public-site .organizing-sticky-cta .brand-button { flex:1; padding:12px 8px; font-size:.94rem; }
+ .public-site .organizing-sticky-cta .brand-button.secondary { background:#fff; }
+ .public-site .organizing-product { padding-bottom:84px; }
+}
+.public-site .consultation-form .request-intro { font-size:.94rem; color:#00464bcc; margin-bottom:8px; }

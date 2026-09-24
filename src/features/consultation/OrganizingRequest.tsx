@@ -38,8 +38,7 @@ export default function OrganizingRequest({ goal, purpose, choose }: { goal: str
     <a className="request-home-link" href="/">回到首頁</a>
   </section>;
   return <form onSubmit={submit} className="consultation-form" aria-busy={busy}>
-    <p className="eyebrow">線上填單・不需註冊</p><h2>告訴我們，這次想怎麼整理</h2>
-    <p>留下需求，顧問會與您確認範圍與報價。標示 * 為必填，尚未確定的細節可以之後再聊。</p>
+    <p className="request-intro">標示 * 為必填，尚未確定的細節可以之後再聊。</p>
     <fieldset disabled={busy} className="request-fields">
       {[{ key: 'goal', title: '本次目標', values: ORGANIZING_GOALS, selected: goal }, { key: 'purpose', title: '整理目的', values: ORGANIZING_PURPOSES, selected: purpose }].map(group => <fieldset key={group.key}><legend>{group.title} *</legend><div className="organizing-options">{group.values.map(value => <label key={value}><input required type="radio" name={group.key} value={value} checked={group.selected === value} onChange={() => choose(group.key, value)} /><span>{value}</span></label>)}</div></fieldset>)}
       <div className="request-contact-grid">

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 
 import OrganizingRequest from '../features/consultation/OrganizingRequest';
+import { LINE_QUOTE_URL } from '../data/organizingCatalog';
 import { ORGANIZING_GOALS, ORGANIZING_PURPOSES } from '../features/consultation/organizing';
 export { ORGANIZING_GOALS, ORGANIZING_PURPOSES } from '../features/consultation/organizing';
 
@@ -86,13 +87,45 @@ const FAQS: [string, string][] = [
   ['費用怎麼計算？', '依整理範圍、物品量、需要的人力與時程評估後報價。第一次到府評估免費，確認費用與時段後才安排服務。'],
 ];
 
+/** 進站先看懂服務，再填單；三個承諾放在第一屏，降低填單前的猶豫。 */
+const PROMISES: [string, string][] = [
+  ['先評估再報價', '第一次到府評估免費，確認費用與時段後才安排。'],
+  ['不替您做決定', '物品去留由您或家人決定，不確定的先留著。'],
+  ['一次一個範圍', '可以只整理一個抽屜或一個房間，不必整屋進行。'],
+];
+
+const PHONE = '02-7755-0920';
+
 const RELATED: [string, string][] = [
   ['退休整理', '退休後重新安排日常，把空間調整成接下來好住的樣子。'],
   ['遺物整理', '家人離開後，陪您以自己的步調整理遺物與回憶。'],
   ['搬家整理', '搬家前先分類打包，搬入後再安排順手的收納位置。'],
 ];
 
+/** 手機常駐 CTA：捲過首屏才出現，進到表單區時收起，避免與頁面按鈕重複。 */
+function useStickyCta() {
+  const [show, setShow] = useState(false);
+  const state = useRef({ hero: true, form: false });
+  useEffect(() => {
+    const targets: [string, 'hero' | 'form'][] = [['.organizing-hero', 'hero'], ['#organizing-request', 'form']];
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const key = entry.target.matches('.organizing-hero') ? 'hero' : 'form';
+        state.current[key] = entry.isIntersecting;
+      }
+      setShow(!state.current.hero && !state.current.form);
+    }, { threshold: 0 });
+    for (const [selector] of targets) {
+      const node = document.querySelector(selector);
+      if (node) observer.observe(node);
+    }
+    return () => observer.disconnect();
+  }, []);
+  return show;
+}
+
 export default function OrganizingPage() {
+  const showStickyCta = useStickyCta();
   const [params, setParams] = useSearchParams();
   const goal = ORGANIZING_GOALS.includes(params.get('goal') || '') ? params.get('goal')! : '';
   const purpose = ORGANIZING_PURPOSES.includes(params.get('purpose') || '') ? params.get('purpose')! : '';
@@ -101,9 +134,22 @@ export default function OrganizingPage() {
   }
   return <div className="organizing-product">
     <Helmet><title>老前整理｜在人生的重要時刻，為生活留出空間｜好齡居 NEXDO</title><meta name="description" content="退休、老前、遺物與搬家整理，同一項整理服務、相同計價方式。選擇這次的目標與目的，由安心顧問陪您確認範圍，先評估再報價。" /><link rel="canonical" href="https://www.nexdo.tw/services/organizing" /></Helmet>
-    <section className="retirement-section"><div className="retirement-container organizing-product-grid">
-      <div><p className="eyebrow">老前整理</p><h1>在人生的重要時刻，<br />為生活留出空間。</h1><p className="organizing-lead">退休，為新生活重新安排日常；走到人生下半場，回看一路珍藏的物品；家人離世後，透過整理，留下與他的珍貴回憶。</p><p>每一次整理，起點可能不同。我們都陪您釐清「想留下什麼、接下來怎麼生活」，依您的步調安排。</p><p className="organizing-meta">先評估再報價・第一次到府評估免費・確認後才安排</p><a className="brand-button organizing-jump" href="#organizing-request">填寫整理需求 ↓</a><img className="organizing-product-photo" src="/images/customers/scene-94.webp" alt="穿著好齡居制服的整理人員，陪長輩整理照片與紀念物，情境示意" /><p className="image-note">情境示意</p></div>
-      <div className="organizing-request" id="organizing-request"><OrganizingRequest goal={goal} purpose={purpose} choose={choose} /></div>
+    <section className="retirement-section organizing-hero"><div className="retirement-container organizing-hero-grid">
+      <div>
+        <p className="eyebrow">老前整理</p>
+        <h1>在人生的重要時刻，<br />為生活留出空間。</h1>
+        <p className="organizing-lead">退休、換屋，或家人離開之後，都可能需要重新安排空間。我們陪您釐清「想留下什麼、接下來怎麼生活」，依您的步調進行。</p>
+        <ul className="organizing-promises">{PROMISES.map(([title, text]) => <li key={title}><strong>{title}</strong><span>{text}</span></li>)}</ul>
+        <div className="organizing-hero-actions">
+          <a className="brand-button" href="#organizing-request">填寫整理需求 ↓</a>
+          <a className="brand-button secondary" href={LINE_QUOTE_URL} target="_blank" rel="noopener noreferrer">用 LINE 詢問 ↗</a>
+        </div>
+        <p className="organizing-meta">填單約 1 分鐘，不需註冊。想直接說也可以來電 <a href={`tel:${PHONE.replace(/-/g, '')}`}>{PHONE}</a>。</p>
+      </div>
+      <figure className="organizing-hero-figure">
+        <img className="organizing-product-photo" src="/images/customers/scene-94.webp" alt="穿著好齡居制服的整理人員，陪長輩整理照片與紀念物，情境示意" />
+        <figcaption className="image-note">情境示意</figcaption>
+      </figure>
     </div></section>
 
     <section className="retirement-section"><div className="retirement-container">
@@ -136,9 +182,24 @@ export default function OrganizingPage() {
           <h3>費用與確認方式</h3>
           <p>第一次到府評估免費。整理費用依範圍、物品量、人力與時程評估後報價，經您確認費用與時段才安排服務；未經確認不會處理任何物品。</p>
           <p>物品的去留以本人意願及家人同意為前提。整理服務不代擬遺囑、不判斷繼承或財產分配，也不取代法律、稅務、醫療或心理專業；有這方面的需求時，建議另外諮詢相關專業人員。</p>
-          <a className="brand-button" href="#organizing-request">先取得需求評估 ↑</a>
+          <a className="brand-button" href="#organizing-request">填寫整理需求，取得報價 ↓</a>
         </div>
       </div>
+    </div></section>
+
+    <section className="retirement-section organizing-form-section" id="organizing-request"><div className="retirement-container organizing-form-wrap">
+      <div className="section-heading">
+        <p className="eyebrow">線上填單・不需註冊</p>
+        <h2>告訴我們，這次想怎麼整理</h2>
+        <p>送出後由安心顧問與您聯繫，確認範圍與費用；您同意後才安排服務。</p>
+      </div>
+      <ol className="organizing-form-steps">
+        <li><strong>1</strong><span>填寫本表單（約 1 分鐘）</span></li>
+        <li><strong>2</strong><span>顧問來電確認需求</span></li>
+        <li><strong>3</strong><span>到府評估後報價</span></li>
+      </ol>
+      <div className="organizing-request"><OrganizingRequest goal={goal} purpose={purpose} choose={choose} /></div>
+      <p className="organizing-footnote">不方便填表單也沒關係，可以直接用 <a href={LINE_QUOTE_URL} target="_blank" rel="noopener noreferrer">LINE</a> 或電話 <a href={`tel:${PHONE.replace(/-/g, '')}`}>{PHONE}</a> 與顧問聯繫。</p>
     </div></section>
 
     <section className="retirement-section faq-section"><div className="retirement-container faq-layout">
@@ -150,5 +211,9 @@ export default function OrganizingPage() {
       <div className="section-heading"><p className="eyebrow">其他人生階段</p><h2>不同的時刻，都有合適的陪伴。</h2><p>都是同一項整理服務、相同的計價方式，差別在這次想先處理的事。</p></div>
       <div className="organizing-cards">{RELATED.map(([title, text]) => <a className="organizing-card" key={title} href={`/services/organizing?goal=${encodeURIComponent(title)}#organizing-request`}><h3>{title}</h3><p>{text}</p><span className="organizing-card-link">看這個目標的整理 →</span></a>)}</div>
     </div></section>
+    <div className={`organizing-sticky-cta${showStickyCta ? ' is-visible' : ''}`} aria-hidden={!showStickyCta}>
+      <a className="brand-button" href="#organizing-request">填寫整理需求</a>
+      <a className="brand-button secondary" href={LINE_QUOTE_URL} target="_blank" rel="noopener noreferrer">LINE 詢問</a>
+    </div>
   </div>;
 }
