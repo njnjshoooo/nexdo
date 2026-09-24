@@ -593,3 +593,22 @@
 .public-site .privacy-body a { color: #00464B; text-decoration: underline; text-underline-offset: 2px; }
 .public-site .privacy-body a:hover { color: #EB5514; }
 .public-site .privacy-body strong { color: #1c1917; }
+
+/* 老前整理產品頁：適合誰、整理方式、流程與費用等新增區塊 */
+.public-site .organizing-meta { font-size:.83rem; color:#00464bcc; margin:16px 0 24px; }
+.public-site .organizing-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+.public-site .organizing-cards a.organizing-card { text-decoration:none; color:inherit; }
+.public-site .organizing-card-link { margin-top:auto; padding-top:16px; font-size:.89rem; font-weight:500; color:#EB5514; }
+.public-site .organizing-pace-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.public-site .organizing-list { list-style:disc; padding-left:1.25rem; margin-top:16px; }
+.public-site .organizing-list li { margin-bottom:8px; line-height:1.8; }
+.public-site .organizing-steps article { display:flex; flex-direction:column; }
+.public-site .organizing-footnote { margin-top:24px; padding-top:24px; border-top:1px solid #00464B25; font-size:.89rem; }
+.public-site .organizing-prepare { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:40px; padding-top:40px; border-top:1px solid #00464B25; }
+.public-site .organizing-prepare h3 { margin-bottom:12px; }
+.public-site .organizing-note-card { background:#fff; border:1px solid #00464B25; border-radius:20px; padding:32px; }
+.public-site .organizing-note-card p { margin-bottom:16px; }
+@media(max-width:767px) {
+ .public-site .organizing-pace-grid,.public-site .organizing-prepare { grid-template-columns:1fr; }
+ .public-site .organizing-note-card { padding:24px; }
+}
