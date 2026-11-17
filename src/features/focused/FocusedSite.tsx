@@ -42,8 +42,8 @@ export function FocusedHome() { return <><PageMeta title="整理生活，從這�
     <h1 id="nx-home-heading">家的東西少一點，<em>日子自在一點。</em></h1>
     <p className="nx-lead">想整理自己或家人的房子？點選圖片，找到需要的協助。</p>
     <div className="nx-picture-grid nx-main-products">
-      <PictureProduct name="退休整理" description="退休了，讓家更好住。" image="/images/choices/retirement.webp" to="/services/retirement-organizing" main />
-      <PictureProduct name="老前整理" description="自己的物品，自己做主。" image="/images/choices/life.webp" to="/services/life-organizing" main />
+      <PictureProduct name="退休整理" description="退休了，讓家更好住。" image="/images/choices/retirement-calm.webp" to="/services/retirement-organizing" main />
+      <PictureProduct name="老前整理" description="自己的物品，自己做主。" image="/images/choices/life-calm.webp" to="/services/life-organizing" main />
       <PictureProduct name="遺物整理" description="留下回憶，慢慢安排。" image="/images/choices/estate.webp" to="/services/estate-organizing" main />
     </div>
     <p className="nx-picture-hint">點圖片就能了解服務。物品去留由您決定，確認報價後再安排。</p>
