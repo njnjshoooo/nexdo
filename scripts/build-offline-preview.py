@@ -11,7 +11,7 @@ with tempfile.TemporaryDirectory() as folder:
     bundle = Path(folder) / 'preview.js'
     subprocess.run([str(ROOT / 'node_modules/.bin/esbuild'), 'scripts/offline-preview.tsx', '--bundle', '--minify', '--format=iife', '--loader:.css=empty', '--outfile=' + str(bundle)], cwd=ROOT, check=True)
     js = bundle.read_text()
-css = '\n'.join((ROOT / path).read_text() for path in ['src/features/focused/focused.css', 'src/features/focused/typography.css'])
+css = '\n'.join((ROOT / path).read_text() for path in ['src/features/focused/focused.css', 'src/features/focused/typography.css', 'src/features/focused/course.css'])
 
 def embed(path):
     asset = ROOT / 'public' / path.lstrip('/')

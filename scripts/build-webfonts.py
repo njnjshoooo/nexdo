@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('font_directory', type=Path, help='Directory containing GenSenRounded-R/M/B.ttc')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
-text = ''.join(p.read_text() for p in (root/'src/features/focused').glob('*.tsx'))
+text = ''.join(p.read_text() for p in (root/'src/features/focused').iterdir() if p.suffix in ['.tsx', '.ts'])
 for path in ['src/features/focused/catalog.ts','src/pages/PrivacyPolicyPage.tsx','src/data/settings/footerData.ts']:
     text += (root/path).read_text()
 text += ''.join(chr(c) for c in range(32,127)) + '，。？！：；、（）「」『』《》【】—…～・✓↗→←'
