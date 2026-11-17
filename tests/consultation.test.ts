@@ -62,3 +62,26 @@ test('拒絕 honeypot 與無效資料，不存檔', async () => {
   }
   assert.equal(saved.length, 0);
 });
+
+test('新增老屋、清運、不確定需求都能保留正確的服務類型', () => {
+  for (const goal of ['老屋物品處理', '物品清運', '還不確定，請協助我']) {
+    const data = validateOrganizing({ ...valid, goal });
+    assert.equal(data.goal, goal); assert.equal(data.requestType, '整理服務諮詢');
+  }
+});
+test('單一培訓課保留待公布費用，不能偽造價格或錯配服務', async () => {
+  for (const [goal, price] of [['遺物整理師培訓課', '費用待公布']]) {
+    const data = validateOrganizing({ ...valid, goal, purpose: '課程學習', coursePrice: '1' });
+    assert.equal(data.coursePrice, price);
+    const { handler, saved, sent } = setup(); const res = response();
+    await handler({ method: 'POST', body: { ...valid, goal, purpose: '課程學習', requestId } } as any, res as any);
+    assert.equal(res.statusCode, 200); assert.equal(saved[0].page_slug, 'courses');
+    assert.equal(saved[0].data.coursePrice, price); assert.equal(sent[0].formName, '遺物整理師培訓課意願登記');
+  }
+  assert.throws(() => validateOrganizing({ ...valid, goal: '遺物整理師培訓課' }));
+  assert.throws(() => validateOrganizing({ ...valid, purpose: '課程學習' }));
+});
+
+test('已移除的初階與中階方案不接受新登記', () => {
+  for (const goal of ['初階課程', '中階課程']) assert.throws(() => validateOrganizing({ ...valid, goal, purpose: '課程學習' }));
+});

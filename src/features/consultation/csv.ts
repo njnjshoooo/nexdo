@@ -12,6 +12,6 @@ export function submissionsCsv(submissions: FormSubmission[], labelFor: (formId:
     const match = submissions.find(s => key in s.data)!;
     return match.formId === ORGANIZING_FORM_ID ? ORGANIZING_LABELS[key] || key : labelFor(match.formId, key);
   })]];
-  for (const s of submissions) rows.push([s.bookingId, s.createdAt, s.status, s.pageTitle, s.formId === ORGANIZING_FORM_ID ? '老前整理線上諮詢' : s.formId, ...fields.map(key => s.data[key])]);
+  for (const s of submissions) rows.push([s.bookingId, s.createdAt, s.status, s.pageTitle, s.formId === ORGANIZING_FORM_ID ? '整理服務／課程意願登記' : s.formId, ...fields.map(key => s.data[key])]);
   return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
 }

@@ -1,3 +1,5 @@
+import { FocusedLayout, FocusedHome, FocusedServices, FocusedServiceDetail, FocusedCourses, FocusedFAQ, FocusedAbout, FocusedBooking } from './features/focused/FocusedSite';
+import { services as focusedServices, supportServices as focusedSupportServices } from './features/focused/catalog';
 import MemberLoginPage from './pages/MemberLoginPage';
 import MemberCenterPage from './pages/MemberCenterPage';
 import PasswordRecoveryPage from './pages/PasswordRecoveryPage';
@@ -66,17 +68,7 @@ import PermissionGuard from './components/PermissionGuard';
 import ChatWidget from './components/ChatWidget';
 
 // 前台佈局
-const MainLayout = () => (
-  <div className="public-site flex flex-col min-h-screen">
-    <Header />
-    <main className="flex-grow">
-      <Outlet />
-    </main>
-    <Footer />
-    {/* 好好 · AI 聊天助理（右下角浮動） */}
-    <ChatWidget />
-  </div>
-);
+const MainLayout = FocusedLayout;
 
 // 💡 建立一個包裝組件，確保首頁能讀取到後台儲存的資料
 const HomePageWrapper = () => {
@@ -164,8 +156,17 @@ export default function App() {
       {/* 2. 前台路由 */}
       <Route element={<MainLayout />}>
         {/* 💡 修改這裡：將原本的 homePage 換成動態的 HomePageWrapper */}
-        <Route path="/" element={<HomePageWrapper />} />
+        <Route path="/" element={<FocusedHome />} />
         
+        <Route path="/services" element={<FocusedServices />} />
+        <Route path="/courses" element={<FocusedCourses />} />
+        <Route path="/faq" element={<FocusedFAQ />} />
+        <Route path="/about" element={<FocusedAbout />} />
+        <Route path="/book" element={<FocusedBooking />} />
+        <Route path="/consultant" element={<Navigate replace to="/book" />} />
+        {[...focusedServices, ...focusedSupportServices].map(service => <Route key={service.slug} path={'/services/' + service.slug} element={<FocusedServiceDetail slug={service.slug} />} />)}
+        <Route path="/services/vacant-property" element={<Navigate replace to="/services/old-house" />} />
+        {['home-safety','renovation','cleaning','health','rent-and-move','peace-of-mind'].map(path => <Route key={path} path={'/' + path} element={<Navigate replace to="/services" />} />)}
         {/* 獨立表單頁面 */}
         <Route path="/forms/:formId" element={<FormPage />} />
         
@@ -181,12 +182,12 @@ export default function App() {
         <Route path="/profile/settings" element={<ProtectedRoute><ProfileSettingsPage /></ProtectedRoute>} />
         
         <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route path="/services/health" element={<ServiceGroupPage kind="health" />} />
-        <Route path="/services/rental" element={<ServiceGroupPage kind="rental" />} />
+        <Route path="/services/health" element={<Navigate replace to="/services" />} />
+        <Route path="/services/rental" element={<Navigate replace to="/services" />} />
         <Route path="/tools/home-safety" element={<SafetyTool />} />
         <Route path="/tools/rental" element={<RentalTool />} />
-        <Route path="/services/organizing" element={<OrganizingPage />} />
-        {[['life-organizing','老前整理'], ['retirement-organizing','退休整理'], ['estate-organizing','遺物整理']].flatMap(([slug,goal]) => [slug, `services/${slug}`].map(path => <Route key={path} path={'/' + path} element={<Navigate replace to={'/services/organizing?goal=' + encodeURIComponent(goal)} />} />))}
+        <Route path="/services/organizing" element={<FocusedServices />} />
+        {focusedServices.map(service => <Route key={service.slug} path={'/' + service.slug} element={<Navigate replace to={'/services/' + service.slug} />} />)}
         <Route path="/search" element={<SearchPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
 

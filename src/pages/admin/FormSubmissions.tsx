@@ -188,7 +188,7 @@ export default function FormSubmissions() {
 
       <div className="flex flex-wrap gap-3 mb-5">
         <button onClick={downloadCsv} disabled={!submissions.length} className="px-4 py-3 bg-primary text-white rounded-lg disabled:opacity-50">下載目前名單 CSV（{submissions.length} 筆）</button>
-        <button onClick={() => setSearchParams({ formId: ORGANIZING_FORM_ID })} className="px-4 py-3 border rounded-lg">只看整理服務需求</button>
+        <button onClick={() => setSearchParams({ formId: ORGANIZING_FORM_ID })} className="px-4 py-3 border rounded-lg">只看整理／課程需求</button>
       </div>
       <AdminTable.Container>
         <AdminTable.Main>
@@ -235,7 +235,7 @@ export default function FormSubmissions() {
                       <div className="text-xs text-stone-500">{submission.pageSlug}</div>
                     </AdminTable.Td>
                     <AdminTable.Td className="text-sm text-stone-900">
-                      {form ? form.name : submission.formId === ORGANIZING_FORM_ID ? '老前整理線上諮詢' : submission.formId}
+                      {form ? form.name : submission.formId === ORGANIZING_FORM_ID ? '整理服務／課程意願登記' : submission.formId}
                     </AdminTable.Td>
                     <AdminTable.Td className="text-sm text-stone-600 max-w-xs truncate">
                       {Array.isArray(summary) ? summary.join(', ') : summary}

@@ -14,6 +14,9 @@ return async function organizingRequest(req: Request, res: Response) {
   let data: Record<string, string>;
   try { data = validateOrganizing(body); }
   catch (error) { return res.status(400).json({ error: (error as Error).message }); }
+  const isCourse = data.purpose === '課程學習';
+  const pageSlug = isCourse ? 'courses' : 'book';
+  const pageTitle = isCourse ? '遺物整理師培訓課意願登記' : '整理服務預約';
   const id = body.requestId as string;
   const bookingId = `ORGA-${id.toUpperCase()}`;
   const createdAt = new Date().toISOString();
@@ -21,7 +24,7 @@ return async function organizingRequest(req: Request, res: Response) {
     const db = deps.getDb();
     const { error } = await db.from('submissions').insert({
       id, form_id: ORGANIZING_FORM_ID, booking_id: bookingId,
-      page_slug: 'services/organizing', page_title: '老前整理線上諮詢',
+      page_slug: pageSlug, page_title: pageTitle,
       data, status: 'PENDING', created_at: createdAt,
     });
     // 同一次重試沿用 requestId，不建立重複名單或重複寄信。
@@ -29,8 +32,8 @@ return async function organizingRequest(req: Request, res: Response) {
     if (error) throw error;
     // 等候寄信完成，避免 serverless 回應後提前停止執行。
     const notification = await deps.notify({
-      bookingId, submissionId: id, formId: ORGANIZING_FORM_ID, formName: '老前整理線上諮詢',
-      pageSlug: 'services/organizing', pageTitle: '老前整理線上諮詢', submittedAt: createdAt,
+      bookingId, submissionId: id, formId: ORGANIZING_FORM_ID, formName: pageTitle,
+      pageSlug, pageTitle, submittedAt: createdAt,
       customerName: data.name, customerPhone: data.phone, customerEmail: data.email,
       fields: Object.entries(data).map(([key, value]) => ({ label: ORGANIZING_LABELS[key] || key, value })),
     });
