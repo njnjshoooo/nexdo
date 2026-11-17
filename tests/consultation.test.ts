@@ -69,8 +69,8 @@ test('新增老屋、清運、不確定需求都能保留正確的服務類型',
     assert.equal(data.goal, goal); assert.equal(data.requestType, '整理服務諮詢');
   }
 });
-test('單一培訓課保留待公布費用，不能偽造價格或錯配服務', async () => {
-  for (const [goal, price] of [['遺物整理師培訓課', '費用待公布']]) {
+test('單一培訓課使用已確認學費，不能偽造價格或錯配服務', async () => {
+  for (const [goal, price] of [['遺物整理師培訓課', 'NT$ 10,200／人']]) {
     const data = validateOrganizing({ ...valid, goal, purpose: '課程學習', coursePrice: '1' });
     assert.equal(data.coursePrice, price);
     const { handler, saved, sent } = setup(); const res = response();

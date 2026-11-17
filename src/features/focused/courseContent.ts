@@ -3,15 +3,16 @@ export const courseOffering = {
   name: '遺物整理師培訓課',
   subtitle: '老屋整理 × 遺物整理 × 家屬溝通',
   status: 'planning' as 'planning' | 'open',
-  price: null as number | null,
-  format: '',
+  price: 10200 as number | null,
+  format: '線上課程',
   schedule: '',
   hours: '',
-  location: '',
+  location: '線上上課',
   instructor: { name: '', bio: '', image: '' },
   refundPolicy: '',
   completionPolicy: '',
 };
+export const coursePriceLabel = courseOffering.price == null ? '費用待公布' : `NT$ ${courseOffering.price.toLocaleString('en-US')}／人`;
 export const learningOutcomes = [
   { title: '知道從哪裡開始', text: '盤點空間與物品，排出整理順序，讓老屋整理有方法。' },
   { title: '把物品去向說清楚', text: '區分保留、傳承、送出與清運，留下重要文件與回憶。' },
@@ -31,6 +32,6 @@ export const courseQuestions = [
   ['只是想整理自己的老屋，可以參加嗎？', '可以。您可以為了整理自己的家而學習，也可以進一步了解遺物整理師的工作流程與服務方法。'],
   ['這堂課和一般收納課有什麼不同？', '除了物品分類與空間盤點，本課程更聚焦老屋物品處理、遺物整理、重要物品保存、家屬溝通與清運協作。'],
   ['上完課就能取得證照或接案嗎？', '實作、評量與結業規則將於正式報名前確認。課程提供遺物整理的學習方向，不保證修課即取得證照、工作資格或案源。'],
-  ['如何線上報名與付款？', '目前可先在本頁登記開課通知，不收費、不保留名額。正式學費、上課資訊與退費規則確認後，才開放正式報名及付款。'],
-  ['什麼時候上課？在哪裡上課？', '上課形式、日期、時數、地點與講師資訊確認後會在本頁公布，也會依您留下的聯絡方式通知。'],
+  ['如何線上報名與付款？', '目前可先在本頁登記開課通知，不收費、不保留名額。學費為 NT$10,200，上課安排與退費規則確認後，才開放正式報名及付款。'],
+  ['線上課是直播還是錄影？何時可以上課？', '已確定採線上課程。直播或錄影形式、開課或上架時間、課程時數與觀看方式，將在規劃確認後公布。'],
 ];
